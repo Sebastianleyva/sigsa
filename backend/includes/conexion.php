@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__DIR__) . '/config/config.php';
 
-$dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';port=' . db_port;
+$dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';port=' . DB_PORT;
 
 $opciones =[
     
