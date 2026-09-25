@@ -16,7 +16,6 @@ switch ($_SERVER['REQUEST_METHOD']){
         break;
 }
 
-
 function login($pdo, $input) {
     if (empty($input['correo']) || empty($input['contrasena'])) {
         http_response_code(400);
@@ -29,16 +28,6 @@ function login($pdo, $input) {
     $query->execute(['correo' => $correo]);
     $usuario = $query->fetch();
 
-//    $hash_fresco = password_hash($input['contrasena'], PASSWORD_BCRYPT);
-    
-//     echo json_encode([
-//         'input_recibido'      => $input['contrasena'],
-//         'hash_en_bd'          => $usuario['contrasena'],
-//         'evaluacion_bd'       => password_verify($input['contrasena'], $usuario['contrasena']),
-//         'hash_nuevo_generado' => $hash_fresco,
-//         'evaluacion_nuevo'    => password_verify($input['contrasena'], $hash_fresco)
-//     ]);
-//     exit;
     if (!$usuario || !password_verify($input['contrasena'], $usuario['contrasena'])) {
         http_response_code(401);
         echo json_encode(["ERROR" => "Credenciales invalidas"]);
