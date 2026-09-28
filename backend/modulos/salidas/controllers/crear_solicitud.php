@@ -2,37 +2,56 @@
 
 header('content-type: application/json');
 
-include_once '../includes/conexion.php';
-include_once '../includes/auth.php';
+require_once '../../../includes/auth.php';
+require_once '../../../includes/conexion.php';
 
 switch($_SERVER['REQUEST_METHOD']){
     case 'POST':
-        $input = json_decode(file_get_contents('php://input',true) ?? []);
+        $input=json_decode(file_get_contents('php://input'),true) ?? [];
         crear_solicitud($pdo,$input);
-        brak;
+        break;
     default:
-        http_response_code(400);
+        http_response_code(405);
         echo json_encode(["ERROR"=>"Metodo no permitido"]);
-        exit;
+        break;
 }
 
-function crear_solicitud($pdo,$input){
-    if(empty($input)){
-        http_response_code(401);
-        json_encode(["ERROR"=>"Campos faltantes en su solicitud"]);
-        break;
+function crear_solicitud($pdo, $input) {
+    // -------------------------------------------------------------------------
+    // MOCK TEMPORAL DE SESIÓN PARA PRUEBAS (ELIMINAR AL INTEGRAR AUTENTICACIÓN)
+    // -------------------------------------------------------------------------
+    $_SESSION['id_personal'] = $_SESSION['id_personal'] ?? $input['id_personal'] ?? 10;
+    $_SESSION['id_jefe']     = $_SESSION['id_jefe']     ?? $input['id_autoriza'] ?? 2;
+    // -------------------------------------------------------------------------
+
+    if (empty($input['tipo_salida']) || empty($input['motivo']) || empty($input['fecha']) || empty($input['hora_salida'])) {
+        http_response_code(400);
+        echo json_encode(["ERROR" => "Campos obligatorios faltantes (tipo_salida, motivo, fecha, hora_salida)"]);
+        exit;
     }
 
-    $tipo_salida = $input['tipo_salida'];
-    $motivo = $input['motivo'];
-    $destino = $input['destino'];
-    $fecha = $input['fecha'];
-    $hora_salida = $input['hora_salida'];
-    $hora_llegada = $input['hora_llegada'];
-    $estado = $input['estado'];
-    $id_personal = $input['id_personal'];
-    $id_autoriza = $input['id_autoriza'];
-    $hora_estimada = $input['hora_estimada'];
+    $id_personal   = $_SESSION['id_personal'];
+    $id_autoriza   = $_SESSION['id_jefe'];
+    $tipo_salida   = $input['tipo_salida'];
+    $motivo        = $input['motivo'];
+    $destino       = $input['destino'] ?? null;
+    $fecha         = $input['fecha'];
+    $hora_salida   = $input['hora_salida'];
+    $hora_estimada = $input['hora_estimada'] ?? null;
+    $hora_llegada  = $input['hora_llegada'] ?? null;
+    $estado        = 1; 
+    $validacion_estado = $pdo->prepare(
+        'SELECT id_salida FROM salidas WHERE estado = 1 AND id_personal = :id_personal'
+    );
+    $validacion_estado->execute([
+        'id_personal' => $id_personal
+    ]);
+
+    if ($validacion_estado->fetch()) {
+        http_response_code(409);
+        echo json_encode(['ERROR' => "Ya cuenta con una solicitud de salida activa o pendiente"]);
+        exit;
+    }
 
     $query = $pdo->prepare(
         'INSERT INTO salidas 
@@ -40,18 +59,37 @@ function crear_solicitud($pdo,$input){
         VALUES
         (:tipo_salida, :motivo, :destino, :fecha, :hora_salida, :hora_llegada, :estado, :id_personal, :id_autoriza, :hora_estimada)'
     );
-    $query -> execute([
-        'tipo_salida' = $tipo_salida, 
-        'motivo' = $motivo, 
-        'destino' = $destino,  
-        'fecha' = $fecha, 
-        'hora_salida' = $hora_salida ,
-        'hora_llegada' = $hora_llegada, 
-        'estado' = $estado ,
-        'id_personal' = $id_personal ,
-        'id_autoriza' = $id_autoriza ,
-        'hora_estimada' = $hora_llegada
-    ])
 
+    $query->execute([
+        'tipo_salida'   => $tipo_salida, 
+        'motivo'        => $motivo, 
+        'destino'       => $destino,  
+        'fecha'         => $fecha, 
+        'hora_salida'   => $hora_salida, 
+        'hora_llegada'  => $hora_llegada, 
+        'estado'        => $estado, 
+        'id_personal'   => $id_personal, 
+        'id_autoriza'   => $id_autoriza, 
+        'hora_estimada' => $hora_estimada
+    ]);
+
+    $id_salida = $pdo->lastInsertId();    
+
+    http_response_code(201);
+    echo json_encode([
+        "message" => "Solicitud de salida creada con éxito",
+        "salida"  => [
+            "id_salida"     => $id_salida,
+            "tipo_salida"   => $tipo_salida, 
+            "motivo"        => $motivo, 
+            "destino"       => $destino,  
+            "fecha"         => $fecha, 
+            "hora_salida"   => $hora_salida, 
+            "hora_estimada" => $hora_estimada,
+            "estado"        => $estado, 
+            "id_personal"   => $id_personal, 
+            "id_autoriza"   => $id_autoriza
+        ]
+    ]);
 }
 
