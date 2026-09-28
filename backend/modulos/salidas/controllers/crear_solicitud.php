@@ -21,7 +21,6 @@ function crear_solicitud($pdo, $input) {
     // MOCK TEMPORAL DE SESIÓN PARA PRUEBAS (ELIMINAR AL INTEGRAR AUTENTICACIÓN)
     // -------------------------------------------------------------------------
     $_SESSION['id_personal'] = $_SESSION['id_personal'] ?? $input['id_personal'] ?? 10;
-    $_SESSION['id_jefe']     = $_SESSION['id_jefe']     ?? $input['id_autoriza'] ?? 2;
     // -------------------------------------------------------------------------
 
     if (empty($input['tipo_salida']) || empty($input['motivo']) || empty($input['fecha']) || empty($input['hora_salida'])) {
@@ -31,7 +30,6 @@ function crear_solicitud($pdo, $input) {
     }
 
     $id_personal   = $_SESSION['id_personal'];
-    $id_autoriza   = $_SESSION['id_jefe'];
     $tipo_salida   = $input['tipo_salida'];
     $motivo        = $input['motivo'];
     $destino       = $input['destino'] ?? null;
@@ -39,9 +37,9 @@ function crear_solicitud($pdo, $input) {
     $hora_salida   = $input['hora_salida'];
     $hora_estimada = $input['hora_estimada'] ?? null;
     $hora_llegada  = $input['hora_llegada'] ?? null;
-    $estado        = 1; 
+    $estado        = "PENDIENTE"; 
     $validacion_estado = $pdo->prepare(
-        'SELECT id_salida FROM salidas WHERE estado = 1 AND id_personal = :id_personal'
+        'SELECT id_salida FROM salidas WHERE estado = "PENDIENTE" AND id_personal = :id_personal'
     );
     $validacion_estado->execute([
         'id_personal' => $id_personal
@@ -55,9 +53,9 @@ function crear_solicitud($pdo, $input) {
 
     $query = $pdo->prepare(
         'INSERT INTO salidas 
-        (tipo_salida, motivo, destino, fecha, hora_salida, hora_llegada, estado, id_personal, id_autoriza, hora_estimada)
+        (tipo_salida, motivo, destino, fecha, hora_salida, hora_llegada, estado, id_personal, hora_estimada)
         VALUES
-        (:tipo_salida, :motivo, :destino, :fecha, :hora_salida, :hora_llegada, :estado, :id_personal, :id_autoriza, :hora_estimada)'
+        (:tipo_salida, :motivo, :destino, :fecha, :hora_salida, :hora_llegada, :estado, :id_personal, :hora_estimada)'
     );
 
     $query->execute([
@@ -69,7 +67,6 @@ function crear_solicitud($pdo, $input) {
         'hora_llegada'  => $hora_llegada, 
         'estado'        => $estado, 
         'id_personal'   => $id_personal, 
-        'id_autoriza'   => $id_autoriza, 
         'hora_estimada' => $hora_estimada
     ]);
 
@@ -88,7 +85,6 @@ function crear_solicitud($pdo, $input) {
             "hora_estimada" => $hora_estimada,
             "estado"        => $estado, 
             "id_personal"   => $id_personal, 
-            "id_autoriza"   => $id_autoriza
         ]
     ]);
 }
