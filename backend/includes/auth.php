@@ -1,6 +1,25 @@
 <?php
+require_once dirname(__DIR__) . '/config/config.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
+}
+
+function crear_jwt(array $claims): string {
+    if (JWT_SECRET === '') {
+        throw new RuntimeException('SIGSA_JWT_SECRET no está configurada');
+    }
+
+    $header = ['typ' => 'JWT', 'alg' => 'HS256'];
+    $codificar = static function (string $valor): string {
+        return rtrim(strtr(base64_encode($valor), '+/', '-_'), '=');
+    };
+
+    $encabezado = $codificar(json_encode($header, JSON_UNESCAPED_SLASHES));
+    $payload = $codificar(json_encode($claims, JSON_UNESCAPED_SLASHES));
+    $firma = $codificar(hash_hmac('sha256', "$encabezado.$payload", JWT_SECRET, true));
+
+    return "$encabezado.$payload.$firma";
 }
 
 // 1. Verificar si hay usuario autenticado

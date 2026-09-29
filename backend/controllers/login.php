@@ -34,16 +34,36 @@ function login($pdo, $input) {
         exit;
     }
 
+    try {
+        $ahora = time();
+        $jwt = crear_jwt([
+            'sub' => (int) $usuario['id_personal'],
+            'id_jefe' => $usuario['id_jefe'],
+            'area' => $usuario['area'],
+            'iat' => $ahora,
+            'exp' => $ahora + 3600,
+            'iss' => 'sigsa'
+        ]);
+    } catch (RuntimeException $e) {
+        error_log($e->getMessage());
+        http_response_code(500);
+        echo json_encode(["ERROR" => "No se pudo configurar la autenticación"]);
+        exit;
+    }
+
     session_regenerate_id(true);
 
     $_SESSION['id_personal'] = $usuario['id_personal'];
     $_SESSION['id_jefe']     = $usuario['id_jefe'];
     $_SESSION['area']        = $usuario['area'];
     $_SESSION['nombre']      = $usuario['nombre'];
+    $_SESSION['csrf_token']  = bin2hex(random_bytes(32));
 
     http_response_code(200);
     echo json_encode([
         "message" => "Inicio de sesión exitoso",
+        "token" => $jwt,
+        "csrf_token" => $_SESSION['csrf_token'],
         "usuario" => [
             "nombre" => $_SESSION['nombre'],
             "area"   => $_SESSION['area']
