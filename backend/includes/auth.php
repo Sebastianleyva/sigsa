@@ -1,5 +1,7 @@
 <?php
-require_once dirname(__DIR__) . '/config/config.php';
+if (!defined('JWT_SECRET')) {
+    define('JWT_SECRET', getenv('SIGSA_JWT_SECRET') ?: getenv('JWT_SECRET') ?: 'dev_secret_local');
+}
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
