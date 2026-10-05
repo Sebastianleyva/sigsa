@@ -29,7 +29,7 @@ switch($_SERVER['REQUEST_METHOD']){
     }
 
     $id_salida = $input['id_salida'];
-    $id_autoriza = $input['id_personal'];
+    $id_autoriza = $input['id_autoriza'];
 
     $validar_estado = $pdo ->prepare(
         'SELECT estado FROM salidas
@@ -48,15 +48,23 @@ switch($_SERVER['REQUEST_METHOD']){
     }
 
     $nuevo_estado = "FINALIZADO";
+    date_default_timezone_set('America/Mexico_City');
+    $hora_llegada = date('H:i:s');
         
     $query = $pdo -> prepare(
         'UPDATE salidas 
-        SET estado = :nuevo_estado
+        SET estado = :nuevo_estado,
+        hora_llegada = :hora_llegada
         WHERE id_salida = :id_salida'
     );
     $query -> execute([
         'id_salida' => $id_salida,
-        'nuevo_estado' => $nuevo_estado
+        'nuevo_estado' => $nuevo_estado,
+        'hora_llegada' => $hora_llegada
     ]);
 
+    http_response_code(200);
+    echo json_encode([
+        "mensaje" => "Salida finalizada correctamente"
+    ]);
 }

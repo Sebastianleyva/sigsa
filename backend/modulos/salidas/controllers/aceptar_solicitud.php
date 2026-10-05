@@ -29,7 +29,7 @@ function aceptar_solicitud($pdo,$input){
     }
 
     $id_salida = $input['id_salida'];
-    $id_autoriza = $input['id_personal']
+    $id_autoriza = $input['id_autoriza'];
 
     $validar_estado = $pdo ->prepare(
         'SELECT estado FROM salidas
@@ -48,22 +48,32 @@ function aceptar_solicitud($pdo,$input){
     }
 
     $nuevo_estado = "EN CURSO";
+    date_default_timezone_set('America/Mexico_City');
+    $hora_salida = date('H:i:s');
+    $hora_estimada = date('H:i:s', strtotime('+2 hour')); 
         
     $query = $pdo -> prepare(
         'UPDATE salidas 
-        SET estado = :nuevo_estado
+        SET estado = :nuevo_estado,
+        hora_salida = :hora_salida,
+        hora_estimada = :hora_estimada
         WHERE id_salida = :id_salida'
     );
     $query -> execute([
         'id_salida' => $id_salida,
-        'estado' => $nuevo_estado
+        'nuevo_estado' => $nuevo_estado,
+        'hora_salida' => $hora_salida,
+        'hora_estimada' => $hora_estimada
     ]);
 
     http_response_code(200);
     echo json_encode([
         "message" => "Operación realizada con éxito",
         "salida" => [
-            'id_salida' => $id_salida
+            'id_salida' => $id_salida,
+            'estado' => $nuevo_estado,
+            'hora_salida' => $hora_salida,
+            'hora_estimada' => $hora_estimada
         ]
     ]);
 
