@@ -64,22 +64,16 @@ function requerir_autenticacion() {
     }
 }
 
-function requerir_rol(array $roles_permitidos) {
+$puestos_permitidos = [1,2,3];
+function requerir_rol(array $puestos_permitidos) {
     requerir_autenticacion();
     
-    if (!in_array($_SESSION['rol'], $roles_permitidos)) {
+    if (!in_array($_SESSION['puesto'], $puestos_permitidos,true)) {
         http_response_code(403);
         echo json_encode(['error' => 'No tienes permisos para realizar esta acción']);
         exit;
     }
 }
 
-function validar_csrf($input) {
-    $token_recibido = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? $input['csrf_token'] ?? '';
-    
-    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_recibido)) {
-        http_response_code(403);
-        echo json_encode(['error' => 'Token CSRF inválido o expirado']);
-        exit;
-    }
-}
+
+
