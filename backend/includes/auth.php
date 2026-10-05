@@ -22,7 +22,40 @@ function crear_jwt(array $claims): string {
     return "$encabezado.$payload.$firma";
 }
 
-// 1. Verificar si hay usuario autenticado
+function validar_jwt_requerido() {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+
+    if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+        http_response_code(401);
+        echo json_encode(["ERROR" => "Token de autenticación no proporcionado"]);
+        exit;
+    }
+
+    try {
+        $datos = verificar_jwt($matches[1]); 
+        if (!$datos) {
+            throw new Exception("Token no válido");
+        }
+        return $datos;
+    } catch (Exception $e) {
+        http_response_code(401);
+        echo json_encode(["ERROR" => "Sesión inválida o expirada"]);
+        exit;
+    }
+}
+
+function validar_csrf_requerido() {
+    $headers = getallheaders();
+    $csrfToken = $headers['X-CSRF-Token'] ?? $headers['x-csrf-token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+
+    if (empty($csrfToken) || empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+        http_response_code(403);
+        echo json_encode(["ERROR" => "Petición no autorizada (CSRF inválido)"]);
+        exit;
+    }
+}
+
 function requerir_autenticacion() {
     if (!isset($_SESSION['usuario_id'])) {
         http_response_code(401);
@@ -34,7 +67,6 @@ function requerir_autenticacion() {
 function requerir_rol(array $roles_permitidos) {
     requerir_autenticacion();
     
-    // Asumiendo que guardaste el rol/puesto en la sesión al hacer Login
     if (!in_array($_SESSION['rol'], $roles_permitidos)) {
         http_response_code(403);
         echo json_encode(['error' => 'No tienes permisos para realizar esta acción']);

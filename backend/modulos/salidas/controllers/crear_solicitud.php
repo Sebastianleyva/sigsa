@@ -7,6 +7,8 @@ require_once '../../../includes/conexion.php';
 
 switch($_SERVER['REQUEST_METHOD']){
     case 'POST':
+        $usuario = validar_jwt_requerido();
+        validar_csrf_requerido();
         $input=json_decode(file_get_contents('php://input'),true) ?? [];
         crear_solicitud($pdo,$input);
         break;
@@ -17,12 +19,6 @@ switch($_SERVER['REQUEST_METHOD']){
 }
 
 function crear_solicitud($pdo, $input) {
-    // -------------------------------------------------------------------------
-    // MOCK TEMPORAL DE SESIÓN PARA PRUEBAS (ELIMINAR AL INTEGRAR AUTENTICACIÓN)
-    // -------------------------------------------------------------------------
-    $_SESSION['id_personal'] = $_SESSION['id_personal'] ?? $input['id_personal'] ?? 10;
-    // -------------------------------------------------------------------------
-
     if (empty($input['tipo_salida']) || empty($input['motivo']) || empty($input['fecha']) || empty($input['hora_salida'])) {
         http_response_code(400);
         echo json_encode(["ERROR" => "Campos obligatorios faltantes (tipo_salida, motivo, fecha, hora_salida)"]);
@@ -32,8 +28,8 @@ function crear_solicitud($pdo, $input) {
     $id_personal   = $_SESSION['id_personal'];
     $tipo_salida   = $input['tipo_salida'];
     $motivo        = $input['motivo'];
-    $destino       = $input['destino'] ?? null;
-    $fecha         = $input['fecha'];
+    $destino       = $input['destino'] ;
+    $fecha         = date('Y-m-d');
     $hora_salida   = $input['hora_salida'];
     $hora_estimada = $input['hora_estimada'] ?? null;
     $hora_llegada  = $input['hora_llegada'] ?? null;

@@ -57,6 +57,9 @@ function login($pdo, $input) {
     $_SESSION['id_jefe']     = $usuario['id_jefe'];
     $_SESSION['area']        = $usuario['area'];
     $_SESSION['nombre']      = $usuario['nombre'];
+    $_SESSION['correo']      = $usuario['correo'];
+    $_SESSION['puesto']      = $usuario['puesto'];
+    $_SESSION['token']       = $jwt;
     $_SESSION['csrf_token']  = bin2hex(random_bytes(32));
 
     http_response_code(200);
@@ -66,7 +69,9 @@ function login($pdo, $input) {
         "csrf_token" => $_SESSION['csrf_token'],
         "usuario" => [
             "nombre" => $_SESSION['nombre'],
-            "area"   => $_SESSION['area']
+            "correo" => $_SESSION['correo'],
+            "area"   => $_SESSION['area'],
+            "puesto" => $_SESSION['puesto']
         ]
     ]);
 }
