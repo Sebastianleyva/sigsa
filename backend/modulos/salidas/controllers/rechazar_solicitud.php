@@ -7,6 +7,8 @@ require_once '../../../includes/conexion.php';
 
 switch ($_SERVER['REQUEST_METHOD']){
     case 'PATCH':
+        $usuario = validar_jwt_requerido();
+        validar_csrf_requerido();
         $input=json_decode(file_get_contents('php://input'),true) ?? [];
         rchazar_solicitud($pdo,$input);
         break;
@@ -17,11 +19,6 @@ switch ($_SERVER['REQUEST_METHOD']){
 }
 
 function rchazar_solicitud($pdo,$input){
-    // -------------------------------------------------------------------------
-    // MOCK TEMPORAL DE SESIÓN PARA PRUEBAS (ELIMINAR AL INTEGRAR AUTENTICACIÓN)
-    // -------------------------------------------------------------------------
-    $_SESSION['id_personal'] = $_SESSION['id_personal'] ?? 2; // ID del Jefe/Autorizador
-    // -------------------------------------------------------------------------
     if(empty($input)){
         http_response_code(400);
         echo json_encode(["ERROR" => "Campos faltantes"]);

@@ -7,7 +7,7 @@ require_once '../../../includes/conexion.php';
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        // En GET no leemos php://input
+        $usuario = validar_jwt_requerido();
         ver_salidas($pdo);
         break;
     default:
@@ -17,16 +17,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
 }
 
 function ver_salidas($pdo) {
-    // -------------------------------------------------------------------------
-    // MOCK TEMPORAL DE SESIÓN / GET PARA PRUEBAS EN POSTMAN
-    // Permite filtrar por un id_personal específico mediante URL (ej: ?id_personal=10)
-    // -------------------------------------------------------------------------
-    $id_personal = $_GET['id_personal'] ?? $_SESSION['id_personal'] ?? null;
-    // -------------------------------------------------------------------------
-
+    
     $estado = "PENDIENTE";
 
-    // Si se especifica un id_personal, traemos únicamente las pendientes de ese usuario
     if ($id_personal) {
         $query = $pdo->prepare(
             'SELECT s.*, p.nombre, p.apellido_p 
