@@ -9,6 +9,7 @@ switch ($_SERVER['REQUEST_METHOD']){
     case 'PATCH':
         $usuario = validar_jwt_requerido();
         validar_csrf_requerido();
+        requerir_rol([1,2,3]);
         $input=json_decode(file_get_contents('php://input'),true) ?? [];
         aceptar_solicitud($pdo,$input);
         break;
@@ -18,16 +19,35 @@ switch ($_SERVER['REQUEST_METHOD']){
         break;
 }
 
+function verificacion_jerarquia($pdo,$input){
+    if(empty($input)){
+        http_response_code(400);
+        echo json_encode(["ERROR" => "Campos faltantes"]);
+        exit;
+    }
+    $id_autorizante = $_SESSION['id_personal'];
+    $id_solicitante = $input['id_personal'];
+    $verificacion = $pdo -> prepare(
+        'SELECT id_jefe FROM personal
+        WHERE id_personal = :id_solicitante'
+    );
+    $verificacion -> execute(['id_solcitante' => $id_solicitante]);
+    $resultado = $verificacion -> fetch();
+
+    if($resultado!=$id_autorizante){
+        http_response_code(403);
+        echo json_encode(["ERROR"=>"No puedes autorizar esta salida"]);
+        exit;
+    }
+}
+
 function aceptar_solicitud($pdo,$input){
     if(empty($input)){
         http_response_code(400);
         echo json_encode(["ERROR" => "Campos faltantes"]);
         exit;
     }
-
     $id_salida = $input['id_salida'];
-    $id_autoriza = $input['id_autoriza'];
-
     $validar_estado = $pdo ->prepare(
         'SELECT estado FROM salidas
         WHERE id_salida = :id_salida'

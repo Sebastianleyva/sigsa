@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-09-2026 a las 16:13:25
+-- Tiempo de generación: 06-10-2026 a las 19:53:11
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 7.4.30
 
@@ -66,18 +66,22 @@ CREATE TABLE `personal` (
   `puesto` bigint(20) NOT NULL,
   `area` bigint(20) DEFAULT NULL,
   `id_jefe` bigint(20) DEFAULT NULL,
-  `activo` char(1) NOT NULL
+  `activo` char(1) NOT NULL,
+  `contrasena` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `personal`
 --
 
-INSERT INTO `personal` (`id_personal`, `rfc`, `curp`, `nombre`, `apellido_p`, `apellido_m`, `correo`, `telefono`, `puesto`, `area`, `id_jefe`, `activo`) VALUES
-(2, 'seb45678io123', 'rils060301hdgyba2', 'sebastian', 'rivera', 'leyva', '', '', 1, NULL, NULL, ''),
-(4, 'seb45678io133', '1sssdfr12345678912', 'sebas', 'leyva', 'leyva', 'ssss', '12345678', 2, 1, 2, ''),
-(6, 'son13valores1', 'aquison18valores12', 'jose', 'perez', 'paez', 'jose@gmail.com', '123456789', 3, 7, 4, ''),
-(8, 'son12valores1', 'aquison18valores13', 'luis', 'jimenez', 'gonzalez', 'jimenez@gmail.com', '123456781', 4, 7, 6, '');
+INSERT INTO `personal` (`id_personal`, `rfc`, `curp`, `nombre`, `apellido_p`, `apellido_m`, `correo`, `telefono`, `puesto`, `area`, `id_jefe`, `activo`, `contrasena`) VALUES
+(2, 'seb45678io123', 'rils060301hdgyba2', 'sebastian', 'rivera', 'leyva', '', '', 1, NULL, NULL, '', ''),
+(4, 'seb45678io133', '1sssdfr12345678912', 'sebas', 'leyva', 'leyva', 'ssss', '12345678', 2, 1, 2, '', ''),
+(6, 'son13valores1', 'aquison18valores12', 'jose', 'perez', 'paez', 'jose@gmail.com', '123456789', 3, 7, 4, '', ''),
+(8, 'son12valores1', 'aquison18valores13', 'luis', 'jimenez', 'gonzalez', 'jimenez@gmail.com', '123456781', 4, 7, 6, '', ''),
+(10, 'seb45678io321', 'rils060301hdgybe3', 'jose', 'leyva', 'leyva', 'riveraleyvasebastian@gmail.com', '987654321', 4, 7, 2, '', '$2y$10$uQUePipyahSE63IyYfw/CusHMotAGjzdJBDxOttg4Tt2mb26Istrq'),
+(11, 'seb45876io123', 'rils060311hdgyba2', 'sebastian', 'Rivera', 'leyva', 'jossssse@gmail.com', '123488889', 3, 7, 4, '', '$2y$10$knVu6YvJTPSk69Tnoy1l/ebl9NXsp.AjiAnxCKCW1/eiduVSlnk4y'),
+(12, 'son21valores1', 'Rils060302hdgtva4', 'sebas', 'leyva', 'rivera', 'jjj@', '6181171603', 2, 1, 2, '', '$2y$10$q/eHMNq/apl/8Wnwf7StJObUQV/9DPD.0BKLbAORfGjnuCjZHMOUq');
 
 -- --------------------------------------------------------
 
@@ -117,7 +121,7 @@ CREATE TABLE `salidas` (
   `hora_llegada` time DEFAULT NULL,
   `estado` text NOT NULL COMMENT 'guarda el estaod de la salida (pendiente o concluida)',
   `id_personal` bigint(20) NOT NULL,
-  `id_autoriza` bigint(20) NOT NULL,
+  `id_autoriza` bigint(20) DEFAULT NULL,
   `hora_estimada` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -126,7 +130,9 @@ CREATE TABLE `salidas` (
 --
 
 INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `hora_estimada`) VALUES
-(1, 'permiso economico', 'cita en el sat', 'sat Calle #130', '2026-09-10', '00:34:17', '00:00:00', '0', 8, 8, '13:34:17');
+(1, 'permiso economico', 'cita en el sat', 'sat Calle #130', '2026-09-10', '00:34:17', '00:00:00', '0', 8, 8, '13:34:17'),
+(2, 'Personal', 'Cita médica', 'Hospital General', '2026-03-30', '10:00:00', NULL, 'PENDIENTE', 10, 2, '12:00:00'),
+(3, 'OFICIAL', 'Comisión de trabajo', 'Oficina Central', '2026-10-06', '12:45:45', NULL, 'EN CURSO', 12, NULL, '14:45:45');
 
 --
 -- Índices para tablas volcadas
@@ -181,7 +187,7 @@ ALTER TABLE `areas`
 -- AUTO_INCREMENT de la tabla `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `id_personal` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_personal` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `puestos`
@@ -193,7 +199,7 @@ ALTER TABLE `puestos`
 -- AUTO_INCREMENT de la tabla `salidas`
 --
 ALTER TABLE `salidas`
-  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Restricciones para tablas volcadas

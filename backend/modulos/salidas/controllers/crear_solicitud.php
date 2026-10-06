@@ -26,13 +26,13 @@ function crear_solicitud($pdo, $input) {
     }
 
     $id_personal   = $_SESSION['id_personal'];
+    $id_jefe       = $_SESSION['id_jefe'];
     $tipo_salida   = $input['tipo_salida'];
     $motivo        = $input['motivo'];
     $destino       = $input['destino'] ;
     $fecha         = date('Y-m-d');
-    $hora_salida   = $input['hora_salida'];
-    $hora_estimada = $input['hora_estimada'] ?? null;
-    $hora_llegada  = $input['hora_llegada'] ?? null;
+    // $hora_salida   = $input['hora_salida'] ?? null;
+    // $hora_llegada  = $input['hora_llegada'] ?? null;
     $estado        = "PENDIENTE"; 
     $validacion_estado = $pdo->prepare(
         'SELECT id_salida FROM salidas WHERE estado = "PENDIENTE" AND id_personal = :id_personal'
@@ -49,21 +49,19 @@ function crear_solicitud($pdo, $input) {
 
     $query = $pdo->prepare(
         'INSERT INTO salidas 
-        (tipo_salida, motivo, destino, fecha, hora_salida, hora_llegada, estado, id_personal, hora_estimada)
+        (tipo_salida, motivo, destino, fecha, estado, id_personal, id_autoriza)
         VALUES
-        (:tipo_salida, :motivo, :destino, :fecha, :hora_salida, :hora_llegada, :estado, :id_personal, :hora_estimada)'
+        (:tipo_salida, :motivo, :destino, :fecha, :estado, :id_personal, :id_jefe)'
     );
 
     $query->execute([
         'tipo_salida'   => $tipo_salida, 
         'motivo'        => $motivo, 
         'destino'       => $destino,  
-        'fecha'         => $fecha, 
-        'hora_salida'   => $hora_salida, 
-        'hora_llegada'  => $hora_llegada, 
+        'fecha'         => $fecha,  
         'estado'        => $estado, 
         'id_personal'   => $id_personal, 
-        'hora_estimada' => $hora_estimada
+        'id_autoriza'   => $id_jefe
     ]);
 
     $id_salida = $pdo->lastInsertId();    
@@ -77,10 +75,9 @@ function crear_solicitud($pdo, $input) {
             "motivo"        => $motivo, 
             "destino"       => $destino,  
             "fecha"         => $fecha, 
-            "hora_salida"   => $hora_salida, 
-            "hora_estimada" => $hora_estimada,
             "estado"        => $estado, 
             "id_personal"   => $id_personal, 
+            "id_autoriza"   => $id_jefe
         ]
     ]);
 }

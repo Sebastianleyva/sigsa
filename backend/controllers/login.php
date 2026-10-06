@@ -66,7 +66,7 @@ function login($pdo, $input) {
     echo json_encode([
         "message" => "Inicio de sesión exitoso",
         "token" => $jwt,
-        // "csrf_token" => $_SESSION['csrf_token'],
+        "csrf_token" => $_SESSION['csrf_token'],
         "usuario" => [
             "id_personal" => $_SESSION['id_personal'],
             "id_jefe" => $_SESSION['id_jefe'],
