@@ -22,6 +22,64 @@ function crear_jwt(array $claims): string {
     return "$encabezado.$payload.$firma";
 }
 
+function verificar_jwt(string $token): array {
+    if (JWT_SECRET === '') {
+        throw new RuntimeException('SIGSA_JWT_SECRET no está configurada');
+    }
+
+    $partes = explode('.', $token);
+    if (count($partes) !== 3) {
+        throw new UnexpectedValueException('Formato de JWT inválido');
+    }
+
+    $decodificar = static function (string $valor): string {
+        if ($valor === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $valor)) {
+            throw new UnexpectedValueException('Codificación de JWT inválida');
+        }
+
+        $base64 = strtr($valor, '-_', '+/');
+        $base64 .= str_repeat('=', (4 - strlen($base64) % 4) % 4);
+        $decodificado = base64_decode($base64, true);
+
+        if ($decodificado === false) {
+            throw new UnexpectedValueException('Codificación de JWT inválida');
+        }
+
+        return $decodificado;
+    };
+
+    $encabezado = json_decode($decodificar($partes[0]), true);
+    $claims = json_decode($decodificar($partes[1]), true);
+    $firma = $decodificar($partes[2]);
+
+    if (!is_array($encabezado) || ($encabezado['alg'] ?? null) !== 'HS256' || ($encabezado['typ'] ?? null) !== 'JWT') {
+        throw new UnexpectedValueException('Encabezado de JWT inválido');
+    }
+
+    if (!is_array($claims)) {
+        throw new UnexpectedValueException('Contenido de JWT inválido');
+    }
+
+    $firmaEsperada = hash_hmac('sha256', "$partes[0].$partes[1]", JWT_SECRET, true);
+    if (!hash_equals($firmaEsperada, $firma)) {
+        throw new UnexpectedValueException('Firma de JWT inválida');
+    }
+
+    if (($claims['iss'] ?? null) !== 'sigsa'
+        || !isset($claims['exp'])
+        || !is_numeric($claims['exp'])
+        || $claims['exp'] <= time()
+    ) {
+        throw new UnexpectedValueException('JWT expirado o inválido');
+    }
+
+    if (isset($claims['nbf']) && (!is_numeric($claims['nbf']) || $claims['nbf'] > time())) {
+        throw new UnexpectedValueException('JWT aún no es válido');
+    }
+
+    return $claims;
+}
+
 function validar_jwt_requerido() {
     $headers = getallheaders();
     $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? '';
@@ -56,17 +114,17 @@ function validar_csrf_requerido() {
     }
 }
 
-function requerir_autenticacion() {
-    if (!isset($_SESSION['usuario_id'])) {
-        http_response_code(401);
-        echo json_encode(['error' => 'No has iniciado sesión']);
-        exit;
-    }
-}
+// function requerir_autenticacion() {
+    
+//     if (!isset($_SESSION['id_personal'])) {
+//         http_response_code(401);
+//         echo json_encode(['error' => 'No has iniciado sesión']);
+//         exit;
+//     }
+// }
 
-$puestos_permitidos = [1,2,3];
 function requerir_rol(array $puestos_permitidos) {
-    requerir_autenticacion();
+    // requerir_autenticacion();
     
     if (!in_array($_SESSION['puesto'], $puestos_permitidos,true)) {
         http_response_code(403);
@@ -75,5 +133,13 @@ function requerir_rol(array $puestos_permitidos) {
     }
 }
 
-
+function requerir_area(array $areas_permitidas) {
+    // requerir_autenticacion();
+    
+    if (!in_array($_SESSION['area'], $areas_permitidas,true)) {
+        http_response_code(403);
+        echo json_encode(['error' => 'No tienes permisos para realizar esta acción']);
+        exit;
+    }
+}
 
