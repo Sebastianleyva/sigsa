@@ -2,8 +2,8 @@
 
 header('Content-type: application/json');
 
-require_once '../includes/auth.php';
-require_once '../includes/conexion.php';
+require_once '../../../includes/auth.php';
+require_once '../../../includes/conexion.php';
 
 switch ($_SERVER['REQUEST_METHOD']){
     case 'POST':
@@ -69,11 +69,11 @@ function login($pdo, $input) {
         "csrf_token" => $_SESSION['csrf_token'],
         "usuario" => [
             "id_personal" => $_SESSION['id_personal'],
-            "id_jefe" => $_SESSION['id_jefe'],
-            "nombre" => $_SESSION['nombre'],
-            "correo" => $_SESSION['correo'],
-            "area"   => $_SESSION['area'],
-            "puesto" => $_SESSION['puesto']
+            "id_jefe"     => $_SESSION['id_jefe'],
+            "nombre"      => $_0SESSION['nombre'],
+            "correo"      => $_SESSION['correo'],
+            "area"        => $_SESSION['area'],
+            "puesto"      => $_SESSION['puesto']
         ]
     ]);
 }

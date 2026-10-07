@@ -2,8 +2,8 @@
 
 header('content-type: application/json');
 
-require_once '../../../includes/auth.php';
-require_once '../../../includes/conexion.php';
+require_once '../../auth/controllers/includes/auth.php';
+require_once '../../auth/controllers/includes/conexion.php';
 
 switch ($_SERVER['REQUEST_METHOD']){
     case 'PATCH':
@@ -26,15 +26,29 @@ function verificacion_jerarquia($pdo,$input){
         exit;
     }
     $id_autorizante = $_SESSION['id_personal'];
-    $id_solicitante = $input['id_personal'];
+    $id_salida = $input['id_salida'];
+
+    $sql = $pdo -> prepare(
+        'SELECT id_personal FROM salidas 
+        WHERE id_salida = :id_salida'
+    );
+    $sql -> execute (['id_salida'=>$id_salida]);
+    $resultado1 = $sql -> fetch();
+    if(!$resultado1){
+        http_response_code(404);
+        echo json_encode(["ERROR"=>"Solicitud inexistente"]);
+        exit;
+    }
+    $id_solicitante = $resultado1['id_personal'];
+
     $verificacion = $pdo -> prepare(
         'SELECT id_jefe FROM personal
         WHERE id_personal = :id_solicitante'
     );
-    $verificacion -> execute(['id_solcitante' => $id_solicitante]);
-    $resultado = $verificacion -> fetch();
+    $verificacion -> execute(['id_solicitante' => $id_solicitante]);
+    $resultado2 = $verificacion -> fetch();
 
-    if($resultado!=$id_autorizante){
+    if($resultado2['id_jefe']!=$id_autorizante){
         http_response_code(403);
         echo json_encode(["ERROR"=>"No puedes autorizar esta salida"]);
         exit;

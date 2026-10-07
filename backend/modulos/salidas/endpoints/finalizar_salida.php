@@ -2,8 +2,8 @@
 
 header ('Content-Type: application/json');
 
-include_once '../../../includes/auth.php';
-include_once '../../../includes/conexion.php';
+require_once '../../auth/controllers/includes/auth.php';
+require_once '../../auth/controllers/includes/conexion.php';
 
 switch($_SERVER['REQUEST_METHOD']){
     case 'PATCH':
@@ -30,7 +30,7 @@ switch($_SERVER['REQUEST_METHOD']){
     $id_autoriza = $input['id_autoriza'];
 
     $validar_estado = $pdo ->prepare(
-        'SELECT estado FROM salidas
+        'SELECT estado,hora_salida FROM salidas
         WHERE id_salida = :id_salida'
     );
     $validar_estado -> execute([
@@ -48,17 +48,22 @@ switch($_SERVER['REQUEST_METHOD']){
     $nuevo_estado = "FINALIZADO";
     date_default_timezone_set('America/Mexico_City');
     $hora_llegada = date('H:i:s');
+    $hora_salida = $salida['hora_salida'];
+    $adeudo = strtotime($hora_salida) - strtotime($hora_llegada);
+    $fromato = gmdate('H:i:s',$adeudo);
         
     $query = $pdo -> prepare(
         'UPDATE salidas 
         SET estado = :nuevo_estado,
-        hora_llegada = :hora_llegada
+        hora_llegada = :hora_llegada,
+        adeudo = :formato
         WHERE id_salida = :id_salida'
     );
     $query -> execute([
         'id_salida' => $id_salida,
         'nuevo_estado' => $nuevo_estado,
-        'hora_llegada' => $hora_llegada
+        'hora_llegada' => $hora_llegada,
+        "adeudo" => $fromato
     ]);
 
     http_response_code(200);
