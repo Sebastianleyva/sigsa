@@ -4,4 +4,12 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      '/sigsa/backend': {
+        target: 'http://localhost',
+        changeOrigin: true,
+      },
+    },
+  },
 })

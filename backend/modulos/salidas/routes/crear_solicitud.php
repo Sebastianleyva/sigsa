@@ -19,9 +19,9 @@ switch($_SERVER['REQUEST_METHOD']){
 }
 
 function crear_solicitud($pdo, $input) {
-    if (empty($input['tipo_salida']) || empty($input['motivo']) || empty($input['fecha']) || empty($input['hora_salida'])) {
+    if (empty($input['tipo_salida']) || empty($input['motivo']) || empty($input['destino'])) {
         http_response_code(400);
-        echo json_encode(["ERROR" => "Campos obligatorios faltantes (tipo_salida, motivo, fecha, hora_salida)"]);
+        echo json_encode(["ERROR" => "Campos obligatorios faltantes (tipo_salida, motivo, destino)"]);
         exit;
     }
 
@@ -29,10 +29,10 @@ function crear_solicitud($pdo, $input) {
     $id_jefe       = $_SESSION['id_jefe'];
     $tipo_salida   = $input['tipo_salida'];
     $motivo        = $input['motivo'];
-    $destino       = $input['destino'] ;
+    $destino       = $input['destino'];
     $fecha         = date('Y-m-d');
-    // $hora_salida   = $input['hora_salida'] ?? null;
-    // $hora_llegada  = $input['hora_llegada'] ?? null;
+    $hora_salida   = date('H:i:s');
+    $hora_estimada = date('H:i:s', strtotime('+2 hours'));
     $estado        = "PENDIENTE"; 
     $validacion_estado = $pdo->prepare(
         'SELECT id_salida FROM salidas WHERE estado = "PENDIENTE" AND id_personal = :id_personal'
@@ -49,9 +49,9 @@ function crear_solicitud($pdo, $input) {
 
     $query = $pdo->prepare(
         'INSERT INTO salidas 
-        (tipo_salida, motivo, destino, fecha, estado, id_personal, id_autoriza)
+        (tipo_salida, motivo, destino, fecha, hora_salida, hora_estimada, estado, id_personal, id_autoriza)
         VALUES
-        (:tipo_salida, :motivo, :destino, :fecha, :estado, :id_personal, :id_jefe)'
+        (:tipo_salida, :motivo, :destino, :fecha, :hora_salida, :hora_estimada, :estado, :id_personal, :id_jefe)'
     );
 
     $query->execute([
@@ -59,6 +59,8 @@ function crear_solicitud($pdo, $input) {
         'motivo'        => $motivo, 
         'destino'       => $destino,  
         'fecha'         => $fecha,  
+        'hora_salida'   => $hora_salida,
+        'hora_estimada' => $hora_estimada,
         'estado'        => $estado, 
         'id_personal'   => $id_personal, 
         'id_autoriza'   => $id_jefe
@@ -75,6 +77,8 @@ function crear_solicitud($pdo, $input) {
             "motivo"        => $motivo, 
             "destino"       => $destino,  
             "fecha"         => $fecha, 
+            "hora_salida"   => $hora_salida,
+            "hora_estimada" => $hora_estimada,
             "estado"        => $estado, 
             "id_personal"   => $id_personal, 
             "id_autoriza"   => $id_jefe

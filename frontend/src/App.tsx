@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import CrearSalidaScreen from './screens/salidas/screens/crear_salida_screen'
 import './App.css'
 
 type Screen = 'login' | 'register'
@@ -18,6 +19,10 @@ function App() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setNotice('El formulario está listo; falta conectarlo al servicio de autenticación.')
+  }
+
+  if (window.location.pathname.endsWith('/salidas/crear')) {
+    return <CrearSalidaScreen />
   }
 
   return (
