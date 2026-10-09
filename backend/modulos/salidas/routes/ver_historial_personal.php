@@ -16,14 +16,14 @@ switch($_SERVER['REQUEST_METHOD']){
         break;
 }
 
-ver_historial_personal($pdo,$input){
+function ver_historial_personal($pdo,$input){
     if(empty($input)){
         http_response_code(403);
         echo json_encode(["ERROR"=>"Campos faltantes"]);
         exit;
     }
 
-    $id_personal = $_SESSION('id_personal');
+    $id_personal = $_SESSION['id_personal'];
     $sql = $pdo -> prepare(
         'SELECT * FROM salidas
         WHERE id_personal = :id_personal
