@@ -2,8 +2,8 @@
 
 header ('Content-Type: application/json');
 
-require_once '../../auth/controllers/includes/auth.php';
-require_once '../../auth/controllers/includes/conexion.php';
+require_once '../../../includes/auth.php';
+require_once '../../../includes/conexion.php';
 
 switch($_SERVER['REQUEST_METHOD']){
     case 'PATCH':
