@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import CrearSalidaScreen from './screens/salidas/screens/crear_salida_screen'
+import CrearSalidaScreen from './screens/salidas/crear_salida_screen'
+import RegistrarScreen from './screens/auth/registrar'
 import './App.css'
 
 type Screen = 'login' | 'register'
@@ -23,6 +24,10 @@ function App() {
 
   if (window.location.pathname.endsWith('/salidas/crear')) {
     return <CrearSalidaScreen />
+  }
+
+  if (window.location.pathname.endsWith('/auth/registrar') || screen === 'register') {
+    return <RegistrarScreen />
   }
 
   return (

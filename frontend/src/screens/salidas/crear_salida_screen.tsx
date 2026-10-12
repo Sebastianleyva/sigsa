@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import '../styles/crear_salida_screen.css'
+import './styles/crear_salida_screen.css'
 
 type SolicitudResponse = {
     message?: string

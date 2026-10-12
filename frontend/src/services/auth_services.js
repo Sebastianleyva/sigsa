@@ -19,6 +19,7 @@ export const authService = {
         throw new Error(
           error.response.data.ERROR || 
           error.response.data.error || 
+          error.response.data.CONFLICT ||
           'Error en la solicitud de registro'
         );
       }
