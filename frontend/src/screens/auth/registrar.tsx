@@ -4,21 +4,21 @@ import { authService } from '../../services/auth_services.js'
 import './registrar.css'
 
 type RegisterForm = {
-    nombre: string
-    apellido_p: string
-    apellido_m: string
-    telefono: string
-    rfc: string
-    curp: string
-    correo: string
-    puesto: string
-    area: string
-    contrasena: string
+    nombre: string,
+    apellido_p: string,
+    apellido_m: string,
+    telefono: string,
+    rfc: string,
+    curp: string,
+    correo: string,
+    puesto: number,
+    area: number ,
+    contrasena: string,
     confirmarContrasena: string
-}
+} 
 
 type Notice = {
-    kind: 'success' | 'error'
+    kind: 'success' | 'error',
     text: string
 }
 
@@ -30,8 +30,8 @@ const initialForm: RegisterForm = {
     rfc: '',
     curp: '',
     correo: '',
-    puesto: '',
-    area: '',
+    puesto: 0,
+    area: 0,
     contrasena: '',
     confirmarContrasena: '',
 }
