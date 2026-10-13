@@ -7,6 +7,8 @@ require_once '../../../includes/conexion.php';
 
 switch($_SERVER['REQUEST_METHOD']){
     case 'POST':
+        $roles = [1,2,3];
+        requerir_rol($roles);
         $input=json_decode(file_get_contents('php://input'),true) ?? [];
         register($pdo,$input);
         break;

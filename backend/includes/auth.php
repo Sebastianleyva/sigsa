@@ -142,4 +142,3 @@ function requerir_area(array $areas_permitidas) {
         exit;
     }
 }
-
