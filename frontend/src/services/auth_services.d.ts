@@ -22,6 +22,16 @@ export type RegisterResponse = {
   }
 }
 
+export type LoginCredencials = {
+  correo : string,
+  contrasena : string
+}
+export type LoginResponse ={
+  message?: string
+}
+
 export const authService: {
   register(userData: RegisterUserData): Promise<RegisterResponse>
+    login(userData: LoginCredencials): Promise<LoginResponse>
+
 }

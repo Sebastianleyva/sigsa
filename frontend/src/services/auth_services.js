@@ -23,5 +23,28 @@ export const authService = {
       // Si fue un error de red o de conexión con el servidor
       throw new Error('No se pudo conectar con el servidor');
     }
-  }
+
+  },
+  async login(userData){
+      try{
+      const response = await api.post('/auth/controllers/login.php',userData)
+     return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.ERROR || 
+          error.response.data.error || 
+          error.response.data.CONFLICT ||
+          'Error al inicio de sesión'
+        );
+      }
+      // Si fue un error de red o de conexión con el servidor
+      throw new Error('No se pudo conectar con el servidor');
+    }
+
+  },
+  
 };
+
+  
+ 
