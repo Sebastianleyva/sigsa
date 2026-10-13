@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import type {FormEvent} from 'react'
-import { loginService } from '../../services/auth_services';
+import { authService } from '../../services/auth_services';
 
 type LoginForm = {
     correo : string,
@@ -30,7 +30,7 @@ export default function LoginScreen(){
         setNotice(null)
 
         try{
-            const result = await loginService.login({
+            const result = await authService.login({
                 correo : form.correo.trim(),
                 contrasena : form.contrasena.trim()
             })
