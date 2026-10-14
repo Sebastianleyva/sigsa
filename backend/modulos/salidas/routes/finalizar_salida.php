@@ -50,7 +50,7 @@ switch($_SERVER['REQUEST_METHOD']){
     $hora_llegada = date('H:i:s');
     $hora_salida = $salida['hora_salida'];
     $adeudo = strtotime($hora_salida) - strtotime($hora_llegada);
-    $fromato = gmdate('H:i:s',$adeudo);
+    $formato = gmdate('H:i:s',$adeudo);
         
     $query = $pdo -> prepare(
         'UPDATE salidas 
@@ -63,7 +63,7 @@ switch($_SERVER['REQUEST_METHOD']){
         'id_salida' => $id_salida,
         'nuevo_estado' => $nuevo_estado,
         'hora_llegada' => $hora_llegada,
-        "adeudo" => $fromato
+        "adeudo" => $formato
     ]);
 
     http_response_code(200);
