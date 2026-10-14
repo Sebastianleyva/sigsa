@@ -12,6 +12,7 @@ export const authService = {
       const response = await api.post('/auth/controllers/registrar.php', userData);
       return response.data;
     } catch (error) {
+      console.error("Detalle del error en login:", error.response || error);
       if (error.response && error.response.data) {
         throw new Error(
           error.response.data.ERROR || 
@@ -26,18 +27,21 @@ export const authService = {
   },
   async login(userData){
       try{
+      // Error: el servicio intentaba guardar la respuesta del backend sin validar la 
+      // estructura real de la respuesta y, previamente, se estaba leyendo la data equivocada. 
+      // Se asegura la lectura de `response.data` antes de guardar el token y el usuario.
       const response = await api.post('/auth/controllers/login.php',userData)
-      if (data.token) {
-        localStorage.setItem('token', data.token);
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
       }
-      if (data.csrf_token) {
-        localStorage.setItem('csrf_token', data.csrf_token);
+      if (response.data.csrf_token) {
+        localStorage.setItem('csrf_token', response.data.csrf_token);
       }
-      if (data.usuario) {
-        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      if (response.data.usuario) {
+        localStorage.setItem('usuario', JSON.stringify(response.data.usuario));
       }
 
-      return data,response.data;
+      return response.data;
     } catch (error) {
       if (error.response && error.response.data) {
         throw new Error(

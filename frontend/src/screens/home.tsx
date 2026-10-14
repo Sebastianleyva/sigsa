@@ -1,0 +1,74 @@
+import './home.css'
+
+const modules = [
+  {
+    index: '01',
+    title: 'Control de salidas',
+    description: 'Consulta y da seguimiento a las solicitudes de salida del personal.',
+    category: 'OPERACIÓN',
+  },
+  {
+    index: '02',
+    title: 'Gestión de personal',
+    description: 'Administra la información y organización del equipo de trabajo.',
+    category: 'PERSONAL',
+  },
+  {
+    index: '03',
+    title: 'Mantenimiento',
+    description: 'Mantén actualizados los catálogos y datos del sistema.',
+    category: 'SISTEMA',
+  },
+]
+
+export default function HomeScreen() {
+  return (
+    <main className="home-page">
+      <header className="home-topbar">
+        <a className="home-brand" href="#inicio" onClick={(event) => event.preventDefault()}>
+          <span className="home-brand-mark" aria-hidden="true"><i /><i /><i /><i /></span>
+          <span>SIGSA</span>
+        </a>
+        <div className="home-topbar-meta">
+          <span className="home-topbar-dot" aria-hidden="true" />
+          <span>Sistema integral de gestión</span>
+        </div>
+      </header>
+
+      <section className="home-content" id="inicio">
+        <div className="home-heading">
+          <span className="home-eyebrow">PANEL PRINCIPAL · SIGSA</span>
+          <h1>Bienvenido a SIGSA</h1>
+          <p>Un espacio para organizar y dar seguimiento a la gestión del equipo.</p>
+        </div>
+
+        <section className="home-modules" aria-labelledby="home-modules-title">
+          <div className="home-section-heading">
+            <div>
+              <span className="home-section-index">01 / MÓDULOS</span>
+              <h2 id="home-modules-title">Áreas del sistema</h2>
+            </div>
+            <span className="home-section-note">PLATAFORMA DE GESTIÓN</span>
+          </div>
+
+          <div className="home-module-grid">
+            {modules.map((module) => (
+              <article className="home-module-card" key={module.index}>
+                <span className="home-module-category">{module.category}</span>
+                <span className="home-module-index">{module.index}</span>
+                <h3>{module.title}</h3>
+                <p>{module.description}</p>
+                <span className="home-module-rule" aria-hidden="true" />
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <footer className="home-footer">
+          <span>© SIGSA</span>
+          <span>Sistema integral de gestión</span>
+        </footer>
+      </section>
+    </main>
+  )
+}
