@@ -62,6 +62,9 @@ function login($pdo, $input) {
     $_SESSION['token']       = $jwt;
     $_SESSION['csrf_token']  = bin2hex(random_bytes(32));
 
+    // Error: la respuesta de login usaba un typo en `$_0SESSION['nombre']`, por lo que 
+    // el backend devolvía un usuario incompleto. Se corrige el nombre para devolver 
+    // la información real del usuario correctamente.
     http_response_code(200);
     echo json_encode([
         "message" => "Inicio de sesión exitoso",
@@ -70,7 +73,7 @@ function login($pdo, $input) {
         "usuario" => [
             "id_personal" => $_SESSION['id_personal'],
             "id_jefe"     => $_SESSION['id_jefe'],
-            "nombre"      => $_0SESSION['nombre'],
+            "nombre"      => $_SESSION['nombre'],
             "correo"      => $_SESSION['correo'],
             "area"        => $_SESSION['area'],
             "puesto"      => $_SESSION['puesto']
