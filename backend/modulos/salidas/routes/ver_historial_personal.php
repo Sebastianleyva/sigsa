@@ -37,6 +37,7 @@ function ver_historial_personal($pdo,$input){
         "Salidas"=>[
             'id_salida'=> $resultado['id_salida'],
             'id_autoriza' => $resultado['id_jefe'],
+            'tipo de salida' => $resultado['tipo_salida'],
             'motivo' => $resultado['motivo'],
             'destino' => $resultado['destino'],
             'horade salida' => $resultado['hora_salida'],

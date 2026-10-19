@@ -47,9 +47,21 @@ export type CrearSalidaResponse = {
   }
 }
 
+export type Salida = {
+    numero_salidas: number,
+    id_salida: number,
+    tipo_salida: string,
+    motivo: string,
+    destino: string,
+    horade_salida: string,
+    horade_regreso: string,
+    adeudo: string
+  
+}
+
 export const authService: {
   register(userData: RegisterUserData): Promise<RegisterResponse>
     login(userData: LoginCredencials): Promise<LoginResponse>
     CrearSalida(solicitud: CrearSalidaData): Promise<CrearSalidaResponse>
-
+    VerHistorialPersonal(): Promise<Salida[]>
 }
