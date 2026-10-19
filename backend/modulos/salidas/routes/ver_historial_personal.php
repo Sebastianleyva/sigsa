@@ -1,48 +1,60 @@
 <?php
 
-header('content-type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
 require_once '../../../includes/auth.php';
 require_once '../../../includes/conexion.php';
 
-switch($_SERVER['REQUEST_METHOD']){
+switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         $usuario = validar_jwt_requerido();
         validar_csrf_requerido();
-        $input = json_decode(file_get_contents('php://'),true) ?? [];
-        ver_historial_personal($pdo,$input);
-        break; 
-    case 'DEFAULT':
+        ver_historial_personal($pdo, $usuario);
+        break;
+    default:
+        http_response_code(405);
+        echo json_encode(['ERROR' => 'Método no permitido']);
         break;
 }
 
-function ver_historial_personal($pdo,$input){
-    if(empty($input)){
-        http_response_code(403);
-        echo json_encode(["ERROR"=>"Campos faltantes"]);
-        exit;
+function ver_historial_personal(PDO $pdo, array $usuario): void
+{
+    $id_personal = filter_var(
+        $usuario['sub'] ?? null,
+        FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1]]
+    );
+
+    if ($id_personal === false) {
+        http_response_code(401);
+        echo json_encode(['ERROR' => 'Los datos de identidad de la sesión no son válidos']);
+        return;
     }
 
-    $id_personal = $_SESSION['id_personal'];
-    $sql = $pdo -> prepare(
-        'SELECT * FROM salidas
+    $sql = $pdo->prepare(
+        'SELECT id_salida, tipo_salida, motivo, destino, hora_salida,
+                hora_llegada, hora_estimada
+        FROM salidas
         WHERE id_personal = :id_personal
-    ');
-    $sql -> execute(['id_personal'=>$id_personal]);
-    $resultado = $sql -> fetch();
-    
-    http_response_code(200);
-    echo json_encode(["message" => "Historial cargado correctamente",
-        "Número de salidas" => count($resultado),
-        "Salidas"=>[
-            'id_salida'=> $resultado['id_salida'],
-            'id_autoriza' => $resultado['id_jefe'],
-            'tipo de salida' => $resultado['tipo_salida'],
-            'motivo' => $resultado['motivo'],
-            'destino' => $resultado['destino'],
-            'horade salida' => $resultado['hora_salida'],
-            'hora de llegada' => $resultado['hora_llegada'],
-            'adeudo de tiempo' => $resultado['adeudo_tiempo']
-        ]);
+        ORDER BY fecha DESC, id_salida DESC'
+    );
+    $sql->execute(['id_personal' => $id_personal]);
+    $salidas = $sql->fetchAll();
 
+    $historial = [];
+    foreach ($salidas as $indice => $salida) {
+        $historial[] = [
+            'numero_salidas' => $indice + 1,
+            'id_salida' => (int) $salida['id_salida'],
+            'tipo_salida' => $salida['tipo_salida'],
+            'motivo' => $salida['motivo'],
+            'destino' => $salida['destino'],
+            'horade_salida' => $salida['hora_salida'],
+            'horade_regreso' => $salida['hora_llegada'] ?? $salida['hora_estimada'],
+            'adeudo' => null
+        ];
+    }
+
+    http_response_code(200);
+    echo json_encode($historial);
 }

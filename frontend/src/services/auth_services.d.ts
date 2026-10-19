@@ -55,7 +55,7 @@ export type Salida = {
     destino: string,
     horade_salida: string,
     horade_regreso: string,
-    adeudo: string
+    adeudo: string | null
   
 }
 

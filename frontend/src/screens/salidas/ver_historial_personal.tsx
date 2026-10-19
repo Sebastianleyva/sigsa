@@ -10,7 +10,7 @@ type Salida = {
     destino: string,
     horade_salida: string,
     horade_regreso: string,
-    adeudo: string
+    adeudo: string | null
 };
 
 export default function Ver_Historial_Personal() {
@@ -97,7 +97,7 @@ export default function Ver_Historial_Personal() {
 
                                     <div className="historial-personal-field historial-personal-field-adeudo">
                                         <span className="historial-personal-label">Adeudo</span>
-                                        <p>{salida.adeudo}</p>
+                                        <p>{salida.adeudo ?? 'No registrado'}</p>
                                     </div>
                                 </div>
                             </article>
