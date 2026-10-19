@@ -4,10 +4,10 @@ import './home.css'
 const modules = [
   {
     index: '01',
-    title: 'Control de salidas',
-    description: 'Consulta y da seguimiento a las solicitudes de salida del personal.',
+    title: 'Salidas',
+    description: 'Registra una solicitud o consulta el historial de tus salidas.',
     category: 'OPERACIÓN',
-    path: '/salidas/crear',
+    path: '/salidas',
   },
   {
     index: '02',
