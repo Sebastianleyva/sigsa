@@ -11,15 +11,17 @@ const modules = [
   },
   {
     index: '02',
-    title: 'Gestión de personal',
+    title: 'Gestión de comisiones',
     description: 'Administra la información y organización del equipo de trabajo.',
     category: 'PERSONAL',
+    path: '/comisiones',
   },
   {
     index: '03',
     title: 'Mantenimiento',
     description: 'Mantén actualizados los catálogos y datos del sistema.',
     category: 'SISTEMA',
+    path: '/mantenimiento',
   },
 ]
 

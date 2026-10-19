@@ -77,7 +77,6 @@ export default function CrearSalida() {
                     <form className="crear-salida-form" onSubmit={handleSubmit}>
                         <div className="crear-salida-form-heading">
                             <div>
-                                <span className="crear-salida-step">01</span>
                                 <h2>Datos de la solicitud</h2>
                             </div>
                             <span className="crear-salida-required-note"><span>*</span> Campos obligatorios</span>
