@@ -9,8 +9,13 @@ switch($_SERVER['REQUEST_METHOD']){
     case 'POST':
         $usuario = validar_jwt_requerido();
         validar_csrf_requerido();
-        $input=json_decode(file_get_contents('php://input'),true) ?? [];
-        crear_solicitud($pdo,$input);
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input)) {
+            http_response_code(400);
+            echo json_encode(["ERROR" => "El cuerpo de la solicitud debe ser un objeto JSON válido"]);
+            exit;
+        }
+        crear_solicitud($pdo, $input, $usuario);
         break;
     default:
         http_response_code(405);
@@ -18,24 +23,52 @@ switch($_SERVER['REQUEST_METHOD']){
         break;
 }
 
-function crear_solicitud($pdo, $input) {
-    if (empty($input['tipo_salida']) || empty($input['motivo']) || empty($input['destino'])) {
+function crear_solicitud($pdo, $input, $usuario) {
+    $tipo_salida = $input['tipo_salida'] ?? null;
+    $motivo = $input['motivo'] ?? null;
+    $destino = $input['destino'] ?? null;
+
+    if (!is_string($tipo_salida) || !is_string($motivo) || !is_string($destino)) {
         http_response_code(400);
         echo json_encode(["ERROR" => "Campos obligatorios faltantes (tipo_salida, motivo, destino)"]);
         exit;
     }
 
-    $id_personal   = $_SESSION['id_personal'];
-    $id_jefe       = $_SESSION['id_jefe'];
-    $tipo_salida   = $input['tipo_salida'];
-    $motivo        = $input['motivo'];
-    $destino       = $input['destino'];
+    $tipo_salida = trim($tipo_salida);
+    $motivo = trim($motivo);
+    $destino = trim($destino);
+
+    if ($tipo_salida === '' || $motivo === '' || $destino === '') {
+        http_response_code(400);
+        echo json_encode(["ERROR" => "Tipo de salida, motivo y destino no pueden estar vacíos"]);
+        exit;
+    }
+
+    if (!in_array($tipo_salida, ['PERSONAL', 'MEDICA', 'CITA'], true)) {
+        http_response_code(400);
+        echo json_encode(["ERROR" => "El tipo de salida no es válido"]);
+        exit;
+    }
+
+    $id_personal = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    $id_jefe_claim = $usuario['id_jefe'] ?? null;
+    $id_jefe = $id_jefe_claim === null
+        ? null
+        : filter_var($id_jefe_claim, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+    if ($id_personal === false || ($id_jefe_claim !== null && $id_jefe === false)) {
+        http_response_code(401);
+        echo json_encode(["ERROR" => "Los datos de identidad de la sesión no son válidos"]);
+        exit;
+    }
+
     $fecha         = date('Y-m-d');
     $hora_salida   = date('H:i:s');
     $hora_estimada = date('H:i:s', strtotime('+2 hours'));
     $estado        = "PENDIENTE"; 
     $validacion_estado = $pdo->prepare(
-        'SELECT id_salida FROM salidas WHERE estado = "PENDIENTE" AND id_personal = :id_personal'
+        'SELECT id_salida FROM salidas
+        WHERE estado IN ("PENDIENTE", "EN CURSO") AND id_personal = :id_personal'
     );
     $validacion_estado->execute([
         'id_personal' => $id_personal
@@ -51,7 +84,7 @@ function crear_solicitud($pdo, $input) {
         'INSERT INTO salidas 
         (tipo_salida, motivo, destino, fecha, hora_salida, hora_estimada, estado, id_personal, id_autoriza)
         VALUES
-        (:tipo_salida, :motivo, :destino, :fecha, :hora_salida, :hora_estimada, :estado, :id_personal, :id_jefe)'
+        (:tipo_salida, :motivo, :destino, :fecha, :hora_salida, :hora_estimada, :estado, :id_personal, :id_autoriza)'
     );
 
     $query->execute([
@@ -63,7 +96,7 @@ function crear_solicitud($pdo, $input) {
         'hora_estimada' => $hora_estimada,
         'estado'        => $estado, 
         'id_personal'   => $id_personal, 
-        'id_autoriza'   => $id_jefe
+        'id_autoriza'   => $id_autoriza
     ]);
 
     $id_salida = $pdo->lastInsertId();    
@@ -81,8 +114,7 @@ function crear_solicitud($pdo, $input) {
             "hora_estimada" => $hora_estimada,
             "estado"        => $estado, 
             "id_personal"   => $id_personal, 
-            "id_autoriza"   => $id_jefe
+            "id_autoriza"   => $id_autoriza
         ]
     ]);
 }
-
