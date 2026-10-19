@@ -70,6 +70,22 @@ export const authService = {
       throw new Error('No se pudo conectar con el servidor.');
     }
   },
+  async VerHistorialPersonal(){
+    try{
+      const response = await api.get('salidas/routes/ver_historial_personal.php');
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.ERROR ||
+          error.response.data.error ||
+          error.response.data.CONFLICT ||
+          'No fue posible obtener el historial personal.'
+        );
+      }
+      throw new Error('No se pudo conectar con el servidor.');
+    }
+  },
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('csrf_token');
