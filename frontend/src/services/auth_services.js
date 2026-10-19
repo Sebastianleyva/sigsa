@@ -54,6 +54,22 @@ export const authService = {
       throw new Error('No se pudo conectar con el servidor');
     }
   },
+  async CrearSalida(solicitud) {
+    try {
+      const response = await api.post('/salidas/routes/crear_solicitud.php', solicitud);
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.ERROR ||
+          error.response.data.error ||
+          error.response.data.CONFLICT ||
+          'No fue posible registrar la solicitud de salida.'
+        );
+      }
+      throw new Error('No se pudo conectar con el servidor.');
+    }
+  },
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('csrf_token');

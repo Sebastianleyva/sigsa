@@ -30,8 +30,26 @@ export type LoginResponse ={
   message?: string
 }
 
+export type CrearSalidaData = {
+  tipo_salida: string
+  motivo: string
+  destino: string
+}
+
+export type CrearSalidaResponse = {
+  message?: string
+  salida?: {
+    id_salida: string
+    tipo_salida: string
+    motivo: string
+    destino: string
+    estado: string
+  }
+}
+
 export const authService: {
   register(userData: RegisterUserData): Promise<RegisterResponse>
     login(userData: LoginCredencials): Promise<LoginResponse>
+    CrearSalida(solicitud: CrearSalidaData): Promise<CrearSalidaResponse>
 
 }
