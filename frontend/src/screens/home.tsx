@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import './home.css'
 
 const modules = [
@@ -6,6 +7,7 @@ const modules = [
     title: 'Control de salidas',
     description: 'Consulta y da seguimiento a las solicitudes de salida del personal.',
     category: 'OPERACIÓN',
+    path: '/salidas/crear',
   },
   {
     index: '02',
@@ -22,6 +24,8 @@ const modules = [
 ]
 
 export default function HomeScreen() {
+  const navigate = useNavigate()
+
   return (
     <main className="home-page">
       <header className="home-topbar">
@@ -53,13 +57,20 @@ export default function HomeScreen() {
 
           <div className="home-module-grid">
             {modules.map((module) => (
-              <article className="home-module-card" key={module.index}>
+              <button
+                className={`home-module-card${module.path ? ' home-module-card-active' : ''}`}
+                key={module.index}
+                type="button"
+                onClick={() => {
+                  if (module.path) navigate(module.path)
+                }}
+              >
                 <span className="home-module-category">{module.category}</span>
                 <span className="home-module-index">{module.index}</span>
                 <h3>{module.title}</h3>
                 <p>{module.description}</p>
                 <span className="home-module-rule" aria-hidden="true" />
-              </article>
+              </button>
             ))}
           </div>
         </section>

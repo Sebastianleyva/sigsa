@@ -137,8 +137,29 @@
 
 .home-module-card {
   position: relative;
+  display: block;
+  width: 100%;
   min-height: 210px;
   padding: 25px 24px 27px;
+  border: 0;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.home-module-card:focus-visible {
+  z-index: 1;
+  outline: 3px solid var(--home-green);
+  outline-offset: -3px;
+}
+
+.home-module-card-active {
+  cursor: pointer;
+}
+
+.home-module-card-active:hover {
+  background: #f8faf8;
 }
 
 .home-module-card + .home-module-card {

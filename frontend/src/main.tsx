@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './index.css'
 import LoginScreen from './screens/auth/login.tsx'
 import App from './screens/home.tsx'
+import CrearSalida from './screens/salidas/crear_salida.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/home" element={<App />} />
+        <Route path="/salidas/crear" element={<CrearSalida />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
