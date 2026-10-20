@@ -1,59 +1,121 @@
-import {useState, useEffect} from 'react';
-import {authService} from '../../services/auth_services.js';
+import { useEffect, useState } from 'react';
+import { authService } from '../../services/auth_services.js';
+import './styles/ver_salidas_pendientes.css';
 
 type SalidaPendiente = {
-    id_salida: number,
-    tipo_salida: string,
-    motivo: string,
-    destino: string,
-    nombre: string,
-    apellido_p: string,
-    apellido_m: string,
-    id_personal: number
-}
+  id_salida: number;
+  tipo_salida: string;
+  motivo: string;
+  destino: string;
+  nombre: string;
+  apellido_p: string;
+  apellido_m: string;
+  id_personal: number;
+};
 
 export default function Ver_Salidas_Pendientes() {
-    const [salidasPendientes, setSalidasPendientes] = useState<SalidaPendiente[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [salidasPendientes, setSalidasPendientes] = useState<SalidaPendiente[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        async function fetchSalidasPendientes() {
-            try{
-                const datos = await authService.VerSalidasPendientes();
-                setSalidasPendientes(datos);
-            }
-            catch(error){
-                console.error("Error fetching salidas pendientes:", error);
-            }finally{
-                setLoading(false);
-            }
-        }
-        fetchSalidasPendientes();
-    },[]);
+  useEffect(() => {
+    async function fetchSalidasPendientes() {
+      try {
+        const datos = await authService.VerSalidasPendientes();
+        setSalidasPendientes(datos);
+      } catch (error) {
+        console.error('Error fetching salidas pendientes:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
 
+    fetchSalidasPendientes();
+  }, []);
 
-    return(
-        <main>
-            <form>
-                {loading ? (
-                    <div>Cargando...</div>
-                    ): 
-                    salidasPendientes.length === 0 ? (
-                        <div>No hay salidas pendientes</div>
-                    ) : (
-                        <div>
-                            {salidasPendientes.map((salida) => (
-                                <div key={salida.id_salida}>
-                                    <p>{salida.nombre} {salida.apellido_p} {salida.apellido_m}</p>
-                                    <p>{salida.tipo_salida}</p>
-                                    <p>{salida.motivo}</p>
-                                    <p>{salida.destino}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )
-                }
-            </form>
-        </main>
-    )
+  return (
+    <main className="salidas-pendientes-page">
+      <header className="salidas-pendientes-topbar">
+        <a className="salidas-pendientes-brand" href="#inicio" onClick={(event) => event.preventDefault()}>
+          <span className="salidas-pendientes-brand-mark" aria-hidden="true"><i /><i /><i /><i /></span>
+          <span>SIGSA</span>
+        </a>
+        <div className="salidas-pendientes-topbar-meta">
+          <span className="salidas-pendientes-topbar-dot" aria-hidden="true" />
+          <span>Sistema integral de gestión</span>
+        </div>
+      </header>
+
+      <section className="salidas-pendientes-content" id="inicio">
+        <div className="salidas-pendientes-heading">
+          <span className="salidas-pendientes-eyebrow">OPERACIÓN · SIGSA</span>
+          <h1>Salidas pendientes</h1>
+          <p>Revisa las solicitudes de salida que están pendientes de atención.</p>
+        </div>
+
+        <section className="salidas-pendientes-section" aria-labelledby="salidas-pendientes-title">
+          <div className="salidas-pendientes-section-heading">
+            <div>
+              <span className="salidas-pendientes-section-index">01 / SOLICITUDES</span>
+              <h2 id="salidas-pendientes-title">Solicitudes por revisar</h2>
+            </div>
+            {!loading && (
+              <span className="salidas-pendientes-count">
+                {salidasPendientes.length} {salidasPendientes.length === 1 ? 'PENDIENTE' : 'PENDIENTES'}
+              </span>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="salidas-pendientes-status salidas-pendientes-status-loading" role="status">
+              Cargando solicitudes...
+            </div>
+          ) : salidasPendientes.length === 0 ? (
+            <div className="salidas-pendientes-empty">
+              <span className="salidas-pendientes-empty-icon" aria-hidden="true">✓</span>
+              <h2>No hay salidas pendientes</h2>
+              <p>Las nuevas solicitudes aparecerán aquí cuando estén disponibles.</p>
+            </div>
+          ) : (
+            <div className="salidas-pendientes-list">
+              {salidasPendientes.map((salida) => (
+                <article className="salidas-pendientes-card" key={salida.id_salida}>
+                  <div className="salidas-pendientes-card-header">
+                    <div>
+                      <span className="salidas-pendientes-card-kicker">SOLICITUD DE SALIDA</span>
+                      <h3>{salida.nombre} {salida.apellido_p} {salida.apellido_m}</h3>
+                    </div>
+                    <span className="salidas-pendientes-card-number">
+                      #{String(salida.id_salida).padStart(3, '0')}
+                    </span>
+                  </div>
+
+                  <div className="salidas-pendientes-card-body">
+                    <div className="salidas-pendientes-field">
+                      <span className="salidas-pendientes-label">Tipo de salida</span>
+                      <p>{salida.tipo_salida}</p>
+                    </div>
+                    <div className="salidas-pendientes-meta-grid">
+                      <div className="salidas-pendientes-field">
+                        <span className="salidas-pendientes-label">Destino</span>
+                        <p>{salida.destino}</p>
+                      </div>
+                      <div className="salidas-pendientes-field">
+                        <span className="salidas-pendientes-label">Motivo</span>
+                        <p>{salida.motivo}</p>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <footer className="salidas-pendientes-footer">
+          <span>© SIGSA</span>
+          <span>Sistema integral de gestión</span>
+        </footer>
+      </section>
+    </main>
+  );
 }

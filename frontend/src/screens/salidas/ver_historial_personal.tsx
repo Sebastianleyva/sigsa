@@ -8,8 +8,8 @@ type Salida = {
     tipo_salida: string,
     motivo: string,
     destino: string,
-    horade_salida: string,
-    horade_regreso: string,
+    horade_salida: string | null,
+    horade_regreso: string | null,
     adeudo: string | null
 };
 

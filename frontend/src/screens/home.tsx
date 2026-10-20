@@ -27,7 +27,7 @@ const modules = [
 
 export default function HomeScreen() {
   const navigate = useNavigate()
-
+  
   return (
     <main className="home-page">
       <header className="home-topbar">

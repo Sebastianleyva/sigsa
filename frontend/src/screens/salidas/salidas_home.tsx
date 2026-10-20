@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import './styles/salidas_home.css';
+import {authService} from '../../services/auth_services.js'
+
 
 const opciones = [
   {
@@ -18,10 +20,24 @@ const opciones = [
     action: 'Ver historial',
     path: '/salidas/historial',
   },
+  {
+    index : '03',
+    category : 'AUTORIZACIÓN',
+    title : 'Ver salidas pendientes',
+    description : 'Revisa las solicitudes de salida que están pendientes de autorización.',
+    action : 'Ver pendientes',
+    path : '/salidas/pendientes'
+  },
 ];
 
 export default function SalidasHome() {
   const navigate = useNavigate();
+  const usuario = authService.getUsuarioActual()
+
+  // Los puestos 1, 2 y 3 pueden acceder a la opción de autorización.
+  const esJefe = [1, 2, 3].includes(usuario?.puesto ?? 0);
+  // La opción de autorización (índice 03) solo se muestra a esos puestos.
+  const opcionesVisibles = opciones.filter((opcion) => opcion.index !== '03' || esJefe);
 
   return (
     <main className="salidas-home-page">
@@ -53,7 +69,7 @@ export default function SalidasHome() {
           </div>
 
           <div className="salidas-home-grid">
-            {opciones.map((opcion) => (
+            {opcionesVisibles.map((opcion) => (
               <button
                 className="salidas-home-card"
                 key={opcion.index}

@@ -48,15 +48,15 @@ export type CrearSalidaResponse = {
 }
 
 export type VerSalida = {
-    numero_salidas: number,
-    id_salida: number,
-    tipo_salida: string,
-    motivo: string,
-    destino: string,
-    horade_salida: string,
-    horade_regreso: string,
-    adeudo: string | null
-  
+  numero_salidas: number
+  id_salida: number
+  tipo_salida: string
+  motivo: string
+  destino: string
+  horade_salida: string | null
+  horade_regreso: string | null
+  estado: string
+  adeudo: string | null
 }
 
 export type VerSalidasPendientesResponse = {

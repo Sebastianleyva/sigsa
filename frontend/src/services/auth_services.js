@@ -89,7 +89,7 @@ export const authService = {
   async VerSalidasPendientes(){
     try{
       const response = await api.get('salidas/routes/ver_salidas_pendientes.php');
-      return response.data;
+      return response.data.Salidas;
     }
     catch(error){
       if (error.response && error.response.data) {
