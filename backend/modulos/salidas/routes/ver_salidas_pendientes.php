@@ -23,8 +23,9 @@ function ver_salidas($pdo, $usuario) {
    $estado = 'PENDIENTE';
 
    $sql = $pdo -> prepare(
-    'SELECT * FROM salidas
-    WHERE estado = :estado'
+    'SELECT s.*, p.nombre,p.apellido_p,p.apellido_m,p.id_personal FROM salidas s
+    JOIN personal p ON s.id_personal = p.id_personal
+    WHERE s.estado = :estado'
    );
 
    $sql -> execute(['estado' => $estado]);
@@ -33,7 +34,6 @@ function ver_salidas($pdo, $usuario) {
     http_response_code(200);
     echo json_encode([
         "message" => "Salidas cargadas correctamente",
-        "Número de salidas" => count($resultado),
         "Salidas" => $resultado
     ]);
 }
