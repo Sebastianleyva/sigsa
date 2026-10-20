@@ -63,8 +63,6 @@ function crear_solicitud($pdo, $input, $usuario) {
     }
 
     $fecha         = date('Y-m-d');
-    $hora_salida   = date('H:i:s');
-    $hora_estimada = date('H:i:s', strtotime('+2 hours'));
     $estado        = "PENDIENTE"; 
     $validacion_estado = $pdo->prepare(
         'SELECT id_salida FROM salidas
@@ -82,9 +80,9 @@ function crear_solicitud($pdo, $input, $usuario) {
 
     $query = $pdo->prepare(
         'INSERT INTO salidas 
-        (tipo_salida, motivo, destino, fecha, hora_salida, hora_estimada, estado, id_personal, id_autoriza)
+        (tipo_salida, motivo, destino, fecha, estado, id_personal, id_autoriza)
         VALUES
-        (:tipo_salida, :motivo, :destino, :fecha, :hora_salida, :hora_estimada, :estado, :id_personal, :id_autoriza)'
+        (:tipo_salida, :motivo, :destino, :fecha, :estado, :id_personal, :id_autoriza)'
     );
 
     $query->execute([
@@ -92,8 +90,6 @@ function crear_solicitud($pdo, $input, $usuario) {
         'motivo'        => $motivo, 
         'destino'       => $destino,  
         'fecha'         => $fecha,  
-        'hora_salida'   => $hora_salida,
-        'hora_estimada' => $hora_estimada,
         'estado'        => $estado, 
         'id_personal'   => $id_personal, 
         'id_autoriza'   => $id_autoriza
@@ -110,8 +106,6 @@ function crear_solicitud($pdo, $input, $usuario) {
             "motivo"        => $motivo, 
             "destino"       => $destino,  
             "fecha"         => $fecha, 
-            "hora_salida"   => $hora_salida,
-            "hora_estimada" => $hora_estimada,
             "estado"        => $estado, 
             "id_personal"   => $id_personal, 
             "id_autoriza"   => $id_autoriza

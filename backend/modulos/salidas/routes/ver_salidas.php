@@ -19,7 +19,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
 function ver_salidas($pdo, $usuario) {
     
     $estado = "PENDIENTE";
-
     $id_personal = $usuario['sub'];
 
     if ($id_personal) {

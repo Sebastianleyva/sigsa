@@ -56,11 +56,8 @@ function verificacion_jerarquia($pdo,$input){
 }
 
 function aceptar_solicitud($pdo,$input){
-    if(empty($input)){
-        http_response_code(400);
-        echo json_encode(["ERROR" => "Campos faltantes"]);
-        exit;
-    }
+    verificacion_jerarquia($pdo,$input);
+    
     $id_salida = $input['id_salida'];
     $validar_estado = $pdo ->prepare(
         'SELECT estado FROM salidas

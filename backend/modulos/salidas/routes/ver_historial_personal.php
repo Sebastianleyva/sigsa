@@ -1,6 +1,6 @@
 <?php
 
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: application/json');
 
 require_once '../../../includes/auth.php';
 require_once '../../../includes/conexion.php';
@@ -17,8 +17,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 }
 
-function ver_historial_personal(PDO $pdo, array $usuario): void
-{
+function ver_historial_personal( $pdo,  $usuario){
     $id_personal = filter_var(
         $usuario['sub'] ?? null,
         FILTER_VALIDATE_INT,
@@ -33,7 +32,7 @@ function ver_historial_personal(PDO $pdo, array $usuario): void
 
     $sql = $pdo->prepare(
         'SELECT id_salida, tipo_salida, motivo, destino, hora_salida,
-                hora_llegada, hora_estimada
+                hora_llegada, estado, hora_estimada, adeudo
         FROM salidas
         WHERE id_personal = :id_personal
         ORDER BY fecha DESC, id_salida DESC'
@@ -49,9 +48,10 @@ function ver_historial_personal(PDO $pdo, array $usuario): void
             'tipo_salida' => $salida['tipo_salida'],
             'motivo' => $salida['motivo'],
             'destino' => $salida['destino'],
-            'horade_salida' => $salida['hora_salida'],
-            'horade_regreso' => $salida['hora_llegada'] ?? $salida['hora_estimada'],
-            'adeudo' => null
+            'horade_salida' => $salida['hora_salida'] ?? null,
+            'horade_regreso' => $salida['hora_llegada'] ?? null,
+            'estado' => $salida['estado'],
+            'adeudo' => $salida['adeudo'] ?? null
         ];
     }
 
