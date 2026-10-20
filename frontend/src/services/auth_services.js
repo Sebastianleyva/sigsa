@@ -103,6 +103,17 @@ export const authService = {
       throw new Error('No se pudo conectar con el servidor.');
     }
   },
+  getUsuarioActual() {
+    const usuario = localStorage.getItem('usuario');
+    if (!usuario) return null;
+
+    try {
+      return JSON.parse(usuario);
+    } catch (error) {
+      console.error('Error al parsear el usuario del localStorage:', error);
+      return null;
+    }
+  },
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('csrf_token');

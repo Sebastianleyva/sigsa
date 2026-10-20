@@ -73,10 +73,22 @@ export type VerSalidasPendientesResponse = {
   id_personal: number
 }
 
+export type Usuario = {
+  id_personal: number
+  nombre: string
+  apellido_p: string
+  apellido_m: string
+  correo: string
+  puesto: number
+  area: number
+  id_jefe: number | null
+}
+
 export const authService: {
   register(userData: RegisterUserData): Promise<RegisterResponse>
     login(userData: LoginCredencials): Promise<LoginResponse>
     CrearSalida(solicitud: CrearSalidaData): Promise<CrearSalidaResponse>
     VerHistorialPersonal(): Promise<VerSalida[]>
     VerSalidasPendientes(): Promise<VerSalidasPendientesResponse[]>
+    getUsuarioActual(): Usuario | null
 }
