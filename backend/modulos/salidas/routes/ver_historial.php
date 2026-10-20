@@ -9,7 +9,6 @@ switch($_SERVER['REQUEST_METHOD']){
     case 'GET':
         $usuario = validar_jwt_requerido();
         validar_csrf_requerido();
-        $input = json_decode(file_get_contents('php://'),true) ?? [];
         ver_historial($pdo,$input);
         break;
     case 'DEFAULT':
@@ -19,12 +18,6 @@ switch($_SERVER['REQUEST_METHOD']){
 }
 
 function ver_historial($pdo,$input){
-    if(empty($input)){
-        http_response_code(403);
-        echo json_encode(["ERROR"=>"Campos faltantes"]);
-        exit;
-    }
-
     $sql = $pdo - prepare(
         'SELECT * from salidas
         WHERE fecha fecha >= NOW() - INTERVAL 1 YEAR'
