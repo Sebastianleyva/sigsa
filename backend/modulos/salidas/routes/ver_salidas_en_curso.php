@@ -1,6 +1,6 @@
 <?php
 
-header('Contenct-Type: application/json');
+header('Content-Type: application/json');
 
 require_once '../../../includes/auth.php';
 require_once '../../../includes/conexion.php';
@@ -22,8 +22,13 @@ function ver_salidas_en_curso($pdo, $usuario){
     $estado = "EN CURSO";
 
     $sql = $pdo -> prepare(
-        'SELECT * FROM salidas
-         WHERE estado = :estado '
+        'SELECT s.id_salida, s.tipo_salida, s.motivo, s.destino, s.fecha,
+                s.hora_salida, s.hora_estimada, s.id_personal,
+                p.nombre, p.apellido_p, p.apellido_m
+         FROM salidas s
+         JOIN personal p ON p.id_personal = s.id_personal
+         WHERE s.estado = :estado
+         ORDER BY s.fecha DESC, s.hora_salida DESC, s.id_salida DESC'
     );
     
     $sql -> execute([

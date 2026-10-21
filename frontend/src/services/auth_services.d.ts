@@ -84,11 +84,26 @@ export type Usuario = {
   id_jefe: number | null
 }
 
+export type VerSalidasEnCursoResponse = {
+  id_salida: number,
+  tipo_salida: string,
+  motivo: string,
+  destino: string,
+  fecha: string,
+  hora_salida: string,
+  hora_estimada: string,
+  nombre: string,
+  apellido_p: string,
+  apellido_m: string,
+  id_personal: number
+}
+
 export const authService: {
   register(userData: RegisterUserData): Promise<RegisterResponse>
     login(userData: LoginCredencials): Promise<LoginResponse>
     CrearSalida(solicitud: CrearSalidaData): Promise<CrearSalidaResponse>
     VerHistorialPersonal(): Promise<VerSalida[]>
     VerSalidasPendientes(): Promise<VerSalidasPendientesResponse[]>
+    VerSalidasEnCurso(): Promise<VerSalidasEnCursoResponse[]>
     getUsuarioActual(): Usuario | null
 }

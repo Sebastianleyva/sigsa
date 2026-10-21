@@ -28,6 +28,14 @@ const opciones = [
     action : 'Ver pendientes',
     path : '/salidas/pendientes'
   },
+  {
+    index: '04',
+    category: 'SEGUIMIENTO',
+    title: 'Salidas en curso',
+    description: 'Consulta las salidas autorizadas que continúan activas.',
+    action: 'Ver salidas activas',
+    path: '/salidas/en-curso',
+  },
 ];
 
 export default function SalidasHome() {

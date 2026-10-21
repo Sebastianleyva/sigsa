@@ -103,6 +103,23 @@ export const authService = {
       throw new Error('No se pudo conectar con el servidor.');
     }
   },
+  async VerSalidasEnCurso(){
+    try{
+      const response = await api.get('salidas/routes/ver_salidas_en_curso.php');
+      return response.data.salidas;
+    }
+    catch(error){
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.ERROR ||
+          error.response.data.error ||
+          error.response.data.CONFLICT ||
+          'No fue posible obtener las salidas en curso.'
+        );
+      }
+      throw new Error('No se pudo conectar con el servidor.');
+    }
+  },
   getUsuarioActual() {
     const usuario = localStorage.getItem('usuario');
     if (!usuario) return null;

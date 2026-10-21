@@ -41,7 +41,7 @@ export default function Ver_Salidas_Pendientes() {
         </a>
         <div className="salidas-pendientes-topbar-meta">
           <span className="salidas-pendientes-topbar-dot" aria-hidden="true" />
-          <span>Sistema integral de gestión</span>
+          <span>Sistema de gestión de servicios administrativos</span>
         </div>
       </header>
 
