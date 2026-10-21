@@ -41,7 +41,7 @@ export default function Ver_Historial_Personal() {
                 </a>
                 <div className="historial-personal-topbar-meta">
                     <span className="historial-personal-topbar-dot" aria-hidden="true" />
-                    <span>Sistema integral de gestión</span>
+                    <span>Sistema de gestión de servicios administrativos</span>
                 </div>
             </header>
 
