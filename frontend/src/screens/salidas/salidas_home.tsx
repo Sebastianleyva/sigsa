@@ -45,8 +45,8 @@ export default function SalidasHome() {
   // Los puestos 1, 2 y 3 pueden acceder a la opción de autorización.
   const esJefe = [1, 2, 3].includes(usuario?.puesto ?? 0);
   // La opción de autorización (índice 03) solo se muestra a esos puestos.
-  const opcionesVisibles = opciones.filter((opcion) => opcion.index !== '03' || esJefe);
-
+  const opcionesRestringidas = ['03','04'];
+  const opcionesVisibles = opciones.filter((opcion) => !opcionesRestringidas.includes(opcion.index) || esJefe,);  
   return (
     <main className="salidas-home-page">
       <header className="salidas-home-topbar">
