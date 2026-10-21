@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-10-2026 a las 19:53:11
+-- Tiempo de generación: 21-10-2026 a las 18:05:50
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 7.4.30
 
@@ -117,22 +117,26 @@ CREATE TABLE `salidas` (
   `motivo` text NOT NULL COMMENT 'razon de la salida',
   `destino` text NOT NULL COMMENT 'el lugar a donde se dirije',
   `fecha` date NOT NULL,
-  `hora_salida` time NOT NULL,
+  `hora_salida` time DEFAULT NULL,
   `hora_llegada` time DEFAULT NULL,
   `estado` text NOT NULL COMMENT 'guarda el estaod de la salida (pendiente o concluida)',
   `id_personal` bigint(20) NOT NULL,
   `id_autoriza` bigint(20) DEFAULT NULL,
-  `hora_estimada` time NOT NULL
+  `hora_estimada` time DEFAULT NULL,
+  `adeudo_tiempo` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `salidas`
 --
 
-INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `hora_estimada`) VALUES
-(1, 'permiso economico', 'cita en el sat', 'sat Calle #130', '2026-09-10', '00:34:17', '00:00:00', '0', 8, 8, '13:34:17'),
-(2, 'Personal', 'Cita médica', 'Hospital General', '2026-03-30', '10:00:00', NULL, 'PENDIENTE', 10, 2, '12:00:00'),
-(3, 'OFICIAL', 'Comisión de trabajo', 'Oficina Central', '2026-10-06', '12:45:45', NULL, 'EN CURSO', 12, NULL, '14:45:45');
+INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `hora_estimada`, `adeudo_tiempo`) VALUES
+(1, 'permiso economico', 'cita en el sat', 'sat Calle #130', '2026-09-10', '00:34:17', '00:00:00', '0', 8, 8, '13:34:17', NULL),
+(2, 'Personal', 'Cita médica', 'Hospital General', '2026-03-30', '10:00:00', NULL, 'PENDIENTE', 10, 2, '12:00:00', NULL),
+(3, 'OFICIAL', 'Comisión de trabajo', 'Oficina Central', '2026-10-06', '12:45:45', NULL, 'EN CURSO', 12, NULL, '14:45:45', NULL),
+(4, 'PERSONAL', 'sss', 'sss', '2026-10-19', '18:42:02', NULL, 'FINALIZADO', 11, NULL, '20:42:02', NULL),
+(5, 'MEDICA', 'Q', 'WWW', '2026-10-20', '16:35:04', NULL, 'FINALIZADO', 11, NULL, '18:35:04', NULL),
+(6, 'MEDICA', 'AA', 'FFF', '2026-10-20', NULL, NULL, 'PENDIENTE', 11, NULL, NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -199,7 +203,7 @@ ALTER TABLE `puestos`
 -- AUTO_INCREMENT de la tabla `salidas`
 --
 ALTER TABLE `salidas`
-  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Restricciones para tablas volcadas
