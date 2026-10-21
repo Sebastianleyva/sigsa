@@ -131,6 +131,38 @@ export const authService = {
       return null;
     }
   },
+  async RechazarSalida(id_salida){
+    try{
+      const response = await api.patch('salidas/routes/rechazar_solicitud.php',id_salida);
+      return response.data;
+    }catch(error){
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.ERROR ||
+          error.response.data.error ||
+          error.response.data.CONFLICT ||
+          'No fue posible rechazar la solicitud.'
+        );
+      }
+      throw new Error('No se pudo conectar con el servidor.');
+    }
+  },
+  async AceptarSalida(id_salida){
+    try{
+      const response = await api.patch('salidas/routes/aceptar_solicitud.php',id_salida);
+      return response.data;
+    }catch(error){
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.ERROR ||
+          error.response.data.error ||
+          error.response.data.CONFLICT ||
+          'No fue posible aceptar la solicitud.'
+        );
+      }
+      throw new Error('No se pudo conectar con el servidor.');
+    }
+  },
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('csrf_token');

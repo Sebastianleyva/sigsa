@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { authService } from '../../services/auth_services.js';
 import './styles/ver_salidas_pendientes.css';
+import type { FormEvent } from 'react';
 
 type SalidaPendiente = {
   id_salida: number;
@@ -16,6 +17,44 @@ type SalidaPendiente = {
 export default function Ver_Salidas_Pendientes() {
   const [salidasPendientes, setSalidasPendientes] = useState<SalidaPendiente[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [procesando, setProcesando] = useState<number | null>(null);
+
+  const toggle = (id_salida:number) => {
+    if(id_salida===selectedId){
+      setSelectedId(null)
+    }else{
+      setSelectedId(id_salida)
+    }
+  }
+
+  async function handleAceptar(id_salida: number){
+    setProcesando(id_salida)
+    try{
+      const datos = await authService.AceptarSalida({id_salida})
+      setSalidasPendientes((prev) => prev.filter((s) => s.id_salida !== id_salida));
+      setSelectedId(null);
+    }catch(error){
+      console.error('Error al aceptar salida:', error);
+    }finally{
+      setProcesando(null);
+    }
+
+  }
+
+  async function handleRechazar(id_salida: number){
+    setProcesando(id_salida);
+    try{
+      const datos = await authService.RechazarSalida({id_salida})
+      setSalidasPendientes((prev) => prev.filter((s) => s.id_salida !== id_salida));
+      setSelectedId(null)
+    }catch(error){
+      console.error('Error al rechazar salida:', error);
+    }finally{
+      setProcesando(null);
+    }
+
+  }
 
   useEffect(() => {
     async function fetchSalidasPendientes() {
@@ -113,7 +152,7 @@ export default function Ver_Salidas_Pendientes() {
 
         <footer className="salidas-pendientes-footer">
           <span>© SIGSA</span>
-          <span>Sistema integral de gestión</span>
+          <span>Sistema de gestión de servicios administrativos</span>
         </footer>
       </section>
     </main>

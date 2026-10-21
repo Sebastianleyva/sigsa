@@ -98,6 +98,24 @@ export type VerSalidasEnCursoResponse = {
   id_personal: number
 }
 
+export type AceptarSalidaData = {
+  id_salida: number
+}
+export type AceptarSalidaResponse = {
+  id_salida: number,
+  estado: string,
+  hora_salida: string,
+  hora_llegada: string
+}
+
+export type RechazarSalidaData = {
+  id_salida: number
+}
+export type RechazarSalidaResponse = {
+  id_salida: number
+}
+
+
 export const authService: {
   register(userData: RegisterUserData): Promise<RegisterResponse>
     login(userData: LoginCredencials): Promise<LoginResponse>
@@ -105,5 +123,7 @@ export const authService: {
     VerHistorialPersonal(): Promise<VerSalida[]>
     VerSalidasPendientes(): Promise<VerSalidasPendientesResponse[]>
     VerSalidasEnCurso(): Promise<VerSalidasEnCursoResponse[]>
+    AceptarSalida(id: AceptarSalidaData): Promise<AceptarSalidaResponse> 
+    RechazarSalida(id: RechazarSalidaData): Promise<RechazarSalidaResponse>
     getUsuarioActual(): Usuario | null
 }

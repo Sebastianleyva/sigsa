@@ -56,7 +56,7 @@ export default function SalidasHome() {
         </a>
         <div className="salidas-home-topbar-meta">
           <span className="salidas-home-topbar-dot" aria-hidden="true" />
-          <span>Sistema integral de gestión</span>
+          <span>Sistema de gestión de servicios administrativos</span>
         </div>
       </header>
 
