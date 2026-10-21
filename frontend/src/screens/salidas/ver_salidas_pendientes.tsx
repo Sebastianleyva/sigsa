@@ -117,7 +117,7 @@ export default function Ver_Salidas_Pendientes() {
           ) : (
             <div className="salidas-pendientes-list">
               {salidasPendientes.map((salida) => (
-                <article className="salidas-pendientes-card" key={salida.id_salida}>
+                <article className="salidas-pendientes-card" key={salida.id_salida} onClick={toggle(salida.id_salida)}>
                   <div className="salidas-pendientes-card-header">
                     <div>
                       <span className="salidas-pendientes-card-kicker">SOLICITUD DE SALIDA</span>
