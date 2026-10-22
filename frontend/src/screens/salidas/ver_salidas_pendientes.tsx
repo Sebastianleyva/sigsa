@@ -20,37 +20,37 @@ export default function Ver_Salidas_Pendientes() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [procesando, setProcesando] = useState<number | null>(null);
 
-  const toggle = (id_salida:number) => {
-    if(id_salida===selectedId){
+  const toggle = (id_salida: number) => {
+    if (id_salida === selectedId) {
       setSelectedId(null)
-    }else{
+    } else {
       setSelectedId(id_salida)
     }
   }
 
-  async function handleAceptar(id_salida: number){
+  async function handleAceptar(id_salida: number) {
     setProcesando(id_salida)
-    try{
-      const datos = await authService.AceptarSalida({id_salida})
+    try {
+      const datos = await authService.AceptarSalida({ id_salida })
       setSalidasPendientes((prev) => prev.filter((s) => s.id_salida !== id_salida));
       setSelectedId(null);
-    }catch(error){
+    } catch (error) {
       console.error('Error al aceptar salida:', error);
-    }finally{
+    } finally {
       setProcesando(null);
     }
 
   }
 
-  async function handleRechazar(id_salida: number){
+  async function handleRechazar(id_salida: number) {
     setProcesando(id_salida);
-    try{
-      const datos = await authService.RechazarSalida({id_salida})
+    try {
+      const datos = await authService.RechazarSalida({ id_salida })
       setSalidasPendientes((prev) => prev.filter((s) => s.id_salida !== id_salida));
       setSelectedId(null)
-    }catch(error){
+    } catch (error) {
       console.error('Error al rechazar salida:', error);
-    }finally{
+    } finally {
       setProcesando(null);
     }
 
@@ -117,7 +117,13 @@ export default function Ver_Salidas_Pendientes() {
           ) : (
             <div className="salidas-pendientes-list">
               {salidasPendientes.map((salida) => (
-                <article className="salidas-pendientes-card" key={salida.id_salida} onClick={toggle(salida.id_salida)}>
+                <article className="salidas-pendientes-card" key={salida.id_salida} onClick={() => toggle(salida.id_salida)}>
+                  {selectedId === salida.id_salida && (
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <button onClick={() => handleAceptar(salida.id_salida)}>Aceptar</button>
+                      <button onClick={() => handleRechazar(salida.id_salida)}>Rechazar</button>
+                    </div>
+                  )}
                   <div className="salidas-pendientes-card-header">
                     <div>
                       <span className="salidas-pendientes-card-kicker">SOLICITUD DE SALIDA</span>
