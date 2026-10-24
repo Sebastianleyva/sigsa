@@ -9,6 +9,7 @@ import SalidasHome from './screens/salidas/salidas_home.tsx'
 import VerHistorialPersonal from './screens/salidas/ver_historial_personal.tsx'
 import Ver_Salidas_Pendientes from './screens/salidas/ver_salidas_pendientes.tsx'
 import Ver_Salidas_En_Curso from './screens/salidas/ver_salidas_en_curso.tsx'
+import RegistrarScreen from './screens/auth/registrar.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/salidas/historial" element={<VerHistorialPersonal />} />
         <Route path="/salidas/pendientes" element={<Ver_Salidas_Pendientes />} />
         <Route path="/salidas/en-curso" element={<Ver_Salidas_En_Curso />} />
+        <Route path="registrarse" element={<RegistrarScreen />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

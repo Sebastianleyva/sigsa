@@ -145,6 +145,56 @@
   box-shadow: 0 12px 30px rgb(25 48 44 / 4%);
 }
 
+.salidas-pendientes-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin: -2px 0 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--salidas-pendientes-line);
+}
+
+.salidas-pendientes-button {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.salidas-pendientes-button:hover {
+  transform: translateY(-1px);
+}
+
+.salidas-pendientes-button:focus-visible {
+  outline: 3px solid var(--salidas-pendientes-coral);
+  outline-offset: 2px;
+}
+
+.salidas-pendientes-button-accept {
+  background: var(--salidas-pendientes-green);
+  color: #fff;
+}
+
+.salidas-pendientes-button-accept:hover {
+  background: #105744;
+}
+
+.salidas-pendientes-button-reject {
+  border-color: #e8c8bd;
+  background: #fff8f5;
+  color: #a94e36;
+}
+
+.salidas-pendientes-button-reject:hover {
+  border-color: var(--salidas-pendientes-coral);
+  background: #fbece6;
+}
+
 .salidas-pendientes-card-header {
   display: flex;
   align-items: flex-start;
