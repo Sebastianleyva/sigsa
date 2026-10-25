@@ -20,17 +20,20 @@ export default function Ver_Salidas_Pendientes() {
   const [procesando, setProcesando] = useState<number | null>(null);
 
   const toggle = (id_salida: number) => {
+    // Si se está procesando esta salida, evitamos que se cierre/abra el menú
+    if (procesando === id_salida) return;
+
     if (id_salida === selectedId) {
-      setSelectedId(null)
+      setSelectedId(null);
     } else {
-      setSelectedId(id_salida)
+      setSelectedId(id_salida);
     }
-  }
+  };
 
   async function handleAceptar(id_salida: number) {
-    setProcesando(id_salida)
+    setProcesando(id_salida);
     try {
-      const datos = await authService.AceptarSalida({ id_salida })
+      await authService.AceptarSalida({ id_salida });
       setSalidasPendientes((prev) => prev.filter((s) => s.id_salida !== id_salida));
       setSelectedId(null);
     } catch (error) {
@@ -38,21 +41,19 @@ export default function Ver_Salidas_Pendientes() {
     } finally {
       setProcesando(null);
     }
-
   }
 
   async function handleRechazar(id_salida: number) {
     setProcesando(id_salida);
     try {
-      const datos = await authService.RechazarSalida({ id_salida })
+      await authService.RechazarSalida({ id_salida });
       setSalidasPendientes((prev) => prev.filter((s) => s.id_salida !== id_salida));
-      setSelectedId(null)
+      setSelectedId(null);
     } catch (error) {
       console.error('Error al rechazar salida:', error);
     } finally {
       setProcesando(null);
     }
-
   }
 
   useEffect(() => {
@@ -116,11 +117,25 @@ export default function Ver_Salidas_Pendientes() {
           ) : (
             <div className="salidas-pendientes-list">
               {salidasPendientes.map((salida) => (
-                <article className="salidas-pendientes-card" key={salida.id_salida} onClick={() => toggle(salida.id_salida)}>
+                <article
+                  className="salidas-pendientes-card"
+                  key={salida.id_salida}
+                  onClick={() => toggle(salida.id_salida)}
+                >
                   {selectedId === salida.id_salida && (
-                    <div className="salidas-pendientes-actions" onClick={(e) => e.stopPropagation()}>
-                      <button className="salidas-pendientes-button salidas-pendientes-button-accept" onClick={() => handleAceptar(salida.id_salida)}>Aceptar</button>
-                      <button className="salidas-pendientes-button salidas-pendientes-button-reject" onClick={() => handleRechazar(salida.id_salida)}>Rechazar</button>
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => handleAceptar(salida.id_salida)}
+                        disabled={procesando === salida.id_salida}
+                      >
+                        {procesando === salida.id_salida ? 'Procesando...' : 'Aceptar'}
+                      </button>
+                      <button
+                        onClick={() => handleRechazar(salida.id_salida)}
+                        disabled={procesando === salida.id_salida}
+                      >
+                        {procesando === salida.id_salida ? 'Procesando...' : 'Rechazar'}
+                      </button>
                     </div>
                   )}
                   <div className="salidas-pendientes-card-header">

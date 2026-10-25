@@ -27,7 +27,7 @@ const modules = [
 
 export default function HomeScreen() {
   const navigate = useNavigate()
-  
+
   return (
     <main className="home-page">
       <header className="home-topbar">
@@ -37,7 +37,7 @@ export default function HomeScreen() {
         </a>
         <div className="home-topbar-meta">
           <span className="home-topbar-dot" aria-hidden="true" />
-          <span>Sistema integral de gestión</span>
+          <span>Sistema de gestión de servicios administrativos</span>
         </div>
       </header>
 
@@ -79,7 +79,7 @@ export default function HomeScreen() {
 
         <footer className="home-footer">
           <span>© SIGSA</span>
-          <span>Sistema integral de gestión</span>
+          <span>Sistema de gestión de servicios administrativos</span>
         </footer>
       </section>
     </main>
