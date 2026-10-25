@@ -9,6 +9,7 @@ switch ($_SERVER['REQUEST_METHOD']){
     case 'PATCH':
         $usuario = validar_jwt_requerido();
         validar_csrf_requerido();
+        requerir_rol([1,2,3]);
         $input=json_decode(file_get_contents('php://input'),true) ?? [];
         rchazar_solicitud($pdo,$input);
         break;
@@ -18,15 +19,47 @@ switch ($_SERVER['REQUEST_METHOD']){
         break;
 }
 
-function rchazar_solicitud($pdo,$input){
+function verificacion_jerarquia($pdo,$input){
     if(empty($input)){
         http_response_code(400);
         echo json_encode(["ERROR" => "Campos faltantes"]);
         exit;
     }
+    $id_autorizante = $_SESSION['id_personal'];
+    $id_salida = $input['id_salida'];
+
+    $sql = $pdo -> prepare(
+        'SELECT id_personal FROM salidas 
+        WHERE id_salida = :id_salida'
+    );
+    $sql -> execute (['id_salida'=>$id_salida]);
+    $resultado1 = $sql -> fetch();
+    if(!$resultado1){
+        http_response_code(404);
+        echo json_encode(["ERROR"=>"Solicitud inexistente"]);
+        exit;
+    }
+    $id_solicitante = $resultado1['id_personal'];
+
+    $verificacion = $pdo -> prepare(
+        'SELECT id_jefe FROM personal
+        WHERE id_personal = :id_solicitante'
+    );
+    $verificacion -> execute(['id_solicitante' => $id_solicitante]);
+    $resultado2 = $verificacion -> fetch();
+
+    if($resultado2['id_jefe']!=$id_autorizante){
+        http_response_code(403);
+        echo json_encode(["ERROR"=>"No puedes autorizar esta salida"]);
+        exit;
+    }
+}
+
+function rchazar_solicitud($pdo,$input){
+    verificacion_jerarquia($pdo,$input);
 
     $id_salida = $input['id_salida'];
-    $id_autoriza = $input['id_personal']
+    $id_autoriza = $_SESSION['id_personal'];
 
     $validar_estado = $pdo ->prepare(
         'SELECT estado FROM salidas
@@ -53,7 +86,7 @@ function rchazar_solicitud($pdo,$input){
     );
     $query -> execute([
         'id_salida' => $id_salida,
-        'estado' => $nuevo_estado
+        'nuevo_estado' => $nuevo_estado
     ]);
 
     http_response_code(200);
