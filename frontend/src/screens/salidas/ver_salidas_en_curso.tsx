@@ -14,6 +14,9 @@ type SalidaEnCurso = {
   apellido_p: string;
   apellido_m: string;
   id_personal: number;
+  autorizante_nombre: string | null;
+  autorizante_apellido_p: string | null;
+  autorizante_apellido_m: string | null;
 };
 
 export default function Ver_Salidas_En_Curso() {
@@ -117,6 +120,14 @@ export default function Ver_Salidas_En_Curso() {
                     <div className="salidas-en-curso-field">
                       <span className="salidas-en-curso-label">Motivo</span>
                       <p>{salida.motivo}</p>
+                    </div>
+                    <div className="salidas-en-curso-field">
+                      <span className="salidas-en-curso-label">Autorizó</span>
+                      <p>
+                        {salida.autorizante_nombre
+                          ? `${salida.autorizante_nombre} ${salida.autorizante_apellido_p ?? ''} ${salida.autorizante_apellido_m ?? ''}`.trim()
+                          : 'No registrado'}
+                      </p>
                     </div>
                     <div className="salidas-en-curso-meta-grid">
                       <div className="salidas-en-curso-field">

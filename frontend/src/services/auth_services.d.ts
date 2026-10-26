@@ -95,17 +95,24 @@ export type VerSalidasEnCursoResponse = {
   nombre: string,
   apellido_p: string,
   apellido_m: string,
-  id_personal: number
+  id_personal: number,
+  autorizante_nombre: string | null,
+  autorizante_apellido_p: string | null,
+  autorizante_apellido_m: string | null
 }
 
 export type AceptarSalidaData = {
   id_salida: number
 }
+
 export type AceptarSalidaResponse = {
-  id_salida: number,
-  estado: string,
-  hora_salida: string,
-  hora_llegada: string
+  message: string
+  salida: {
+    id_salida: number
+    estado: string
+    hora_salida: string
+    hora_estimada: string
+  }
 }
 
 export type RechazarSalidaData = {
@@ -128,6 +135,9 @@ export type VerHistorialSalida = {
   nombre: string
   apellido_p: string
   apellido_m: string
+  autorizante_nombre: string | null
+  autorizante_apellido_p: string | null
+  autorizante_apellido_m: string | null
 }
 
 export type VerHistorialResponse = {

@@ -117,6 +117,14 @@ export default function VerHistorial() {
                       <span className="historial-label">Motivo</span>
                       <p>{salida.motivo}</p>
                     </div>
+                    <div className="historial-field">
+                      <span className="historial-label">Autorizó</span>
+                      <p>
+                        {salida.autorizante_nombre
+                          ? `${salida.autorizante_nombre} ${salida.autorizante_apellido_p ?? ''} ${salida.autorizante_apellido_m ?? ''}`.trim()
+                          : 'No registrado'}
+                      </p>
+                    </div>
                     <div className="historial-meta-grid">
                       <div className="historial-field">
                         <span className="historial-label">Fecha</span>

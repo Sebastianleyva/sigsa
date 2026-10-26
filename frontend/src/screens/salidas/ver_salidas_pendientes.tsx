@@ -117,25 +117,11 @@ export default function Ver_Salidas_Pendientes() {
           ) : (
             <div className="salidas-pendientes-list">
               {salidasPendientes.map((salida) => (
-                <article
-                  className="salidas-pendientes-card"
-                  key={salida.id_salida}
-                  onClick={() => toggle(salida.id_salida)}
-                >
+                <article className="salidas-pendientes-card" key={salida.id_salida} onClick={() => toggle(salida.id_salida)}>
                   {selectedId === salida.id_salida && (
-                    <div onClick={(e) => e.stopPropagation()}>
-                      <button
-                        onClick={() => handleAceptar(salida.id_salida)}
-                        disabled={procesando === salida.id_salida}
-                      >
-                        {procesando === salida.id_salida ? 'Procesando...' : 'Aceptar'}
-                      </button>
-                      <button
-                        onClick={() => handleRechazar(salida.id_salida)}
-                        disabled={procesando === salida.id_salida}
-                      >
-                        {procesando === salida.id_salida ? 'Procesando...' : 'Rechazar'}
-                      </button>
+                    <div className="salidas-pendientes-actions" onClick={(e) => e.stopPropagation()}>
+                      <button className="salidas-pendientes-button salidas-pendientes-button-accept" onClick={() => handleAceptar(salida.id_salida)}>Aceptar</button>
+                      <button className="salidas-pendientes-button salidas-pendientes-button-reject" onClick={() => handleRechazar(salida.id_salida)}>Rechazar</button>
                     </div>
                   )}
                   <div className="salidas-pendientes-card-header">

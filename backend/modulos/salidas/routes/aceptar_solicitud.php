@@ -58,7 +58,9 @@ function verificacion_jerarquia($pdo,$input){
 function aceptar_solicitud($pdo,$input){
     verificacion_jerarquia($pdo,$input);
     
+    $id_autorizante = $_SESSION['id_personal'];
     $id_salida = $input['id_salida'];
+
     $validar_estado = $pdo ->prepare(
         'SELECT estado FROM salidas
         WHERE id_salida = :id_salida'
@@ -84,11 +86,13 @@ function aceptar_solicitud($pdo,$input){
         'UPDATE salidas 
         SET estado = :nuevo_estado,
         hora_salida = :hora_salida,
-        hora_estimada = :hora_estimada
+        hora_estimada = :hora_estimada,
+        id_autoriza = :id_autoriza
         WHERE id_salida = :id_salida'
     );
     $query -> execute([
         'id_salida' => $id_salida,
+        'id_autoriza' => $id_autorizante,
         'nuevo_estado' => $nuevo_estado,
         'hora_salida' => $hora_salida,
         'hora_estimada' => $hora_estimada
@@ -101,7 +105,10 @@ function aceptar_solicitud($pdo,$input){
             'id_salida' => $id_salida,
             'estado' => $nuevo_estado,
             'hora_salida' => $hora_salida,
-            'hora_estimada' => $hora_estimada
+            'hora_estimada' => $hora_estimada,
+            'autoriza' => $_SESSION['nombre'],
+            'id_autoriza' => $_SESSION['id_personal']
+            
         ]
     ]);
 
