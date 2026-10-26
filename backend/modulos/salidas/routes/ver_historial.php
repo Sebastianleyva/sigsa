@@ -9,7 +9,8 @@ switch($_SERVER['REQUEST_METHOD']){
     case 'GET':
         $usuario = validar_jwt_requerido();
         validar_csrf_requerido();
-        ver_historial($pdo,$input);
+        requerir_rol([1, 2, 3]);
+        ver_historial($pdo);
         break;
     case 'DEFAULT':
         http_response_code(405);
@@ -17,10 +18,13 @@ switch($_SERVER['REQUEST_METHOD']){
         break;
 }
 
-function ver_historial($pdo,$input){
-    $sql = $pdo - prepare(
-        'SELECT * from salidas
-        WHERE fecha fecha >= NOW() - INTERVAL 1 YEAR'
+function ver_historial($pdo){
+    $sql = $pdo -> prepare(
+        'SELECT s.id_salida, s.destino, s.motivo, s.hora_llegada, s.hora_salida, s.id_personal, s.id_autoriza, s.fecha,
+        s.adeudo_tiempo, p.nombre, p.apellido_p, p.apellido_m 
+        FROM salidas s
+        JOIN personal p on s.id_personal = p.id_personal
+        WHERE s.fecha >= NOW() - INTERVAL 1 YEAR'
     );
     $sql -> execute();
     $resultado = $sql -> fetchAll();

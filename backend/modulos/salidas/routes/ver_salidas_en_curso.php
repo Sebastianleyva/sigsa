@@ -9,6 +9,7 @@ switch($_SERVER['REQUEST_METHOD']){
     case 'GET':
         $usuario = validar_jwt_requerido();
         validar_csrf_requerido();
+        requerir_rol([1, 2, 3]);
         ver_salidas_en_curso($pdo, $usuario);
         break;
     default:
