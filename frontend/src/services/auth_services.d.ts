@@ -115,16 +115,25 @@ export type RechazarSalidaResponse = {
   id_salida: number
 }
 
+export type VerHistorialSalida = {
+  id_salida: number
+  destino: string
+  motivo: string
+  hora_llegada: string | null
+  hora_salida: string | null
+  id_personal: number
+  id_autoriza: number | null
+  fecha: string
+  adeudo_tiempo: string | null
+  nombre: string
+  apellido_p: string
+  apellido_m: string
+}
+
 export type VerHistorialResponse = {
-    id_salida: number,
-    motivo: string,
-    destino: string, 
-    nombre: string,
-    apellido_p: string,
-    apellido_m: string,
-    hora_salida: string,
-    hora_llegada: string,
-    adeudo: string | null
+  message: string
+  "Número de salidas": number
+  Salidas: VerHistorialSalida[]
 }
 
 export const authService: {
@@ -137,5 +146,5 @@ export const authService: {
     AceptarSalida(id: AceptarSalidaData): Promise<AceptarSalidaResponse> 
     RechazarSalida(id: RechazarSalidaData): Promise<RechazarSalidaResponse>
     getUsuarioActual(): Usuario | null
-    VerHistorial(): promise<VerHistorialResponse[]>
+    VerHistorial(): Promise<VerHistorialResponse>
 }

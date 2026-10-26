@@ -36,16 +36,23 @@ const opciones = [
     action: 'Ver salidas activas',
     path: '/salidas/en-curso',
   },
+  {
+    index: '05',
+    category: 'CONSULTA',
+    title: 'Historial general',
+    description: 'Consulta las salidas registradas de todo el personal durante el último año.',
+    action: 'Ver historial general',
+    path: '/salidas/historial-general',
+  },
 ];
 
 export default function SalidasHome() {
   const navigate = useNavigate();
   const usuario = authService.getUsuarioActual()
 
-  // Los puestos 1, 2 y 3 pueden acceder a la opción de autorización.
+  // Los puestos 1, 2 y 3 pueden acceder a las opciones de seguimiento general.
   const esJefe = [1, 2, 3].includes(usuario?.puesto ?? 0);
-  // La opción de autorización (índice 03) solo se muestra a esos puestos.
-  const opcionesRestringidas = ['03','04'];
+  const opcionesRestringidas = ['03', '04', '05'];
   const opcionesVisibles = opciones.filter((opcion) => !opcionesRestringidas.includes(opcion.index) || esJefe,);  
   return (
     <main className="salidas-home-page">
