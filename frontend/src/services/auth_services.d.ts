@@ -115,6 +115,17 @@ export type RechazarSalidaResponse = {
   id_salida: number
 }
 
+export type VerHistorialResponse = {
+    id_salida: number,
+    motivo: string,
+    destino: string, 
+    nombre: string,
+    apellido_p: string,
+    apellido_m: string,
+    hora_salida: string,
+    hora_llegada: string,
+    adeudo: string | null
+}
 
 export const authService: {
   register(userData: RegisterUserData): Promise<RegisterResponse>
@@ -126,4 +137,5 @@ export const authService: {
     AceptarSalida(id: AceptarSalidaData): Promise<AceptarSalidaResponse> 
     RechazarSalida(id: RechazarSalidaData): Promise<RechazarSalidaResponse>
     getUsuarioActual(): Usuario | null
+    VerHistorial(): promise<VerHistorialResponse[]>
 }

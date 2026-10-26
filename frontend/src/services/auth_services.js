@@ -163,6 +163,22 @@ export const authService = {
       throw new Error('No se pudo conectar con el servidor.');
     }
   },
+  async VerHistorial(){
+    try{
+      const response = await api.get('salidas/routes/ver_historial.php');
+      return response.data;
+    }catch(error){
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.ERROR ||
+          error.response.data.error ||
+          error.response.data.CONFLICT ||
+          'No fue posible aceptar la solicitud.'
+        );
+      }
+      throw new Error('No se pudo conectar con el servidor.');
+    }
+  },
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('csrf_token');
