@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 21-10-2026 a las 18:05:50
--- Versión del servidor: 10.4.25-MariaDB
--- Versión de PHP: 7.4.30
+-- Host: 127.0.0.1
+-- Generation Time: Oct 26, 2026 at 03:47 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `sigsa`
+-- Database: `sigsa`
 --
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `areas`
+-- Table structure for table `areas`
 --
 
 CREATE TABLE `areas` (
@@ -32,10 +32,10 @@ CREATE TABLE `areas` (
   `nombre` text NOT NULL,
   `descripcion` text NOT NULL,
   `id_subdireccion` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `areas`
+-- Dumping data for table `areas`
 --
 
 INSERT INTO `areas` (`id_area`, `nombre`, `descripcion`, `id_subdireccion`) VALUES
@@ -51,7 +51,7 @@ INSERT INTO `areas` (`id_area`, `nombre`, `descripcion`, `id_subdireccion`) VALU
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `personal`
+-- Table structure for table `personal`
 --
 
 CREATE TABLE `personal` (
@@ -68,35 +68,35 @@ CREATE TABLE `personal` (
   `id_jefe` bigint(20) DEFAULT NULL,
   `activo` char(1) NOT NULL,
   `contrasena` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `personal`
+-- Dumping data for table `personal`
 --
 
 INSERT INTO `personal` (`id_personal`, `rfc`, `curp`, `nombre`, `apellido_p`, `apellido_m`, `correo`, `telefono`, `puesto`, `area`, `id_jefe`, `activo`, `contrasena`) VALUES
-(2, 'seb45678io123', 'rils060301hdgyba2', 'sebastian', 'rivera', 'leyva', '', '', 1, NULL, NULL, '', ''),
-(4, 'seb45678io133', '1sssdfr12345678912', 'sebas', 'leyva', 'leyva', 'ssss', '12345678', 2, 1, 2, '', ''),
-(6, 'son13valores1', 'aquison18valores12', 'jose', 'perez', 'paez', 'jose@gmail.com', '123456789', 3, 7, 4, '', ''),
-(8, 'son12valores1', 'aquison18valores13', 'luis', 'jimenez', 'gonzalez', 'jimenez@gmail.com', '123456781', 4, 7, 6, '', ''),
-(10, 'seb45678io321', 'rils060301hdgybe3', 'jose', 'leyva', 'leyva', 'riveraleyvasebastian@gmail.com', '987654321', 4, 7, 2, '', '$2y$10$uQUePipyahSE63IyYfw/CusHMotAGjzdJBDxOttg4Tt2mb26Istrq'),
-(11, 'seb45876io123', 'rils060311hdgyba2', 'sebastian', 'Rivera', 'leyva', 'jossssse@gmail.com', '123488889', 3, 7, 4, '', '$2y$10$knVu6YvJTPSk69Tnoy1l/ebl9NXsp.AjiAnxCKCW1/eiduVSlnk4y'),
-(12, 'son21valores1', 'Rils060302hdgtva4', 'sebas', 'leyva', 'rivera', 'jjj@', '6181171603', 2, 1, 2, '', '$2y$10$q/eHMNq/apl/8Wnwf7StJObUQV/9DPD.0BKLbAORfGjnuCjZHMOUq');
+(13, 'son13valores1', 'rils060301hdgytba2', 'Sebastian', 'Rivera', 'Leyva', 'sebastian@gmail.com', '6181161702', 1, NULL, NULL, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
+(14, 'son13valores2', 'legs060301hdgytba2', 'Sebastian', 'Leyva', 'Gutierrez', 'leyva@gmail.com', '6181161703', 2, 2, 13, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
+(15, 'son13valores3', 'rils060301hdgytba3', 'Luis', 'Jimenez', 'Delgado', 'delgado@gmail.com', '6181161704', 3, 7, 14, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
+(16, 'son13valores4', 'rils060301hdgytba4', 'Diego', 'Erre', 'So', 'diego@gmail.com', '6181161705', 4, 7, 15, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
+(18, 'son13valores5', 'rils060301hdgytba5', 'Jose', 'Lomas', 'Turbas', 'jose@gmail.com', '6181161706', 2, 1, 13, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
+(20, 'son13valores6', 'rils060301hdgytba6', 'Itzel', 'Ochoa', 'Gandara', 'itzel@gmail.com', '6181161707', 3, 8, 18, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
+(21, 'son13valores7', 'rils060301hdgytba7', 'Mafer', 'luna', 'soto', 'mafer@gmail.com', '6181161708', 4, 8, 20, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `puestos`
+-- Table structure for table `puestos`
 --
 
 CREATE TABLE `puestos` (
   `id_puesto` bigint(20) NOT NULL,
   `nombre` text NOT NULL,
   `descripcion` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `puestos`
+-- Dumping data for table `puestos`
 --
 
 INSERT INTO `puestos` (`id_puesto`, `nombre`, `descripcion`) VALUES
@@ -108,7 +108,7 @@ INSERT INTO `puestos` (`id_puesto`, `nombre`, `descripcion`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `salidas`
+-- Table structure for table `salidas`
 --
 
 CREATE TABLE `salidas` (
@@ -124,33 +124,29 @@ CREATE TABLE `salidas` (
   `id_autoriza` bigint(20) DEFAULT NULL,
   `hora_estimada` time DEFAULT NULL,
   `adeudo_tiempo` time DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `salidas`
+-- Dumping data for table `salidas`
 --
 
 INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `hora_estimada`, `adeudo_tiempo`) VALUES
-(1, 'permiso economico', 'cita en el sat', 'sat Calle #130', '2026-09-10', '00:34:17', '00:00:00', '0', 8, 8, '13:34:17', NULL),
-(2, 'Personal', 'Cita médica', 'Hospital General', '2026-03-30', '10:00:00', NULL, 'PENDIENTE', 10, 2, '12:00:00', NULL),
-(3, 'OFICIAL', 'Comisión de trabajo', 'Oficina Central', '2026-10-06', '12:45:45', NULL, 'EN CURSO', 12, NULL, '14:45:45', NULL),
-(4, 'PERSONAL', 'sss', 'sss', '2026-10-19', '18:42:02', NULL, 'FINALIZADO', 11, NULL, '20:42:02', NULL),
-(5, 'MEDICA', 'Q', 'WWW', '2026-10-20', '16:35:04', NULL, 'FINALIZADO', 11, NULL, '18:35:04', NULL),
-(6, 'MEDICA', 'AA', 'FFF', '2026-10-20', NULL, NULL, 'PENDIENTE', 11, NULL, NULL, NULL);
+(7, 'PERSONAL', 'Voy por el festival del día de las madres en la escuela de mi hijo', 'Secundaria #3', '2026-10-22', '16:59:40', NULL, 'FINALIZADO', 21, NULL, '18:59:40', NULL),
+(8, 'MEDICA', 'me duele la panza', 'issste', '2026-10-25', NULL, NULL, 'RECHAZADA', 21, NULL, NULL, NULL);
 
 --
--- Índices para tablas volcadas
+-- Indexes for dumped tables
 --
 
 --
--- Indices de la tabla `areas`
+-- Indexes for table `areas`
 --
 ALTER TABLE `areas`
   ADD PRIMARY KEY (`id_area`),
   ADD KEY `id_subdireccion` (`id_subdireccion`);
 
 --
--- Indices de la tabla `personal`
+-- Indexes for table `personal`
 --
 ALTER TABLE `personal`
   ADD PRIMARY KEY (`id_personal`),
@@ -163,13 +159,13 @@ ALTER TABLE `personal`
   ADD KEY `id_jefe` (`id_jefe`);
 
 --
--- Indices de la tabla `puestos`
+-- Indexes for table `puestos`
 --
 ALTER TABLE `puestos`
   ADD PRIMARY KEY (`id_puesto`);
 
 --
--- Indices de la tabla `salidas`
+-- Indexes for table `salidas`
 --
 ALTER TABLE `salidas`
   ADD PRIMARY KEY (`id_salida`),
@@ -178,45 +174,45 @@ ALTER TABLE `salidas`
   ADD KEY `id_personal_2` (`id_personal`);
 
 --
--- AUTO_INCREMENT de las tablas volcadas
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT de la tabla `areas`
+-- AUTO_INCREMENT for table `areas`
 --
 ALTER TABLE `areas`
   MODIFY `id_area` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT de la tabla `personal`
+-- AUTO_INCREMENT for table `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `id_personal` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_personal` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
--- AUTO_INCREMENT de la tabla `puestos`
+-- AUTO_INCREMENT for table `puestos`
 --
 ALTER TABLE `puestos`
   MODIFY `id_puesto` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT de la tabla `salidas`
+-- AUTO_INCREMENT for table `salidas`
 --
 ALTER TABLE `salidas`
-  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- Restricciones para tablas volcadas
+-- Constraints for dumped tables
 --
 
 --
--- Filtros para la tabla `areas`
+-- Constraints for table `areas`
 --
 ALTER TABLE `areas`
   ADD CONSTRAINT `areas_ibfk_1` FOREIGN KEY (`id_subdireccion`) REFERENCES `areas` (`id_area`);
 
 --
--- Filtros para la tabla `personal`
+-- Constraints for table `personal`
 --
 ALTER TABLE `personal`
   ADD CONSTRAINT `personal_ibfk_1` FOREIGN KEY (`area`) REFERENCES `areas` (`id_area`),
@@ -224,7 +220,7 @@ ALTER TABLE `personal`
   ADD CONSTRAINT `personal_ibfk_3` FOREIGN KEY (`id_jefe`) REFERENCES `personal` (`id_personal`);
 
 --
--- Filtros para la tabla `salidas`
+-- Constraints for table `salidas`
 --
 ALTER TABLE `salidas`
   ADD CONSTRAINT `salidas_ibfk_1` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`),
