@@ -35,9 +35,13 @@ function ver_historial_personal( $pdo,  $usuario){
                 hora_llegada, estado, hora_estimada, adeudo_tiempo
         FROM salidas
         WHERE id_personal = :id_personal
+        AND estado = :estado
         ORDER BY fecha DESC, id_salida DESC'
     );
-    $sql->execute(['id_personal' => $id_personal]);
+    $sql->execute([
+        'id_personal' => $id_personal,
+        'estado' => 'FINALIZADO'
+    ]);
     $salidas = $sql->fetchAll();
 
     $historial = [];

@@ -49,7 +49,7 @@ export default function Ver_Historial_Personal() {
                 <div className="historial-personal-heading">
                     <span className="historial-personal-eyebrow">HISTORIAL · SIGSA</span>
                     <h1>Mis salidas</h1>
-                    <p>Consulta el registro de tus solicitudes y revisa el detalle de cada salida programada.</p>
+                    <p>Consulta el registro de tus salidas finalizadas y revisa sus detalles.</p>
                 </div>
 
                 {loading ? (
@@ -58,7 +58,7 @@ export default function Ver_Historial_Personal() {
                     <div className="historial-personal-empty">
                         <span className="historial-personal-empty-icon" aria-hidden="true">✓</span>
                         <h2>No hay salidas registradas</h2>
-                        <p>Aún no tienes movimientos en tu historial personal.</p>
+                        <p>Aún no tienes salidas finalizadas en tu historial personal.</p>
                     </div>
                 ) : (
                     <div className="historial-personal-list">
