@@ -70,7 +70,8 @@ export type VerSalidasPendientesResponse = {
   nombre: string,
   apellido_p: string,
   apellido_m: string,
-  id_personal: number
+  id_personal: number,
+  area: number | null
 }
 
 export type Usuario = {

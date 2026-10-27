@@ -11,11 +11,13 @@ type SalidaPendiente = {
   apellido_p: string;
   apellido_m: string;
   id_personal: number;
+  area: number | null;
 };
 
 export default function Ver_Salidas_Pendientes() {
   const [salidasPendientes, setSalidasPendientes] = useState<SalidaPendiente[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [procesando, setProcesando] = useState<number | null>(null);
 
@@ -59,10 +61,23 @@ export default function Ver_Salidas_Pendientes() {
   useEffect(() => {
     async function fetchSalidasPendientes() {
       try {
+        const usuario = authService.getUsuarioActual();
+        const areaUsuario = usuario?.area;
+        if (areaUsuario == null || !Number.isFinite(Number(areaUsuario)) || Number(areaUsuario) <= 0) {
+          throw new Error('No se pudo determinar el área del usuario para consultar las solicitudes.');
+        }
+
         const datos = await authService.VerSalidasPendientes();
-        setSalidasPendientes(datos);
-      } catch (error) {
-        console.error('Error fetching salidas pendientes:', error);
+        setSalidasPendientes(
+          datos.filter((salida) => salida.area != null && Number(salida.area) === Number(areaUsuario)),
+        );
+      } catch (fetchError) {
+        console.error('Error fetching salidas pendientes:', fetchError);
+        setError(
+          fetchError instanceof Error
+            ? fetchError.message
+            : 'No fue posible obtener las salidas pendientes.',
+        );
       } finally {
         setLoading(false);
       }
@@ -107,6 +122,10 @@ export default function Ver_Salidas_Pendientes() {
           {loading ? (
             <div className="salidas-pendientes-status salidas-pendientes-status-loading" role="status">
               Cargando solicitudes...
+            </div>
+          ) : error ? (
+            <div className="salidas-pendientes-status salidas-pendientes-status-error" role="alert">
+              {error}
             </div>
           ) : salidasPendientes.length === 0 ? (
             <div className="salidas-pendientes-empty">

@@ -23,7 +23,7 @@ function ver_salidas($pdo) {
    $estado = 'PENDIENTE';
 
    $sql = $pdo -> prepare(
-    'SELECT s.*, p.nombre,p.apellido_p,p.apellido_m,p.id_personal FROM salidas s
+    'SELECT s.*, p.nombre,p.apellido_p,p.apellido_m,p.id_personal,p.area FROM salidas s
     JOIN personal p ON s.id_personal = p.id_personal
     WHERE s.estado = :estado'
    );
