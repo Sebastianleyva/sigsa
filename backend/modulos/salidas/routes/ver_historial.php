@@ -7,7 +7,7 @@ require_once '../../../includes/conexion.php';
 
 switch($_SERVER['REQUEST_METHOD']){
     case 'GET':
-        $usuario = validar_jwt_requerido();
+        validar_jwt_requerido();
         validar_csrf_requerido();
         requerir_rol([1, 2, 3]);
         ver_historial($pdo);
@@ -21,12 +21,14 @@ switch($_SERVER['REQUEST_METHOD']){
 function ver_historial($pdo){
     $sql = $pdo -> prepare(
         'SELECT s.id_salida, s.destino, s.motivo, s.hora_llegada, s.hora_salida, s.id_personal, s.id_autoriza, s.fecha,
-        s.adeudo_tiempo, p.nombre, p.apellido_p, p.apellido_m,
+        s.adeudo_tiempo, p.nombre, p.apellido_p, p.apellido_m, p.area,
+        ar.nombre AS area_nombre,
         a.nombre AS autorizante_nombre,
         a.apellido_p AS autorizante_apellido_p,
         a.apellido_m AS autorizante_apellido_m
         FROM salidas s
         JOIN personal p ON s.id_personal = p.id_personal
+        LEFT JOIN areas ar ON p.area = ar.id_area
         LEFT JOIN personal a ON s.id_autoriza = a.id_personal
         WHERE s.estado = :estado
         AND s.fecha >= NOW() - INTERVAL 1 YEAR

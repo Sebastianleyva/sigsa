@@ -11,7 +11,7 @@ switch ($_SERVER['REQUEST_METHOD']){
         validar_csrf_requerido();
         requerir_rol([1,2,3]);
         $input=json_decode(file_get_contents('php://input'),true) ?? [];
-        aceptar_solicitud($pdo,$input);
+        aceptar_solicitud($pdo,$input,$usuario);
         break;
     default:
         http_response_code(405);
@@ -19,13 +19,17 @@ switch ($_SERVER['REQUEST_METHOD']){
         break;
 }
 
-function verificacion_jerarquia($pdo,$input){
+function verificacion_jerarquia($pdo,$input,$usuario){
     if(empty($input)){
         http_response_code(400);
         echo json_encode(["ERROR" => "Campos faltantes"]);
         exit;
     }
-    $id_autorizante = $_SESSION['id_personal'];
+    $id_autorizante = filter_var(
+        $usuario['sub'] ?? null,
+        FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1]]
+    );
     $id_salida = $input['id_salida'];
 
     $sql = $pdo -> prepare(
@@ -55,10 +59,14 @@ function verificacion_jerarquia($pdo,$input){
     }
 }
 
-function aceptar_solicitud($pdo,$input){
-    verificacion_jerarquia($pdo,$input);
+function aceptar_solicitud($pdo,$input,$usuario){
+    verificacion_jerarquia($pdo,$input,$usuario);
     
-    $id_autorizante = $_SESSION['id_personal'];
+    $id_autorizante = filter_var(
+        $usuario['sub'] ?? null,
+        FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1]]
+    );
     $id_salida = $input['id_salida'];
 
     $validar_estado = $pdo ->prepare(

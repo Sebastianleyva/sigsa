@@ -110,6 +110,10 @@ export default function VerHistorial() {
 
                   <div className="historial-card-body">
                     <div className="historial-field">
+                      <span className="historial-label">Área</span>
+                      <p>{salida.area_nombre ?? 'No asignada'}</p>
+                    </div>
+                    <div className="historial-field">
                       <span className="historial-label">Destino</span>
                       <p>{salida.destino}</p>
                     </div>

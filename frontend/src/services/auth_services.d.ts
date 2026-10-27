@@ -122,6 +122,14 @@ export type RechazarSalidaResponse = {
   id_salida: number
 }
 
+export type FinalizarSalidaResponse = {
+  message: string
+}
+
+export type FinalizarSalidaData = {
+  id_salida: number
+}
+
 export type VerHistorialSalida = {
   id_salida: number
   destino: string
@@ -135,6 +143,7 @@ export type VerHistorialSalida = {
   nombre: string
   apellido_p: string
   apellido_m: string
+  area_nombre: string | null
   autorizante_nombre: string | null
   autorizante_apellido_p: string | null
   autorizante_apellido_m: string | null
@@ -155,6 +164,7 @@ export const authService: {
     VerSalidasEnCurso(): Promise<VerSalidasEnCursoResponse[]>
     AceptarSalida(id: AceptarSalidaData): Promise<AceptarSalidaResponse> 
     RechazarSalida(id: RechazarSalidaData): Promise<RechazarSalidaResponse>
+    FinalizarSalida(id: FinalizarSalidaData): Promise<FinalizarSalidaResponse>
     getUsuarioActual(): Usuario | null
     VerHistorial(): Promise<VerHistorialResponse>
 }

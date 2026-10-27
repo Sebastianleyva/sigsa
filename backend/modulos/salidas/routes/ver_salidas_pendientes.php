@@ -7,10 +7,10 @@ require_once '../../../includes/conexion.php';
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        $usuario = validar_jwt_requerido();
+        validar_jwt_requerido();
         validar_csrf_requerido();
         requerir_rol([1, 2, 3]);
-        ver_salidas($pdo, $usuario);
+        ver_salidas($pdo);
         break;
     default:
         http_response_code(405);
@@ -19,7 +19,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 }
 
 
-function ver_salidas($pdo, $usuario) {
+function ver_salidas($pdo) {
    $estado = 'PENDIENTE';
 
    $sql = $pdo -> prepare(

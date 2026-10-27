@@ -19,10 +19,42 @@ type SalidaEnCurso = {
   autorizante_apellido_m: string | null;
 };
 
+
 export default function Ver_Salidas_En_Curso() {
   const [salidasEnCurso, setSalidasEnCurso] = useState<SalidaEnCurso[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [procesando, setProcesando] = useState<number | null>(null);
+
+  const toggle = (id_salida: number) => {
+    // Si se está procesando esta salida, evitamos que se cierre/abra el menú
+    if (procesando === id_salida) return;
+
+    if (id_salida === selectedId) {
+      setSelectedId(null);
+    } else {
+      setSelectedId(id_salida);
+    }
+  };
+
+  async function handleFinalizar(id_salida: number) {
+    setActionError(null);
+    setProcesando(id_salida);
+    try {
+      await authService.FinalizarSalida({ id_salida });
+      setSalidasEnCurso((prev) => prev.filter((s) => s.id_salida !== id_salida));
+      setSelectedId(null);
+    } catch (error) {
+      console.error('Error al finalizar salida:', error);
+      setActionError(
+        error instanceof Error ? error.message : 'No fue posible finalizar la salida.',
+      );
+    } finally {
+      setProcesando(null);
+    }
+  }
 
   useEffect(() => {
     let mounted = true;
@@ -101,7 +133,23 @@ export default function Ver_Salidas_En_Curso() {
           ) : (
             <div className="salidas-en-curso-list">
               {salidasEnCurso.map((salida) => (
-                <article className="salidas-en-curso-card" key={salida.id_salida}>
+                <article
+                  className="salidas-en-curso-card"
+                  key={salida.id_salida}
+                  onClick={() => toggle(salida.id_salida)}
+                >
+                  {selectedId === salida.id_salida && (
+                    <div className="salidas-en-curso-actions" onClick={(event) => event.stopPropagation()}>
+                      <button
+                        className="salidas-en-curso-button"
+                        type="button"
+                        disabled={procesando === salida.id_salida}
+                        onClick={() => handleFinalizar(salida.id_salida)}
+                      >
+                        {procesando === salida.id_salida ? 'Finalizando...' : 'Finalizar salida'}
+                      </button>
+                    </div>
+                  )}
                   <div className="salidas-en-curso-card-header">
                     <div>
                       <span className="salidas-en-curso-card-kicker">SALIDA ACTIVA · {salida.tipo_salida}</span>
@@ -146,6 +194,11 @@ export default function Ver_Salidas_En_Curso() {
                   </div>
                 </article>
               ))}
+            </div>
+          )}
+          {actionError && (
+            <div className="salidas-en-curso-status salidas-en-curso-status-error" role="alert">
+              {actionError}
             </div>
           )}
         </section>

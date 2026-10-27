@@ -143,6 +143,45 @@
   border-radius: 18px;
   background: #fff;
   box-shadow: 0 12px 30px rgb(25 48 44 / 4%);
+  cursor: pointer;
+}
+
+.salidas-en-curso-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin: -2px 0 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--salidas-en-curso-line);
+}
+
+.salidas-en-curso-button {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--salidas-en-curso-green);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.salidas-en-curso-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #105744;
+}
+
+.salidas-en-curso-button:focus-visible {
+  outline: 3px solid var(--salidas-en-curso-coral);
+  outline-offset: 2px;
+}
+
+.salidas-en-curso-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .salidas-en-curso-card-header {

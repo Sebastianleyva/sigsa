@@ -7,10 +7,10 @@ require_once '../../../includes/conexion.php';
 
 switch($_SERVER['REQUEST_METHOD']){
     case 'GET':
-        $usuario = validar_jwt_requerido();
+        validar_jwt_requerido();
         validar_csrf_requerido();
         requerir_rol([1, 2, 3]);
-        ver_salidas_en_curso($pdo, $usuario);
+        ver_salidas_en_curso($pdo);
         break;
     default:
         http_response_code(405);
@@ -18,7 +18,7 @@ switch($_SERVER['REQUEST_METHOD']){
         break;
 }
 
-function ver_salidas_en_curso($pdo, $usuario){
+function ver_salidas_en_curso($pdo){
 
     $estado = "EN CURSO";
 
