@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2026 at 03:47 PM
+-- Generation Time: Oct 27, 2026 at 04:48 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -47,6 +47,18 @@ INSERT INTO `areas` (`id_area`, `nombre`, `descripcion`, `id_subdireccion`) VALU
 (6, 'DEPARTAMENTO DE OPERACIONES Y LOGISTICA', 'ENCARGADOS DE LA CONTADURIA Y PROCESOS ADMINISTRATVOS DENTRO DE LA DIRECCION', NULL),
 (7, 'DEPARTAMENTO DE DESARROLLO DE SISTEMAS', 'ENCARGADOS DEL DESARROLLO Y MANTENIMIENTO DE SISTEMAS DENTRO Y RELACIONADOS CON LA DIRECCION', 2),
 (8, 'DEPARTAMENTO DE IMPLEMENTACION DE SISTEMAS', '...', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `calendario`
+--
+
+CREATE TABLE `calendario` (
+  `id_calendario` bigint(20) NOT NULL,
+  `fecha` date NOT NULL,
+  `descripcion` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -108,6 +120,37 @@ INSERT INTO `puestos` (`id_puesto`, `nombre`, `descripcion`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `reportes`
+--
+
+CREATE TABLE `reportes` (
+  `id_reporte` bigint(20) NOT NULL,
+  `tipo_reporte` text NOT NULL,
+  `requisicion` char(1) DEFAULT NULL,
+  `id_personal` bigint(20) NOT NULL,
+  `id_servicio` bigint(20) NOT NULL,
+  `id_area` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `requisiciones`
+--
+
+CREATE TABLE `requisiciones` (
+  `id_requisicion` bigint(20) NOT NULL,
+  `fecha` date NOT NULL,
+  `id_solicitante` bigint(20) NOT NULL,
+  `id_autoriza` bigint(20) NOT NULL,
+  `tipo_financiamiento` text NOT NULL,
+  `descripcion` text NOT NULL,
+  `justificacion` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `salidas`
 --
 
@@ -132,7 +175,22 @@ CREATE TABLE `salidas` (
 
 INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `hora_estimada`, `adeudo_tiempo`) VALUES
 (7, 'PERSONAL', 'Voy por el festival del día de las madres en la escuela de mi hijo', 'Secundaria #3', '2026-10-22', '16:59:40', NULL, 'FINALIZADO', 21, NULL, '18:59:40', NULL),
-(8, 'MEDICA', 'me duele la panza', 'issste', '2026-10-25', NULL, NULL, 'RECHAZADA', 21, NULL, NULL, NULL);
+(8, 'MEDICA', 'me duele la panza', 'issste', '2026-10-25', NULL, NULL, 'RECHAZADA', 21, NULL, NULL, NULL),
+(9, 'PERSONAL', 'voy a cuidar a mi mama', 'manuel rosas #304', '2026-10-26', NULL, NULL, 'RECHAZADA', 21, NULL, NULL, NULL),
+(10, 'MEDICA', 'me duele todo', 'xicoli 305', '2026-10-27', '08:42:30', '09:46:52', 'FINALIZADO', 21, 20, '10:42:30', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `servicios`
+--
+
+CREATE TABLE `servicios` (
+  `id_servicio` bigint(20) NOT NULL,
+  `tipo_servicio` text NOT NULL,
+  `requisicion` char(1) DEFAULT NULL,
+  `descripcion` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -144,6 +202,12 @@ INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`,
 ALTER TABLE `areas`
   ADD PRIMARY KEY (`id_area`),
   ADD KEY `id_subdireccion` (`id_subdireccion`);
+
+--
+-- Indexes for table `calendario`
+--
+ALTER TABLE `calendario`
+  ADD PRIMARY KEY (`id_calendario`);
 
 --
 -- Indexes for table `personal`
@@ -165,6 +229,23 @@ ALTER TABLE `puestos`
   ADD PRIMARY KEY (`id_puesto`);
 
 --
+-- Indexes for table `reportes`
+--
+ALTER TABLE `reportes`
+  ADD PRIMARY KEY (`id_reporte`),
+  ADD KEY `id_personal` (`id_personal`),
+  ADD KEY `id_servicio` (`id_servicio`),
+  ADD KEY `id_area` (`id_area`);
+
+--
+-- Indexes for table `requisiciones`
+--
+ALTER TABLE `requisiciones`
+  ADD PRIMARY KEY (`id_requisicion`),
+  ADD KEY `id_solicitante` (`id_solicitante`),
+  ADD KEY `id_autoriza` (`id_autoriza`);
+
+--
 -- Indexes for table `salidas`
 --
 ALTER TABLE `salidas`
@@ -172,6 +253,12 @@ ALTER TABLE `salidas`
   ADD KEY `id_personal` (`id_personal`),
   ADD KEY `id_autoriza` (`id_autoriza`),
   ADD KEY `id_personal_2` (`id_personal`);
+
+--
+-- Indexes for table `servicios`
+--
+ALTER TABLE `servicios`
+  ADD PRIMARY KEY (`id_servicio`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -182,6 +269,12 @@ ALTER TABLE `salidas`
 --
 ALTER TABLE `areas`
   MODIFY `id_area` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `calendario`
+--
+ALTER TABLE `calendario`
+  MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `personal`
@@ -196,10 +289,28 @@ ALTER TABLE `puestos`
   MODIFY `id_puesto` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `reportes`
+--
+ALTER TABLE `reportes`
+  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `requisiciones`
+--
+ALTER TABLE `requisiciones`
+  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `salidas`
 --
 ALTER TABLE `salidas`
-  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `servicios`
+--
+ALTER TABLE `servicios`
+  MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
