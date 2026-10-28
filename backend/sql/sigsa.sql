@@ -165,6 +165,7 @@ CREATE TABLE `salidas` (
   `estado` text NOT NULL COMMENT 'guarda el estaod de la salida (pendiente o concluida)',
   `id_personal` bigint(20) NOT NULL,
   `id_autoriza` bigint(20) DEFAULT NULL,
+  `solicita_respaldo` tinyint(1) NOT NULL DEFAULT 0,
   `hora_estimada` time DEFAULT NULL,
   `adeudo_tiempo` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
