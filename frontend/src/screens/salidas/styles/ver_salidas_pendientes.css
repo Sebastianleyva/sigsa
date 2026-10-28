@@ -170,6 +170,11 @@
   transform: translateY(-1px);
 }
 
+.salidas-pendientes-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .salidas-pendientes-button:focus-visible {
   outline: 3px solid var(--salidas-pendientes-coral);
   outline-offset: 2px;
@@ -209,6 +214,17 @@
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.2px;
+}
+
+.salidas-pendientes-escalada {
+  display: inline-flex;
+  margin-top: 9px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #fff3e8;
+  color: #8a4c20;
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .salidas-pendientes-card-header h3 {

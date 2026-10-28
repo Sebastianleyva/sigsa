@@ -210,6 +210,38 @@
   font-size: 10px;
 }
 
+.crear-salida-respaldo {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-top: 21px;
+  padding: 15px;
+  border: 1px solid #d9e3dc;
+  border-radius: 3px;
+  background: #f8faf8;
+  color: #334641;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.crear-salida-respaldo input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin: 2px 0 0;
+  accent-color: var(--crear-salida-green);
+}
+
+.crear-salida-respaldo small {
+  display: block;
+  margin-top: 4px;
+  color: var(--crear-salida-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
 .crear-salida-notice {
   display: flex;
   align-items: flex-start;

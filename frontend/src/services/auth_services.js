@@ -27,6 +27,21 @@ export const authService = {
       throw new Error("No se pudo conectar con el servidor");
     }
   },
+  async ObtenerOpcionesRegistro() {
+    try {
+      const response = await api.get("/auth/controllers/opciones_registro.php");
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.ERROR ||
+            error.response.data.error ||
+            "No fue posible cargar las opciones de registro.",
+        );
+      }
+      throw new Error("No se pudo conectar con el servidor.");
+    }
+  },
   async login(userData) {
     try {
       // Error: el servicio intentaba guardar la respuesta del backend sin validar la
@@ -112,11 +127,11 @@ export const authService = {
     }
   },
   async VerSalidasPendientes() {
+    let response;
     try {
-      const response = await api.get(
+      response = await api.get(
         "salidas/routes/ver_salidas_pendientes.php",
       );
-      return response.data.Salidas;
     } catch (error) {
       if (error.response && error.response.data) {
         throw new Error(
@@ -128,6 +143,11 @@ export const authService = {
       }
       throw new Error("No se pudo conectar con el servidor.");
     }
+
+    if (!Array.isArray(response.data?.Salidas)) {
+      throw new Error("El servidor devolvió una respuesta inválida al consultar las salidas pendientes.");
+    }
+    return response.data.Salidas;
   },
   async VerSalidasEnCurso() {
     try {

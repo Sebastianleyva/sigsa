@@ -14,6 +14,7 @@ type SalidaEnCurso = {
   apellido_p: string;
   apellido_m: string;
   id_personal: number;
+  puesto: number;
   autorizante_nombre: string | null;
   autorizante_apellido_p: string | null;
   autorizante_apellido_m: string | null;
@@ -174,7 +175,9 @@ export default function Ver_Salidas_En_Curso() {
                       <p>
                         {salida.autorizante_nombre
                           ? `${salida.autorizante_nombre} ${salida.autorizante_apellido_p ?? ''} ${salida.autorizante_apellido_m ?? ''}`.trim()
-                          : 'No registrado'}
+                          : [1, 2].includes(Number(salida.puesto))
+                            ? 'No requiere autorización'
+                            : 'No registrado'}
                       </p>
                     </div>
                     <div className="salidas-en-curso-meta-grid">

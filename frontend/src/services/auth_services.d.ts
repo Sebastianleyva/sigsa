@@ -22,6 +22,22 @@ export type RegisterResponse = {
   }
 }
 
+export type OpcionesRegistroResponse = {
+  areas: {
+    id_area: number
+    nombre: string
+    id_subdireccion: number | null
+  }[]
+  personal: {
+    id_personal: number
+    nombre: string
+    apellido_p: string
+    apellido_m: string
+    puesto: number
+    area: number | null
+  }[]
+}
+
 export type LoginCredencials = {
   correo : string,
   contrasena : string
@@ -43,6 +59,7 @@ export type CrearSalidaData = {
   tipo_salida: string
   motivo: string
   destino: string
+  solicita_respaldo: boolean
 }
 
 export type CrearSalidaResponse = {
@@ -80,7 +97,8 @@ export type VerSalidasPendientesResponse = {
   apellido_p: string,
   apellido_m: string,
   id_personal: number,
-  area: number | null
+  area: number | null,
+  solicita_respaldo: number | boolean
 }
 
 export type Usuario = {
@@ -106,6 +124,7 @@ export type VerSalidasEnCursoResponse = {
   apellido_p: string,
   apellido_m: string,
   id_personal: number,
+  puesto: number,
   autorizante_nombre: string | null,
   autorizante_apellido_p: string | null,
   autorizante_apellido_m: string | null
@@ -167,6 +186,7 @@ export type VerHistorialResponse = {
 
 export const authService: {
   register(userData: RegisterUserData): Promise<RegisterResponse>
+    ObtenerOpcionesRegistro(): Promise<OpcionesRegistroResponse>
     login(userData: LoginCredencials): Promise<LoginResponse>
     CambiarContrasena(datos: CambiarContrasenaData): Promise<CambiarContrasenaResponse>
     CrearSalida(solicitud: CrearSalidaData): Promise<CrearSalidaResponse>

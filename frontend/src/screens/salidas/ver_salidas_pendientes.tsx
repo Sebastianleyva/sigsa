@@ -12,6 +12,7 @@ type SalidaPendiente = {
   apellido_m: string;
   id_personal: number;
   area: number | null;
+  solicita_respaldo: number | boolean;
 };
 
 export default function Ver_Salidas_Pendientes() {
@@ -20,6 +21,7 @@ export default function Ver_Salidas_Pendientes() {
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [procesando, setProcesando] = useState<number | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const toggle = (id_salida: number) => {
     // Si se está procesando esta salida, evitamos que se cierre/abra el menú
@@ -34,12 +36,14 @@ export default function Ver_Salidas_Pendientes() {
 
   async function handleAceptar(id_salida: number) {
     setProcesando(id_salida);
+    setActionError(null);
     try {
       await authService.AceptarSalida({ id_salida });
       setSalidasPendientes((prev) => prev.filter((s) => s.id_salida !== id_salida));
       setSelectedId(null);
     } catch (error) {
       console.error('Error al aceptar salida:', error);
+      setActionError(error instanceof Error ? error.message : 'No fue posible aceptar la solicitud.');
     } finally {
       setProcesando(null);
     }
@@ -47,12 +51,14 @@ export default function Ver_Salidas_Pendientes() {
 
   async function handleRechazar(id_salida: number) {
     setProcesando(id_salida);
+    setActionError(null);
     try {
       await authService.RechazarSalida({ id_salida });
       setSalidasPendientes((prev) => prev.filter((s) => s.id_salida !== id_salida));
       setSelectedId(null);
     } catch (error) {
       console.error('Error al rechazar salida:', error);
+      setActionError(error instanceof Error ? error.message : 'No fue posible rechazar la solicitud.');
     } finally {
       setProcesando(null);
     }
@@ -61,16 +67,8 @@ export default function Ver_Salidas_Pendientes() {
   useEffect(() => {
     async function fetchSalidasPendientes() {
       try {
-        const usuario = authService.getUsuarioActual();
-        const areaUsuario = usuario?.area;
-        if (areaUsuario == null || !Number.isFinite(Number(areaUsuario)) || Number(areaUsuario) <= 0) {
-          throw new Error('No se pudo determinar el área del usuario para consultar las solicitudes.');
-        }
-
         const datos = await authService.VerSalidasPendientes();
-        setSalidasPendientes(
-          datos.filter((salida) => salida.area != null && Number(salida.area) === Number(areaUsuario)),
-        );
+        setSalidasPendientes(datos);
       } catch (fetchError) {
         console.error('Error fetching salidas pendientes:', fetchError);
         setError(
@@ -139,14 +137,31 @@ export default function Ver_Salidas_Pendientes() {
                 <article className="salidas-pendientes-card" key={salida.id_salida} onClick={() => toggle(salida.id_salida)}>
                   {selectedId === salida.id_salida && (
                     <div className="salidas-pendientes-actions" onClick={(e) => e.stopPropagation()}>
-                      <button className="salidas-pendientes-button salidas-pendientes-button-accept" onClick={() => handleAceptar(salida.id_salida)}>Aceptar</button>
-                      <button className="salidas-pendientes-button salidas-pendientes-button-reject" onClick={() => handleRechazar(salida.id_salida)}>Rechazar</button>
+                      <button
+                        className="salidas-pendientes-button salidas-pendientes-button-accept"
+                        onClick={() => handleAceptar(salida.id_salida)}
+                        disabled={procesando === salida.id_salida}
+                      >
+                        {procesando === salida.id_salida ? 'Procesando…' : 'Aceptar'}
+                      </button>
+                      <button
+                        className="salidas-pendientes-button salidas-pendientes-button-reject"
+                        onClick={() => handleRechazar(salida.id_salida)}
+                        disabled={procesando === salida.id_salida}
+                      >
+                        Rechazar
+                      </button>
                     </div>
                   )}
                   <div className="salidas-pendientes-card-header">
                     <div>
                       <span className="salidas-pendientes-card-kicker">SOLICITUD DE SALIDA</span>
                       <h3>{salida.nombre} {salida.apellido_p} {salida.apellido_m}</h3>
+                      {Boolean(Number(salida.solicita_respaldo)) && (
+                        <span className="salidas-pendientes-escalada">
+                          Revisión solicitada al subdirector
+                        </span>
+                      )}
                     </div>
                     <span className="salidas-pendientes-card-number">
                       #{String(salida.id_salida).padStart(3, '0')}
@@ -171,6 +186,11 @@ export default function Ver_Salidas_Pendientes() {
                   </div>
                 </article>
               ))}
+            </div>
+          )}
+          {actionError && (
+            <div className="salidas-pendientes-status salidas-pendientes-status-error" role="alert">
+              {actionError}
             </div>
           )}
         </section>

@@ -7,12 +7,14 @@ import './styles/crear_salida.css'
 type SalidaForm = {
     tipo_salida: string,
     motivo: string,
-    destino: string
+    destino: string,
+    solicita_respaldo: boolean
 } 
 const initialForm: SalidaForm ={
     tipo_salida:'',
     motivo:'',
-    destino:''
+    destino:'',
+    solicita_respaldo: false
 }
 
 type Notice = {
@@ -24,8 +26,9 @@ export default function CrearSalida() {
     const [form, setForm] =  useState<SalidaForm>(initialForm)
     const [notice, setNotice] = useState<Notice | null>(null)
     const [loading, setLoading] = useState(false)
+    const usuario = authService.getUsuarioActual()
 
-    function updateField(field: keyof SalidaForm, value: string) {
+    function updateField<Field extends keyof SalidaForm>(field: Field, value: SalidaForm[Field]) {
         setForm((current) => ({ ...current, [field]: value }))
     }
 
@@ -38,7 +41,8 @@ export default function CrearSalida() {
             const result = await authService.CrearSalida({
                 tipo_salida: form.tipo_salida.trim(),
                 motivo: form.motivo.trim(),
-                destino: form.destino.trim()
+                destino: form.destino.trim(),
+                solicita_respaldo: form.solicita_respaldo
             })
             
             setNotice ({kind: "success", text: result.message ?? "La salida fue creada con éxito"})
@@ -122,6 +126,20 @@ export default function CrearSalida() {
                             />
                         </div>
 
+                        {Number(usuario?.puesto) === 4 && (
+                            <label className="crear-salida-respaldo">
+                                <input
+                                    type="checkbox"
+                                    checked={form.solicita_respaldo}
+                                    onChange={(event) => updateField("solicita_respaldo", event.target.checked)}
+                                />
+                                <span>
+                                    Solicitar revisión del subdirector porque mi jefe directo no está disponible.
+                                    <small>La solicitud seguirá visible para tu jefe directo y el subdirector de tu subdirección.</small>
+                                </span>
+                            </label>
+                        )}
+
                         {notice && (
                             <div
                                 className={`crear-salida-notice crear-salida-notice-${notice.kind}`}
@@ -148,7 +166,11 @@ export default function CrearSalida() {
                         <span className="crear-salida-aside-index">INFORMACIÓN</span>
                         <span className="crear-salida-aside-rule" aria-hidden="true" />
                         <h2>Antes de enviar</h2>
-                        <p>Completa todos los campos con la información de tu salida. Una vez enviada, la solicitud quedará pendiente de revisión.</p>
+                        <p>
+                            {[1, 2].includes(Number(usuario?.puesto))
+                                ? 'Tu salida se registrará directamente en curso y no necesitará autorización.'
+                                : 'Una vez enviada, la solicitud quedará pendiente de revisión por tu jefe directo.'}
+                        </p>
                         <div className="crear-salida-aside-status">
                             <span className="crear-salida-status-icon" aria-hidden="true">i</span>
                             <span>Podrás consultar el estado de tu solicitud en el módulo de salidas.</span>
