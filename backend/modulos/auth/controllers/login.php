@@ -34,6 +34,12 @@ function login($pdo, $input) {
         exit;
     }
 
+    if ((string) ($usuario['activo'] ?? '0') !== '1') {
+        http_response_code(403);
+        echo json_encode(["ERROR" => "La cuenta está inactiva"]);
+        exit;
+    }
+
     try {
         $ahora = time();
         $jwt = crear_jwt([
