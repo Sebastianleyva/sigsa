@@ -7,10 +7,10 @@ require_once '../../../includes/conexion.php';
 
 switch($_SERVER['REQUEST_METHOD']){
     case 'PATCH':
-        validar_jwt_requerido();
+        $usuario = validar_jwt_requerido();
         validar_csrf_requerido();
         $input=json_decode(file_get_contents('php://input'),true) ?? [];
-        cambiar_contra($pdo,$input);
+        cambiar_contra($pdo,$input,$usuario);
         break;
     default:
         http_response_code(405);
@@ -18,14 +18,14 @@ switch($_SERVER['REQUEST_METHOD']){
         break;
 }
 
-function cambiar_contra($pdo,$input){
+function cambiar_contra($pdo,$input,$usuario){
     if(empty($input) || empty($input['contrasena'] || empty($input['nueva_contrasena  ']))){
         http_response_code(400);
         echo json_encode(["ERROR" =>"Campos faltantes"]);
         exit;
     }
 
-    $id_personal = $_SESSION['id_personal'] ;
+    $id_personal = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
     $contrasena = $input['contrasena'];
 
     $verificacion = $pdo -> prepare(

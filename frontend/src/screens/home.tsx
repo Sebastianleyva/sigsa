@@ -1,7 +1,15 @@
 import { useNavigate } from 'react-router-dom'
+import { authService } from '../services/auth_services.js'
 import './home.css'
 
-const modules = [
+const modules: {
+  index: string
+  title: string
+  description: string
+  category: string
+  path: string
+  soloJefes?: boolean
+}[] = [
   {
     index: '01',
     title: 'Salidas',
@@ -23,10 +31,21 @@ const modules = [
     category: 'SISTEMA',
     path: '/mantenimiento',
   },
+  {
+    index: '04',
+    title: 'Registrar usuario',
+    description: 'Registra una cuenta nueva para el personal del sistema.',
+    category: 'PERSONAL',
+    path: '/registrarse',
+    soloJefes: true,
+  },
 ]
 
 export default function HomeScreen() {
   const navigate = useNavigate()
+  const usuario = authService.getUsuarioActual()
+  const esJefe = [1, 2, 3].includes(usuario?.puesto ?? 0)
+  const modulosVisibles = modules.filter((module) => !module.soloJefes || esJefe)
 
   return (
     <main className="home-page">
@@ -58,7 +77,7 @@ export default function HomeScreen() {
           </div>
 
           <div className="home-module-grid">
-            {modules.map((module) => (
+            {modulosVisibles.map((module) => (
               <button
                 className={`home-module-card${module.path ? ' home-module-card-active' : ''}`}
                 key={module.index}

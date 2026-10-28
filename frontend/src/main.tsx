@@ -26,7 +26,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/salidas/pendientes" element={<Ver_Salidas_Pendientes />} />
         <Route path="/salidas/en-curso" element={<Ver_Salidas_En_Curso />} />
         <Route path="/salidas/historial-general" element={<VerHistorial />} />
-        <Route path="registrarse" element={<RegistrarScreen />} />
+        <Route path="/registrarse" element={<RegistrarScreen />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

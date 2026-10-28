@@ -11,8 +11,8 @@ type RegisterForm = {
     rfc: string,
     curp: string,
     correo: string,
-    puesto: number,
-    area: number ,
+    puesto: string,
+    area: string,
     contrasena: string,
     confirmarContrasena: string
 } 
@@ -30,8 +30,8 @@ const initialForm: RegisterForm = {
     rfc: '',
     curp: '',
     correo: '',
-    puesto: 0,
-    area: 0,
+    puesto: '',
+    area: '',
     contrasena: '',
     confirmarContrasena: '',
 }
