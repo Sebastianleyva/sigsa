@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { authService } from '../../services/auth_services.js'
+import type { OpcionesRegistroResponse } from '../../services/auth_services.js'
 import './registrar.css'
 
 type RegisterForm = {
@@ -13,6 +14,7 @@ type RegisterForm = {
     correo: string,
     puesto: string,
     area: string,
+    id_jefe: string,
     contrasena: string,
     confirmarContrasena: string
 } 
@@ -32,6 +34,7 @@ const initialForm: RegisterForm = {
     correo: '',
     puesto: '',
     area: '',
+    id_jefe: '',
     contrasena: '',
     confirmarContrasena: '',
 }
@@ -41,9 +44,69 @@ function RegistrarScreen() {
     const [notice, setNotice] = useState<Notice | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [passwordVisible, setPasswordVisible] = useState(false)
+    const [opciones, setOpciones] = useState<OpcionesRegistroResponse | null>(null)
+    const [loadingOptions, setLoadingOptions] = useState(true)
+
+    useEffect(() => {
+        let mounted = true
+        authService.ObtenerOpcionesRegistro()
+            .then((result) => {
+                if (mounted) setOpciones(result)
+            })
+            .catch((error: unknown) => {
+                if (mounted) {
+                    setNotice({
+                        kind: 'error',
+                        text: error instanceof Error ? error.message : 'No fue posible cargar las opciones de registro.',
+                    })
+                }
+            })
+            .finally(() => {
+                if (mounted) setLoadingOptions(false)
+            })
+
+        return () => {
+            mounted = false
+        }
+    }, [])
+
+    const puestoSeleccionado = Number(form.puesto)
+    const areasDisponibles = opciones?.areas.filter((area) => {
+        if (puestoSeleccionado === 2) {
+            return area.id_subdireccion == null && area.nombre.toUpperCase().startsWith('SUBDIRECCION')
+        }
+        return (puestoSeleccionado === 3 || puestoSeleccionado === 4) && area.id_subdireccion != null
+    }) ?? []
+
+    const jefesDisponibles = opciones?.personal.filter((personal) => {
+        if (puestoSeleccionado === 2)         return Number(personal.puesto) === 1
+        if (puestoSeleccionado === 3) {
+            const areaSeleccionada = opciones.areas.find((area) => Number(area.id_area) === Number(form.area))
+            return Number(personal.puesto) === 2 && Number(personal.area) === Number(areaSeleccionada?.id_subdireccion)
+        }
+        if (puestoSeleccionado === 4) {
+            return Number(personal.puesto) === 3 && Number(personal.area) === Number(form.area)
+        }
+        return false
+    }) ?? []
+
+    const hayDirectorActivo = opciones?.personal.some((personal) => Number(personal.puesto) === 1) ?? false
+    const subdirectoresActivos = opciones?.personal.filter((personal) => Number(personal.puesto) === 2).length ?? 0
+    const subdireccionOcupada = opciones?.personal.some((personal) => (
+        Number(personal.puesto) === 2 && Number(personal.area) === Number(form.area)
+    )) ?? false
+    const hayCupoDisponible = puestoSeleccionado === 1
+        ? !hayDirectorActivo
+        : puestoSeleccionado === 2
+            ? subdirectoresActivos < 2 && !subdireccionOcupada
+            : true
 
     function updateField(field: keyof RegisterForm, value: string) {
-        setForm((current) => ({ ...current, [field]: value }))
+        setForm((current) => {
+            if (field === 'puesto') return { ...current, puesto: value, area: '', id_jefe: '' }
+            if (field === 'area') return { ...current, area: value, id_jefe: '' }
+            return { ...current, [field]: value }
+        })
     }
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -52,6 +115,28 @@ function RegistrarScreen() {
 
         if (form.contrasena !== form.confirmarContrasena) {
             setNotice({ kind: 'error', text: 'Las contraseñas no coinciden.' })
+            return
+        }
+
+        if (!opciones) {
+            setNotice({ kind: 'error', text: 'No se pudieron cargar las opciones de registro.' })
+            return
+        }
+
+        if (!hayCupoDisponible) {
+            setNotice({
+                kind: 'error',
+                text: puestoSeleccionado === 1
+                    ? 'Ya existe un director activo.'
+                    : subdirectoresActivos >= 2
+                        ? 'Ya están ocupadas las dos plazas de subdirector.'
+                        : 'Ya existe un subdirector activo en esta subdirección.',
+            })
+            return
+        }
+
+        if (puestoSeleccionado !== 1 && !jefesDisponibles.some((jefe) => Number(jefe.id_personal) === Number(form.id_jefe))) {
+            setNotice({ kind: 'error', text: 'Selecciona un jefe activo que corresponda al puesto y al área.' })
             return
         }
 
@@ -65,14 +150,24 @@ function RegistrarScreen() {
                 rfc: form.rfc.trim(),
                 curp: form.curp.trim(),
                 correo: form.correo.trim(),
-                puesto: Number(form.puesto),
-                area: form.area ? Number(form.area) : null,
-                id_jefe: null,
+                puesto: puestoSeleccionado,
+                area: puestoSeleccionado === 1 ? null : Number(form.area),
+                id_jefe: puestoSeleccionado === 1 ? null : Number(form.id_jefe),
                 contrasena: form.contrasena,
             })
 
             setNotice({ kind: 'success', text: result.message ?? 'Usuario registrado con éxito.' })
             setForm({ ...initialForm })
+            try {
+                setOpciones(await authService.ObtenerOpcionesRegistro())
+            } catch (error) {
+                setNotice({
+                    kind: 'error',
+                    text: `El usuario se registró, pero no se actualizaron las opciones: ${
+                        error instanceof Error ? error.message : 'recarga la pantalla para ver los cambios.'
+                    }`,
+                })
+            }
         } catch (error) {
             setNotice({
                 kind: 'error',
@@ -224,25 +319,65 @@ function RegistrarScreen() {
                                 </select>
                             </div>
 
-                            <div className="registro-field">
-                                <label htmlFor="registro-area">Área</label>
-                                <select
-                                    id="registro-area"
-                                    name="area"
-                                    value={form.area}
-                                    onChange={(event) => updateField('area', event.target.value)}
-                                >
-                                    <option value="">Sin área asignada</option>
-                                    <option value="1">Subdirección de tecnologías</option>
-                                    <option value="2">Subdirección de sistemas</option>
-                                    <option value="3">Soporte técnico a centros escolares</option>
-                                    <option value="4">Soporte técnico a centros administrativos</option>
-                                    <option value="5">Redes y telecomunicaciones</option>
-                                    <option value="6">Operaciones y logística</option>
-                                    <option value="7">Desarrollo de sistemas</option>
-                                    <option value="8">Implementación de sistemas</option>
-                                </select>
-                            </div>
+                            {form.puesto && puestoSeleccionado !== 1 && (
+                                <div className="registro-field">
+                                    <label htmlFor="registro-area">Área <span aria-hidden="true">*</span></label>
+                                    <select
+                                        id="registro-area"
+                                        name="area"
+                                        value={form.area}
+                                        onChange={(event) => updateField('area', event.target.value)}
+                                        required
+                                        disabled={!form.puesto || loadingOptions}
+                                    >
+                                        <option value="" disabled>Selecciona un área</option>
+                                        {areasDisponibles.map((area) => (
+                                            <option key={area.id_area} value={area.id_area}>{area.nombre}</option>
+                                        ))}
+                                    </select>
+                                    {form.puesto && areasDisponibles.length === 0 && (
+                                        <span className="registro-field-help">
+                                            No hay áreas disponibles para este puesto. Verifica la jerarquía de áreas.
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+
+                            {form.puesto && puestoSeleccionado !== 1 && (
+                                <div className="registro-field">
+                                    <label htmlFor="registro-jefe">Jefe directo <span aria-hidden="true">*</span></label>
+                                    <select
+                                        id="registro-jefe"
+                                        name="id_jefe"
+                                        value={form.id_jefe}
+                                        onChange={(event) => updateField('id_jefe', event.target.value)}
+                                        required
+                                        disabled={!form.area || loadingOptions || jefesDisponibles.length === 0}
+                                    >
+                                        <option value="" disabled>Selecciona un jefe</option>
+                                        {jefesDisponibles.map((jefe) => (
+                                            <option key={jefe.id_personal} value={jefe.id_personal}>
+                                                {jefe.nombre} {jefe.apellido_p} {jefe.apellido_m}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {form.area && jefesDisponibles.length === 0 && (
+                                        <span className="registro-field-help">
+                                            No hay un jefe activo disponible para el área seleccionada.
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+
+                            {!hayCupoDisponible && (
+                                <p className="registro-field-help registro-field-wide">
+                                    {puestoSeleccionado === 1
+                                        ? 'El puesto de director ya está ocupado por un usuario activo.'
+                                        : subdirectoresActivos >= 2
+                                            ? 'Las dos plazas de subdirector ya están ocupadas.'
+                                            : 'El puesto de subdirector ya está ocupado en esta subdirección.'}
+                                </p>
+                            )}
 
                             <div className="registro-field">
                                 <label htmlFor="registro-contrasena">Contraseña <span aria-hidden="true">*</span></label>
@@ -289,8 +424,8 @@ function RegistrarScreen() {
 
                         <div className="registro-form-actions">
                             <span>Los campos marcados con * son obligatorios.</span>
-                            <button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? 'Registrando…' : 'Crear cuenta'}
+                            <button type="submit" disabled={isSubmitting || loadingOptions || !opciones}>
+                                {loadingOptions ? 'Cargando opciones…' : isSubmitting ? 'Registrando…' : 'Crear cuenta'}
                                 <span aria-hidden="true">→</span>
                             </button>
                         </div>

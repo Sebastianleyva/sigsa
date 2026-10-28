@@ -180,6 +180,12 @@
   font-weight: 700;
 }
 
+.registro-field-help {
+  color: #8a4c20;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 .registro-field input,
 .registro-field select {
   width: 100%;
