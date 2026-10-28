@@ -214,6 +214,40 @@
   background: #f5e5dc;
 }
 
+.home-account-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.home-account-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--home-line);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--home-ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.home-account-actions button:hover {
+  border-color: var(--home-green);
+  color: var(--home-green);
+}
+
+.home-account-actions button:focus-visible {
+  outline: 3px solid var(--home-green);
+  outline-offset: 2px;
+}
+
 .home-footer {
   display: flex;
   justify-content: space-between;
@@ -274,5 +308,10 @@
   .home-footer {
     flex-direction: column;
     gap: 6px;
+  }
+
+  .home-account-actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

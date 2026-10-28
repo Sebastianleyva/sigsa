@@ -56,6 +56,24 @@ export const authService = {
       throw new Error("No se pudo conectar con el servidor");
     }
   },
+  async CambiarContrasena(datos) {
+    try {
+      const response = await api.patch(
+        "/auth/controllers/cambiar_contra.php",
+        datos,
+      );
+      return response.data;
+    } catch (error) {
+      if (error.response && error.response.data) {
+        throw new Error(
+          error.response.data.ERROR ||
+            error.response.data.error ||
+            "No fue posible cambiar la contraseña.",
+        );
+      }
+      throw new Error("No se pudo conectar con el servidor.");
+    }
+  },
   async CrearSalida(solicitud) {
     try {
       const response = await api.post(

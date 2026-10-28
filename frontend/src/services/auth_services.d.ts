@@ -30,6 +30,15 @@ export type LoginResponse ={
   message?: string
 }
 
+export type CambiarContrasenaData = {
+  contrasena: string
+  nueva_contrasena: string
+}
+
+export type CambiarContrasenaResponse = {
+  MESSAGE: string
+}
+
 export type CrearSalidaData = {
   tipo_salida: string
   motivo: string
@@ -159,6 +168,7 @@ export type VerHistorialResponse = {
 export const authService: {
   register(userData: RegisterUserData): Promise<RegisterResponse>
     login(userData: LoginCredencials): Promise<LoginResponse>
+    CambiarContrasena(datos: CambiarContrasenaData): Promise<CambiarContrasenaResponse>
     CrearSalida(solicitud: CrearSalidaData): Promise<CrearSalidaResponse>
     VerHistorialPersonal(): Promise<VerSalida[]>
     VerSalidasPendientes(): Promise<VerSalidasPendientesResponse[]>

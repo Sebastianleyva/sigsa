@@ -11,6 +11,7 @@ import Ver_Salidas_Pendientes from './screens/salidas/ver_salidas_pendientes.tsx
 import Ver_Salidas_En_Curso from './screens/salidas/ver_salidas_en_curso.tsx'
 import VerHistorial from './screens/salidas/ver_historial.tsx'
 import RegistrarScreen from './screens/auth/registrar.tsx'
+import CambiarContrasenaScreen from './screens/auth/cambiar_contrasena.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/salidas/en-curso" element={<Ver_Salidas_En_Curso />} />
         <Route path="/salidas/historial-general" element={<VerHistorial />} />
         <Route path="/registrarse" element={<RegistrarScreen />} />
+        <Route path="/cambiar-contrasena" element={<CambiarContrasenaScreen />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

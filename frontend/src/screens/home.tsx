@@ -31,22 +31,12 @@ const modules: {
     category: 'SISTEMA',
     path: '/mantenimiento',
   },
-  {
-    index: '04',
-    title: 'Registrar usuario',
-    description: 'Registra una cuenta nueva para el personal del sistema.',
-    category: 'PERSONAL',
-    path: '/registrarse',
-    soloJefes: true,
-  },
 ]
 
 export default function HomeScreen() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
   const esJefe = [1, 2, 3].includes(usuario?.puesto ?? 0)
-  const modulosVisibles = modules.filter((module) => !module.soloJefes || esJefe)
-
   return (
     <main className="home-page">
       <header className="home-topbar">
@@ -77,7 +67,7 @@ export default function HomeScreen() {
           </div>
 
           <div className="home-module-grid">
-            {modulosVisibles.map((module) => (
+            {modules.map((module) => (
               <button
                 className={`home-module-card${module.path ? ' home-module-card-active' : ''}`}
                 key={module.index}
@@ -94,6 +84,17 @@ export default function HomeScreen() {
               </button>
             ))}
           </div>
+        </section>
+
+        <section className="home-account-actions" aria-label="Acciones de cuenta">
+          <button type="button" onClick={() => navigate('/cambiar-contrasena')}>
+            Cambiar contraseña <span aria-hidden="true">→</span>
+          </button>
+          {esJefe && (
+            <button type="button" onClick={() => navigate('/registrarse')}>
+              Registrar usuario <span aria-hidden="true">→</span>
+            </button>
+          )}
         </section>
 
         <footer className="home-footer">

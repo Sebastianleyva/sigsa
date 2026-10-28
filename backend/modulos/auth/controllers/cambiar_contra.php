@@ -19,13 +19,24 @@ switch($_SERVER['REQUEST_METHOD']){
 }
 
 function cambiar_contra($pdo,$input,$usuario){
-    if(empty($input) || empty($input['contrasena'] || empty($input['nueva_contrasena  ']))){
+    if (!is_array($input)
+        || !isset($input['contrasena'], $input['nueva_contrasena'])
+        || !is_string($input['contrasena'])
+        || !is_string($input['nueva_contrasena'])
+        || $input['contrasena'] === ''
+        || $input['nueva_contrasena'] === '') {
         http_response_code(400);
-        echo json_encode(["ERROR" =>"Campos faltantes"]);
+        echo json_encode(["ERROR" => "Campos faltantes"]);
         exit;
     }
 
     $id_personal = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id_personal === false) {
+        http_response_code(401);
+        echo json_encode(["ERROR" => "Sesión inválida"]);
+        exit;
+    }
+
     $contrasena = $input['contrasena'];
 
     $verificacion = $pdo -> prepare(
@@ -38,7 +49,7 @@ function cambiar_contra($pdo,$input,$usuario){
     ]);
     $resultado = $verificacion -> fetch();
 
-    if(!password_verify($contrasena,$resultado['contrasena'])){
+    if (!$resultado || !password_verify($contrasena, $resultado['contrasena'])) {
         http_response_code(409);
         echo json_encode(["ERROR" => "Contraseña incorrecta"]);
         exit;
