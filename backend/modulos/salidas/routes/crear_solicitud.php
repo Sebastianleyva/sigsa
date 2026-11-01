@@ -141,13 +141,10 @@ function crear_solicitud($pdo, $input, $usuario) {
         }
     }
 
-    date_default_timezone_set('America/Mexico_City');
     $fecha = date('Y-m-d');
     $requiere_autorizacion = in_array($puesto, [3, 4], true);
     $estado = $requiere_autorizacion ? "PENDIENTE" : "EN CURSO";
-    $hora_salida = $requiere_autorizacion ? null : date('H:i:s');
-    $hora_estimada = $requiere_autorizacion ? null : date('H:i:s', strtotime('+2 hour'));
-
+   
     try {
         $pdo->beginTransaction();
         $bloquear_personal = $pdo->prepare(
@@ -172,9 +169,9 @@ function crear_solicitud($pdo, $input, $usuario) {
 
         $query = $pdo->prepare(
             'INSERT INTO salidas
-            (tipo_salida, motivo, destino, fecha, estado, id_personal, id_autoriza, hora_salida, hora_estimada, solicita_respaldo)
+            (tipo_salida, motivo, destino, fecha, estado, id_personal, id_autoriza, solicita_respaldo)
             VALUES
-            (:tipo_salida, :motivo, :destino, :fecha, :estado, :id_personal, NULL, :hora_salida, :hora_estimada, :solicita_respaldo)'
+            (:tipo_salida, :motivo, :destino, :fecha, :estado, :id_personal, NULL, :solicita_respaldo)'
         );
 
         $query->execute([
@@ -184,8 +181,6 @@ function crear_solicitud($pdo, $input, $usuario) {
             'fecha' => $fecha,
             'estado' => $estado,
             'id_personal' => $id_personal,
-            'hora_salida' => $hora_salida,
-            'hora_estimada' => $hora_estimada,
             'solicita_respaldo' => $solicita_respaldo ? 1 : 0
         ]);
 
@@ -213,8 +208,6 @@ function crear_solicitud($pdo, $input, $usuario) {
             "estado"        => $estado,
             "id_personal"   => $id_personal,
             "id_autoriza"   => null,
-            "hora_salida"   => $hora_salida,
-            "hora_estimada" => $hora_estimada,
             "solicita_respaldo" => $solicita_respaldo
         ]
     ]);
