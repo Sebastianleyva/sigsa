@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Nov 01, 2026 at 02:42 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 03-11-2026 a las 18:26:30
+-- Versión del servidor: 10.4.25-MariaDB
+-- Versión de PHP: 7.4.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `sigsa`
+-- Base de datos: `sigsa`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `areas`
+-- Estructura de tabla para la tabla `areas`
 --
 
 CREATE TABLE `areas` (
@@ -32,10 +32,10 @@ CREATE TABLE `areas` (
   `nombre` text NOT NULL,
   `descripcion` text NOT NULL,
   `id_subdireccion` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `areas`
+-- Volcado de datos para la tabla `areas`
 --
 
 INSERT INTO `areas` (`id_area`, `nombre`, `descripcion`, `id_subdireccion`) VALUES
@@ -51,21 +51,20 @@ INSERT INTO `areas` (`id_area`, `nombre`, `descripcion`, `id_subdireccion`) VALU
 -- --------------------------------------------------------
 
 --
--- Table structure for table `calendario`
+-- Estructura de tabla para la tabla `calendario`
 --
 
 CREATE TABLE `calendario` (
   `id_calendario` bigint(20) NOT NULL,
-  `fecha_destinada` date DEFAULT NULL,
-  `estado` varchar(20) DEFAULT NULL,
-  `id_servicio` bigint(20) DEFAULT NULL,
-  `id_area` bigint(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `fecha_destinada` date NOT NULL,
+  `estado` varchar(20) NOT NULL,
+  `id_servicio` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `incidencias`
+-- Estructura de tabla para la tabla `incidencias`
 --
 
 CREATE TABLE `incidencias` (
@@ -74,13 +73,21 @@ CREATE TABLE `incidencias` (
   `descripcion` text NOT NULL,
   `fecha` date NOT NULL,
   `urgencia` varchar(20) NOT NULL,
-  `estado` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `estado` varchar(20) NOT NULL,
+  `lugar` varchar(60) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `incidencias`
+--
+
+INSERT INTO `incidencias` (`id_incidencia`, `id_personal`, `descripcion`, `fecha`, `urgencia`, `estado`, `lugar`) VALUES
+(1, 20, 'hay un ollo en la pared', '2026-11-03', 'URGENTE', 'pendiente', 'Cocina');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `personal`
+-- Estructura de tabla para la tabla `personal`
 --
 
 CREATE TABLE `personal` (
@@ -97,10 +104,10 @@ CREATE TABLE `personal` (
   `id_jefe` bigint(20) DEFAULT NULL,
   `activo` char(1) NOT NULL,
   `contrasena` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `personal`
+-- Volcado de datos para la tabla `personal`
 --
 
 INSERT INTO `personal` (`id_personal`, `rfc`, `curp`, `nombre`, `apellido_p`, `apellido_m`, `correo`, `telefono`, `puesto`, `area`, `id_jefe`, `activo`, `contrasena`) VALUES
@@ -115,17 +122,17 @@ INSERT INTO `personal` (`id_personal`, `rfc`, `curp`, `nombre`, `apellido_p`, `a
 -- --------------------------------------------------------
 
 --
--- Table structure for table `puestos`
+-- Estructura de tabla para la tabla `puestos`
 --
 
 CREATE TABLE `puestos` (
   `id_puesto` bigint(20) NOT NULL,
   `nombre` text NOT NULL,
   `descripcion` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `puestos`
+-- Volcado de datos para la tabla `puestos`
 --
 
 INSERT INTO `puestos` (`id_puesto`, `nombre`, `descripcion`) VALUES
@@ -137,7 +144,7 @@ INSERT INTO `puestos` (`id_puesto`, `nombre`, `descripcion`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reportes`
+-- Estructura de tabla para la tabla `reportes`
 --
 
 CREATE TABLE `reportes` (
@@ -148,13 +155,14 @@ CREATE TABLE `reportes` (
   `id_personal` bigint(20) DEFAULT NULL,
   `fecha_inicio` date DEFAULT NULL,
   `fecha_final` date DEFAULT NULL,
-  `estado` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `estado` varchar(20) DEFAULT NULL,
+  `descripcion` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `requisiciones`
+-- Estructura de tabla para la tabla `requisiciones`
 --
 
 CREATE TABLE `requisiciones` (
@@ -168,12 +176,12 @@ CREATE TABLE `requisiciones` (
   `descripcion_servicio` text DEFAULT NULL,
   `estado` varchar(20) DEFAULT NULL,
   `tipo_financiamiento` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `salidas`
+-- Estructura de tabla para la tabla `salidas`
 --
 
 CREATE TABLE `salidas` (
@@ -192,10 +200,10 @@ CREATE TABLE `salidas` (
   `adeudo_tiempo` time DEFAULT NULL,
   `justificante` tinyint(1) DEFAULT NULL,
   `fecha_llegada` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `salidas`
+-- Volcado de datos para la tabla `salidas`
 --
 
 INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `solicita_respaldo`, `hora_estimada`, `adeudo_tiempo`, `justificante`, `fecha_llegada`) VALUES
@@ -208,44 +216,44 @@ INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `servicios`
+-- Estructura de tabla para la tabla `servicios`
 --
 
 CREATE TABLE `servicios` (
   `id_servicio` bigint(20) NOT NULL,
-  `nombre` varchar(50) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
   `periodicidad` int(3) DEFAULT NULL,
   `descripcion` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Indexes for dumped tables
+-- Índices para tablas volcadas
 --
 
 --
--- Indexes for table `areas`
+-- Indices de la tabla `areas`
 --
 ALTER TABLE `areas`
   ADD PRIMARY KEY (`id_area`),
   ADD KEY `id_subdireccion` (`id_subdireccion`);
 
 --
--- Indexes for table `calendario`
+-- Indices de la tabla `calendario`
 --
 ALTER TABLE `calendario`
   ADD PRIMARY KEY (`id_calendario`),
   ADD KEY `id_servicio` (`id_servicio`),
-  ADD KEY `id_area` (`id_area`);
+  ADD KEY `id_servicio_2` (`id_servicio`);
 
 --
--- Indexes for table `incidencias`
+-- Indices de la tabla `incidencias`
 --
 ALTER TABLE `incidencias`
   ADD PRIMARY KEY (`id_incidencia`),
   ADD KEY `id_personal` (`id_personal`);
 
 --
--- Indexes for table `personal`
+-- Indices de la tabla `personal`
 --
 ALTER TABLE `personal`
   ADD PRIMARY KEY (`id_personal`),
@@ -258,13 +266,13 @@ ALTER TABLE `personal`
   ADD KEY `id_jefe` (`id_jefe`);
 
 --
--- Indexes for table `puestos`
+-- Indices de la tabla `puestos`
 --
 ALTER TABLE `puestos`
   ADD PRIMARY KEY (`id_puesto`);
 
 --
--- Indexes for table `reportes`
+-- Indices de la tabla `reportes`
 --
 ALTER TABLE `reportes`
   ADD PRIMARY KEY (`id_reporte`),
@@ -273,7 +281,7 @@ ALTER TABLE `reportes`
   ADD KEY `id_personal` (`id_personal`);
 
 --
--- Indexes for table `requisiciones`
+-- Indices de la tabla `requisiciones`
 --
 ALTER TABLE `requisiciones`
   ADD PRIMARY KEY (`id_requisicion`),
@@ -281,7 +289,7 @@ ALTER TABLE `requisiciones`
   ADD KEY `id_autoriza` (`id_autoriza`);
 
 --
--- Indexes for table `salidas`
+-- Indices de la tabla `salidas`
 --
 ALTER TABLE `salidas`
   ADD PRIMARY KEY (`id_salida`),
@@ -290,88 +298,93 @@ ALTER TABLE `salidas`
   ADD KEY `id_personal_2` (`id_personal`);
 
 --
--- Indexes for table `servicios`
+-- Indices de la tabla `servicios`
 --
 ALTER TABLE `servicios`
   ADD PRIMARY KEY (`id_servicio`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT de las tablas volcadas
 --
 
 --
--- AUTO_INCREMENT for table `areas`
+-- AUTO_INCREMENT de la tabla `areas`
 --
 ALTER TABLE `areas`
   MODIFY `id_area` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT for table `calendario`
+-- AUTO_INCREMENT de la tabla `calendario`
 --
 ALTER TABLE `calendario`
   MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `incidencias`
+-- AUTO_INCREMENT de la tabla `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `personal`
+-- AUTO_INCREMENT de la tabla `personal`
 --
 ALTER TABLE `personal`
   MODIFY `id_personal` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
--- AUTO_INCREMENT for table `puestos`
+-- AUTO_INCREMENT de la tabla `puestos`
 --
 ALTER TABLE `puestos`
   MODIFY `id_puesto` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `reportes`
+-- AUTO_INCREMENT de la tabla `reportes`
 --
 ALTER TABLE `reportes`
   MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `requisiciones`
+-- AUTO_INCREMENT de la tabla `requisiciones`
 --
 ALTER TABLE `requisiciones`
   MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `salidas`
+-- AUTO_INCREMENT de la tabla `salidas`
 --
 ALTER TABLE `salidas`
   MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT for table `servicios`
+-- AUTO_INCREMENT de la tabla `servicios`
 --
 ALTER TABLE `servicios`
   MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
--- Constraints for dumped tables
+-- Restricciones para tablas volcadas
 --
 
 --
--- Constraints for table `areas`
+-- Filtros para la tabla `areas`
 --
 ALTER TABLE `areas`
   ADD CONSTRAINT `areas_ibfk_1` FOREIGN KEY (`id_subdireccion`) REFERENCES `areas` (`id_area`);
 
 --
--- Constraints for table `calendario`
+-- Filtros para la tabla `calendario`
 --
 ALTER TABLE `calendario`
-  ADD CONSTRAINT `id_area` FOREIGN KEY (`id_area`) REFERENCES `areas` (`id_area`),
   ADD CONSTRAINT `id_servicio` FOREIGN KEY (`id_servicio`) REFERENCES `servicios` (`id_servicio`);
 
 --
--- Constraints for table `personal`
+-- Filtros para la tabla `incidencias`
+--
+ALTER TABLE `incidencias`
+  ADD CONSTRAINT `incidencias_ibfk_1` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`);
+
+--
+-- Filtros para la tabla `personal`
 --
 ALTER TABLE `personal`
   ADD CONSTRAINT `personal_ibfk_1` FOREIGN KEY (`area`) REFERENCES `areas` (`id_area`),
@@ -379,7 +392,7 @@ ALTER TABLE `personal`
   ADD CONSTRAINT `personal_ibfk_3` FOREIGN KEY (`id_jefe`) REFERENCES `personal` (`id_personal`);
 
 --
--- Constraints for table `reportes`
+-- Filtros para la tabla `reportes`
 --
 ALTER TABLE `reportes`
   ADD CONSTRAINT `id_calendario` FOREIGN KEY (`id_calendario`) REFERENCES `calendario` (`id_calendario`),
@@ -387,14 +400,14 @@ ALTER TABLE `reportes`
   ADD CONSTRAINT `id_personal` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`);
 
 --
--- Constraints for table `requisiciones`
+-- Filtros para la tabla `requisiciones`
 --
 ALTER TABLE `requisiciones`
   ADD CONSTRAINT `id_autoriza` FOREIGN KEY (`id_autoriza`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `id_solicita` FOREIGN KEY (`id_solicita`) REFERENCES `personal` (`id_personal`);
 
 --
--- Constraints for table `salidas`
+-- Filtros para la tabla `salidas`
 --
 ALTER TABLE `salidas`
   ADD CONSTRAINT `salidas_ibfk_1` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`),
