@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-11-2026 a las 18:26:30
+-- Tiempo de generación: 04-11-2026 a las 19:06:23
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 7.4.30
 
@@ -60,6 +60,14 @@ CREATE TABLE `calendario` (
   `estado` varchar(20) NOT NULL,
   `id_servicio` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `calendario`
+--
+
+INSERT INTO `calendario` (`id_calendario`, `fecha_destinada`, `estado`, `id_servicio`) VALUES
+(13, '2026-11-05', 'pendiente', 2),
+(14, '2026-10-11', 'pendiente', 3);
 
 -- --------------------------------------------------------
 
@@ -149,15 +157,22 @@ INSERT INTO `puestos` (`id_puesto`, `nombre`, `descripcion`) VALUES
 
 CREATE TABLE `reportes` (
   `id_reporte` bigint(20) NOT NULL,
-  `tipo` text DEFAULT NULL,
+  `tipo` text NOT NULL,
   `id_calendario` bigint(20) DEFAULT NULL,
   `id_incidencia` bigint(20) DEFAULT NULL,
   `id_personal` bigint(20) DEFAULT NULL,
-  `fecha_inicio` date DEFAULT NULL,
+  `fecha_inicio` date NOT NULL,
   `fecha_final` date DEFAULT NULL,
-  `estado` varchar(20) DEFAULT NULL,
+  `estado` varchar(20) NOT NULL,
   `descripcion` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `reportes`
+--
+
+INSERT INTO `reportes` (`id_reporte`, `tipo`, `id_calendario`, `id_incidencia`, `id_personal`, `fecha_inicio`, `fecha_final`, `estado`, `descripcion`) VALUES
+(2, 'incidencia', NULL, NULL, NULL, '2026-11-04', NULL, 'pendiente', 'si');
 
 -- --------------------------------------------------------
 
@@ -167,16 +182,24 @@ CREATE TABLE `reportes` (
 
 CREATE TABLE `requisiciones` (
   `id_requisicion` bigint(20) NOT NULL,
-  `id_reporte` bigint(20) DEFAULT NULL,
-  `id_solicita` bigint(20) DEFAULT NULL,
+  `id_reporte` bigint(20) NOT NULL,
+  `id_solicita` bigint(20) NOT NULL,
   `id_autoriza` bigint(20) DEFAULT NULL,
-  `justificacion` text DEFAULT NULL,
-  `fecha` date DEFAULT NULL,
+  `justificacion` text NOT NULL,
+  `fecha` date NOT NULL,
   `fecha_entrega` date DEFAULT NULL,
-  `descripcion_servicio` text DEFAULT NULL,
-  `estado` varchar(20) DEFAULT NULL,
-  `tipo_financiamiento` text DEFAULT NULL
+  `descripcion_servicio` text NOT NULL,
+  `estado` varchar(20) NOT NULL,
+  `tipo_financiamiento` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `requisiciones`
+--
+
+INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `justificacion`, `fecha`, `fecha_entrega`, `descripcion_servicio`, `estado`, `tipo_financiamiento`) VALUES
+(2, 2, 14, 13, 'hace falta', '2026-11-04', NULL, 'necesito dos panes', 'pendiente', 'est'),
+(3, 2, 14, NULL, 'ssss', '2026-11-04', NULL, 'sss', 'sss', 'sss');
 
 -- --------------------------------------------------------
 
@@ -227,6 +250,14 @@ CREATE TABLE `servicios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
+-- Volcado de datos para la tabla `servicios`
+--
+
+INSERT INTO `servicios` (`id_servicio`, `nombre`, `periodicidad`, `descripcion`) VALUES
+(2, 'ssss', 2, 'sss'),
+(3, 'revision de extintores', 4, 'revision del llenado y funcionalidad de los extintores');
+
+--
 -- Índices para tablas volcadas
 --
 
@@ -242,8 +273,7 @@ ALTER TABLE `areas`
 --
 ALTER TABLE `calendario`
   ADD PRIMARY KEY (`id_calendario`),
-  ADD KEY `id_servicio` (`id_servicio`),
-  ADD KEY `id_servicio_2` (`id_servicio`);
+  ADD KEY `id_servicio` (`id_servicio`);
 
 --
 -- Indices de la tabla `incidencias`
@@ -286,7 +316,8 @@ ALTER TABLE `reportes`
 ALTER TABLE `requisiciones`
   ADD PRIMARY KEY (`id_requisicion`),
   ADD KEY `id_solicita` (`id_solicita`),
-  ADD KEY `id_autoriza` (`id_autoriza`);
+  ADD KEY `id_autoriza` (`id_autoriza`),
+  ADD KEY `id_reporte` (`id_reporte`);
 
 --
 -- Indices de la tabla `salidas`
@@ -317,7 +348,7 @@ ALTER TABLE `areas`
 -- AUTO_INCREMENT de la tabla `calendario`
 --
 ALTER TABLE `calendario`
-  MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `incidencias`
@@ -341,13 +372,13 @@ ALTER TABLE `puestos`
 -- AUTO_INCREMENT de la tabla `reportes`
 --
 ALTER TABLE `reportes`
-  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `requisiciones`
 --
 ALTER TABLE `requisiciones`
-  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `salidas`
@@ -359,7 +390,7 @@ ALTER TABLE `salidas`
 -- AUTO_INCREMENT de la tabla `servicios`
 --
 ALTER TABLE `servicios`
-  MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Restricciones para tablas volcadas
@@ -404,7 +435,8 @@ ALTER TABLE `reportes`
 --
 ALTER TABLE `requisiciones`
   ADD CONSTRAINT `id_autoriza` FOREIGN KEY (`id_autoriza`) REFERENCES `personal` (`id_personal`),
-  ADD CONSTRAINT `id_solicita` FOREIGN KEY (`id_solicita`) REFERENCES `personal` (`id_personal`);
+  ADD CONSTRAINT `id_solicita` FOREIGN KEY (`id_solicita`) REFERENCES `personal` (`id_personal`),
+  ADD CONSTRAINT `requisiciones_ibfk_1` FOREIGN KEY (`id_reporte`) REFERENCES `reportes` (`id_reporte`);
 
 --
 -- Filtros para la tabla `salidas`
