@@ -13,7 +13,7 @@ if($_SERVER['REQUEST_METHOD'] !== 'POST'){
 }
 
 try{
-    valiar_jwt_requerido();
+    validar_jwt_requerido();
     validar_csrf_requerido();
 
     $input = json_decode(file_get_contents('php://input'), true);
@@ -25,15 +25,23 @@ try{
 
     $calendario = generar_calendario($pdo, $input);
 
-    http_response_code(200);
+    http_response_code(201);
     echo json_encode([
         "mensaje" => "Calendario generado exitosamente",
         "calendario" => $calendario
     ]);
 }catch (PDOException $e) {
+    error_log("Error al generar el calendario: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(["ERROR" => "Error al generar el calendario: " . $e->getMessage()]);
-} catch (Exception $e) {
+    echo json_encode(["ERROR" => "Error al generar el calendario"]);
+} catch (OutOfBoundsException $e) {
+    http_response_code(404);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+} catch (InvalidArgumentException $e) {
     http_response_code(400);
-    echo json_encode(["ERROR" => "Error: " . $e->getMessage()]);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+} catch (Throwable $e) {
+    error_log("Error inesperado al generar el calendario: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(["ERROR" => "Error interno al generar el calendario"]);
 }
