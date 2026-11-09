@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import * as XLSX from 'xlsx';
 import { authService } from '../../services/auth_services.js';
 import type { VerHistorialSalida } from '../../services/auth_services.js';
 import './styles/ver_historial.css';
@@ -13,6 +14,42 @@ function formatearFecha(fecha: string) {
 
 function formatearHora(hora: string | null) {
   return hora ? hora.slice(0, 5) : 'No registrada';
+}
+
+function descargarExcel(salidas: VerHistorialSalida[]) {
+  const filas = salidas.map((salida) => ({
+    'No.': `#${String(salida.id_salida).padStart(3, '0')}`,
+    Personal: `${salida.nombre} ${salida.apellido_p} ${salida.apellido_m}`.trim(),
+    'Área': salida.area_nombre ?? 'No asignada',
+    Destino: salida.destino,
+    Motivo: salida.motivo,
+    Autorizó: salida.autorizante_nombre
+      ? `${salida.autorizante_nombre} ${salida.autorizante_apellido_p ?? ''} ${salida.autorizante_apellido_m ?? ''}`.trim()
+      : 'No registrado',
+    Fecha: formatearFecha(salida.fecha),
+    'Hora de salida': formatearHora(salida.hora_salida),
+    'Hora de regreso': formatearHora(salida.hora_llegada),
+    'Adeudo de tiempo': salida.adeudo_tiempo ?? 'No registrado',
+  }));
+
+  const hoja = XLSX.utils.json_to_sheet(filas);
+  hoja['!cols'] = [
+    { wch: 8 },
+    { wch: 28 },
+    { wch: 22 },
+    { wch: 28 },
+    { wch: 36 },
+    { wch: 28 },
+    { wch: 20 },
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 20 },
+  ];
+  hoja['!freeze'] = { xSplit: 0, ySplit: 1 };
+
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, 'Historial de salidas');
+  XLSX.writeFile(libro, `historial_salidas_${new Date().toISOString().slice(0, 10)}.xlsx`);
 }
 
 export default function VerHistorial() {
@@ -74,9 +111,19 @@ export default function VerHistorial() {
               <h2 id="historial-title">Salidas registradas</h2>
             </div>
             {!loading && !error && (
-              <span className="historial-count">
-                {salidas.length} {salidas.length === 1 ? 'SALIDA' : 'SALIDAS'}
-              </span>
+              <div className="historial-section-actions">
+                <span className="historial-count">
+                  {salidas.length} {salidas.length === 1 ? 'SALIDA' : 'SALIDAS'}
+                </span>
+                <button
+                  className="historial-export-button"
+                  type="button"
+                  onClick={() => descargarExcel(salidas)}
+                  disabled={salidas.length === 0}
+                >
+                  Descargar Excel
+                </button>
+              </div>
             )}
           </div>
 
