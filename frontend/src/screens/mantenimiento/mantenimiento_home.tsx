@@ -55,6 +55,14 @@ const opcionesAdministrativas: OpcionMantenimiento[] = [
         action: 'Ver mantenimientos',
         path: '/mantenimiento/reportes/en-curso',
     },
+    {
+        index: '06',
+        category: 'CATÁLOGO',
+        title: 'Servicios',
+        description: 'Crea servicios de mantenimiento y desactiva los que ya no se utilicen.',
+        action: 'Administrar servicios',
+        path: '/mantenimiento/servicios',
+    },
 ]
 
 const destinos: Record<string, string> = {
@@ -63,6 +71,7 @@ const destinos: Record<string, string> = {
     '/mantenimiento/incidencias': 'Incidencias',
     '/mantenimiento/reportes/historial': 'Historial de reportes',
     '/mantenimiento/reportes/en-curso': 'Mantenimientos en curso',
+    '/mantenimiento/servicios': 'Servicios',
 }
 
 export default function MantenimientoHome() {

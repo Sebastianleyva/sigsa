@@ -13,6 +13,8 @@ import VerHistorial from './screens/salidas/ver_historial.tsx'
 import RegistrarScreen from './screens/auth/registrar.tsx'
 import CambiarContrasenaScreen from './screens/auth/cambiar_contrasena.tsx'
 import MantenimientoHome, { MantenimientoDestino } from './screens/mantenimiento/mantenimiento_home.tsx'
+import CalendarioMantenimiento from './screens/mantenimiento/calendario_mantenimiento.tsx'
+import ServiciosMantenimiento from './screens/mantenimiento/servicios_mantenimiento.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -23,6 +25,8 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/home" element={<App />} />
         <Route path="/mantenimiento" element={<MantenimientoHome />} />
+        <Route path="/mantenimiento/calendario" element={<CalendarioMantenimiento />} />
+        <Route path="/mantenimiento/servicios" element={<ServiciosMantenimiento />} />
         <Route path="/mantenimiento/*" element={<MantenimientoDestino />} />
         <Route path="/salidas" element={<SalidasHome />} />
         <Route path="/salidas/crear" element={<CrearSalida />} />

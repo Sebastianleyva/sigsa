@@ -19,6 +19,12 @@ function crear_servicio($pdo, $input){
     $periodicidad = $input['periodicidad'];
     $descripcion = $input['descripcion'];
 
+    if (trim($nombre) === '' || trim($descripcion) === '') {
+        http_response_code(400);
+        echo json_encode(["ERROR" => "El nombre y la descripcion no pueden estar vacios"]);
+        exit;
+    }
+
     try{$stm = $pdo -> prepare(
         "INSERT INTO servicios 
         (nombre, periodicidad, descripcion, activo)
