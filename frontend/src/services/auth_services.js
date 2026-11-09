@@ -233,9 +233,11 @@ export const authService = {
       throw new Error("No se pudo conectar con el servidor.");
     }
   },
-  async VerHistorial() {
+  async VerHistorial(mes, anio) {
     try {
-      const response = await api.get("salidas/routes/ver_historial.php");
+      const response = await api.get("salidas/routes/ver_historial.php", {
+        params: { mes, anio },
+      });
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {

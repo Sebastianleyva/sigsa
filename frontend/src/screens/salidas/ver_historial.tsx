@@ -16,7 +16,7 @@ function formatearHora(hora: string | null) {
   return hora ? hora.slice(0, 5) : 'No registrada';
 }
 
-function descargarExcel(salidas: VerHistorialSalida[]) {
+function descargarExcel(salidas: VerHistorialSalida[], mesConsulta: Date) {
   const filas = salidas.map((salida) => ({
     'No.': `#${String(salida.id_salida).padStart(3, '0')}`,
     Personal: `${salida.nombre} ${salida.apellido_p} ${salida.apellido_m}`.trim(),
@@ -49,20 +49,43 @@ function descargarExcel(salidas: VerHistorialSalida[]) {
 
   const libro = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(libro, hoja, 'Historial de salidas');
-  XLSX.writeFile(libro, `historial_salidas_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  const mes = String(mesConsulta.getMonth() + 1).padStart(2, '0');
+  XLSX.writeFile(libro, `historial_salidas_${mesConsulta.getFullYear()}-${mes}.xlsx`);
 }
 
 export default function VerHistorial() {
+  const hoy = new Date();
+  const inicioDelAno = new Date(hoy.getFullYear(), 0, 1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [salidas, setSalidas] = useState<VerHistorialSalida[]>([]);
+  const [mesConsulta, setMesConsulta] = useState(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+
+  const cambiarMes = (cantidad: number) => {
+    setMesConsulta((mesActual) => {
+      const nuevoMes = new Date(mesActual.getFullYear(), mesActual.getMonth() + cantidad, 1);
+      const inicioDelMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+      if (nuevoMes < inicioDelAno) return inicioDelAno;
+      if (nuevoMes > inicioDelMesActual) return inicioDelMesActual;
+      return nuevoMes;
+    });
+  };
+
+  const nombreMesConsulta = mesConsulta.toLocaleDateString('es-MX', {
+    month: 'long',
+    year: 'numeric',
+  });
 
   useEffect(() => {
     let mounted = true;
 
     async function fetchSalidas() {
       try {
-        const resultados = await authService.VerHistorial();
+        const resultados = await authService.VerHistorial(
+          mesConsulta.getMonth() + 1,
+          mesConsulta.getFullYear(),
+        );
         if (mounted) setSalidas(resultados.Salidas);
       } catch (fetchError) {
         console.error('Error al obtener el historial de salidas:', fetchError);
@@ -82,7 +105,7 @@ export default function VerHistorial() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [mesConsulta]);
 
   return (
     <main className="historial-page">
@@ -112,13 +135,34 @@ export default function VerHistorial() {
             </div>
             {!loading && !error && (
               <div className="historial-section-actions">
+                <div className="historial-month-navigation" aria-label="Navegación por mes">
+                  <button
+                    className="historial-month-button"
+                    type="button"
+                    onClick={() => cambiarMes(-1)}
+                    disabled={mesConsulta <= inicioDelAno}
+                    aria-label="Consultar el mes anterior"
+                  >
+                    ←
+                  </button>
+                  <span className="historial-month-label">{nombreMesConsulta}</span>
+                  <button
+                    className="historial-month-button"
+                    type="button"
+                    onClick={() => cambiarMes(1)}
+                    disabled={mesConsulta >= new Date(hoy.getFullYear(), hoy.getMonth(), 1)}
+                    aria-label="Consultar el mes siguiente"
+                  >
+                    →
+                  </button>
+                </div>
                 <span className="historial-count">
                   {salidas.length} {salidas.length === 1 ? 'SALIDA' : 'SALIDAS'}
                 </span>
                 <button
                   className="historial-export-button"
                   type="button"
-                  onClick={() => descargarExcel(salidas)}
+                  onClick={() => descargarExcel(salidas, mesConsulta)}
                   disabled={salidas.length === 0}
                 >
                   Descargar Excel

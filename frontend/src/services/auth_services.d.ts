@@ -197,5 +197,5 @@ export const authService: {
     RechazarSalida(id: RechazarSalidaData): Promise<RechazarSalidaResponse>
     FinalizarSalida(id: FinalizarSalidaData): Promise<FinalizarSalidaResponse>
     getUsuarioActual(): Usuario | null
-    VerHistorial(): Promise<VerHistorialResponse>
+    VerHistorial(mes?: number, anio?: number): Promise<VerHistorialResponse>
 }

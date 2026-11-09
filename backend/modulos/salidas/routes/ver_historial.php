@@ -19,6 +19,18 @@ switch($_SERVER['REQUEST_METHOD']){
 }
 
 function ver_historial($pdo){
+    $mes = filter_input(INPUT_GET, 'mes', FILTER_VALIDATE_INT);
+    $anio = filter_input(INPUT_GET, 'anio', FILTER_VALIDATE_INT);
+    $mesActual = (int) date('n');
+    $anioActual = (int) date('Y');
+
+    if ($mes === false || $mes === null || $mes < 1 || $mes > 12 ||
+        $anio === false || $anio === null || $anio !== $anioActual || $mes > $mesActual) {
+        http_response_code(400);
+        echo json_encode(["ERROR" => "El mes de consulta no es válido"]);
+        return;
+    }
+
     $sql = $pdo -> prepare(
         'SELECT s.id_salida, s.destino, s.motivo, s.hora_llegada, s.hora_salida, s.id_personal, s.id_autoriza, s.fecha,
         s.adeudo_tiempo, p.nombre, p.apellido_p, p.apellido_m, p.area,
@@ -31,10 +43,15 @@ function ver_historial($pdo){
         LEFT JOIN areas ar ON p.area = ar.id_area
         LEFT JOIN personal a ON s.id_autoriza = a.id_personal
         WHERE s.estado = :estado
-        AND s.fecha >= NOW() - INTERVAL 1 YEAR
+        AND MONTH(s.fecha) = :mes
+        AND YEAR(s.fecha) = :anio
         ORDER BY s.fecha DESC, s.hora_salida DESC, s.id_salida DESC'
     );
-    $sql -> execute(['estado' => 'FINALIZADO']);
+    $sql -> execute([
+        'estado' => 'FINALIZADO',
+        'mes' => $mes,
+        'anio' => $anio,
+    ]);
     $resultado = $sql -> fetchAll();
 
     http_response_code(200);
