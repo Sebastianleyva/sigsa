@@ -13,7 +13,7 @@ function generar_requisicion($pdo,$input,$usuario){
 
     $stm = $pdo ->prepare(
         
-        "INSERT INTO requisicion 
+        "INSERT INTO requisiciones 
         (id_reporte, id_solicita, justificacion, fecha, descripcion_servicio, estado)
         VALUES
         (:id_reporte, :id_solicita, :justificacion, :fecha, :descripcion_servicio, :estado)"

@@ -1,6 +1,6 @@
 <?php
 
-function aceptar_incidencia($pdo, $input, $id_personal){
+function aceptar_incidencia($pdo, $input){
 
     $estado = 'ACEPTADA';
     $id_incidencia =filter_var($input['id_incidencia'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -10,11 +10,10 @@ function aceptar_incidencia($pdo, $input, $id_personal){
         
         $query = $pdo->prepare(
             "SELECT * FROM incidencias 
-            WHERE id_incidencia = :id_incidencia AND id_personal = :id_personal"
+            WHERE id_incidencia = :id_incidencia "
         );
         $query->execute([
-            ':id_incidencia' => $id_incidencia,
-            ':id_personal' => $id_personal
+            ':id_incidencia' => $id_incidencia
         ]);
         $incidencia = $query->fetch(PDO::FETCH_ASSOC);
 

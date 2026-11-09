@@ -13,6 +13,9 @@ function crear_servicio($pdo, $input){
 
     $nombre = $input['nombre'];
     $periodicidad = $input['periodicidad'];
+    if(!is_int($periodicidad)){
+        throw new InvalidArgumentException('El campo periodicidad debe ser un entero');
+    }
     $descripcion = $input['descripcion'];
 
     try{$stm = $pdo -> prepare(

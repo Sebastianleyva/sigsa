@@ -4,7 +4,7 @@ header('Content-Type: application/json');
 
 require_once '../../../includes/auth.php';
 require_once '../../../includes/conexion.php';
-require_once '../models/rechazar_incidencia.php';
+require_once '../models/ver_incidencias.php';
 
 if($_SERVER['REQUEST_METHOD'] !== 'GET'){
     http_response_code(405);
@@ -12,10 +12,10 @@ if($_SERVER['REQUEST_METHOD'] !== 'GET'){
     exit;
 }
 
-tyr{
+try{
     validar_jwt_requerido();
     validar_csrf_requerido();
-    requirer_rol([1, 2, 3]);
+    requerir_rol([1, 2, 3]);
 
     $incidencias = ver_incidencias($pdo);
 

@@ -14,6 +14,9 @@ function generar_reporte($pdo,$input){
     $tipo = $input['tipo'];
     $id_calendario = $input['id_calendario'] ?? null;
     $id_incidencia = $input['id_incidencia'] ?? null;
+    if(!$id_calendario && !$id_incidencia){
+        throw new InvalidArgumentException('El reporte debe estar asociado a un calendario o a una incidencia');
+    }
     $id_personal = $input['id_personal'] ?? null;
     $fecha_inicio = $input['fecha_inicio'];
     $estado = $input['estado'];

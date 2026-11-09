@@ -5,6 +5,13 @@ function generar_calendario($pdo,$input){
         throw new InvalidArgumentException('La entrada debe ser un JSON valido');
     }
     
+    $campos = ['fecha_destinada', 'estado', 'id_servicio'];
+    foreach ($campos as $campo) {
+        if (!array_key_exists($campo, $input)) {
+            throw new InvalidArgumentException("Falta el campo obligatorio: $campo");
+        }
+    }
+
     $fecha_destinada = $input['fecha_destinada'];
     $estado = $input['estado'];
     $id_servicio = $input['id_servicio'];
@@ -12,7 +19,8 @@ function generar_calendario($pdo,$input){
     $query = $pdo->prepare(
         "SELECT id_servicio
         FROM servicios
-        WHERE id_servicio = :id_servicio"
+        WHERE id_servicio = :id_servicio
+        AND activo = 1"
     );
     $query->execute(['id_servicio' => $id_servicio]);
     if(!$query->fetchColumn()){

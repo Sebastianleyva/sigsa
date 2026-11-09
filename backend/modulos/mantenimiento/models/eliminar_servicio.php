@@ -4,8 +4,8 @@ function eliminar_servicio($pdo, $id_servicio){
 
     try {
         $stm = $pdo->prepare(
-            "DELETE FROM 
-            servicios 
+            "UPDATE servicios 
+            SET activo = 0
             WHERE 
             id_servicio = :id_servicio");
 

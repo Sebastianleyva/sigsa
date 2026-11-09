@@ -15,6 +15,7 @@ if($_SERVER['REQUEST_METHOD'] !== 'PATCH'){
 try{
     $usuario = validar_jwt_requerido();
     validar_csrf_requerido();
+    requerir_rol([1, 2, 3]);
     
     $input = json_decode(file_get_contents('php://input'), true);
     if (!is_array($input)) {
@@ -23,8 +24,7 @@ try{
         exit;
     }
 
-    $id_personal = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-    $incidencia = rechazar_incidencia($pdo, $input, $id_personal);
+    $incidencia = rechazar_incidencia($pdo, $input);
 
     http_response_code(200);
     echo json_encode(["mensaje" => "Incidencia rechazada exitosamente",
