@@ -15,7 +15,7 @@ function crear_incidencia($pdo,$input,$usuario_id){
     $fecha = date('Y-m-d');
     $urgencia = $input['urgencia'];
     $lugar = $input['lugar'];
-    $estado = $input['estado'];
+    $estado = 'PENDIENTE'
     $stm = $pdo->prepare(
         "INSERT INTO incidencias 
         (id_personal, descripcion, fecha, urgencia, estado,lugar) 
