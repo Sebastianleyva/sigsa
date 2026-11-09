@@ -30,10 +30,15 @@ try{
     echo json_encode(["mensaje" => "Servicio creado exitosamente", 
         "servicio" => $servicio]);
 
-}catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(["ERROR" => "Error al crear el servicio: " . $e->getMessage()]);
-} catch (Exception $e) {
+} catch (InvalidArgumentException $e) {
     http_response_code(400);
-    echo json_encode(["ERROR" => "Error: " . $e->getMessage()]);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+} catch (PDOException $e) {
+    error_log("Error al crear el servicio: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(["ERROR" => "Error al crear el servicio"]);
+} catch (Throwable $e) {
+    error_log("Error inesperado al crear el servicio: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(["ERROR" => "Error interno al crear el servicio"]);
 }
