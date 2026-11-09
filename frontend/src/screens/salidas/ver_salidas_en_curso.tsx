@@ -8,8 +8,8 @@ type SalidaEnCurso = {
   motivo: string;
   destino: string;
   fecha: string;
-  hora_salida: string;
-  hora_estimada: string;
+  hora_salida: string | null;
+  hora_estimada: string | null;
   nombre: string;
   apellido_p: string;
   apellido_m: string;
@@ -187,11 +187,11 @@ export default function Ver_Salidas_En_Curso() {
                       </div>
                       <div className="salidas-en-curso-field">
                         <span className="salidas-en-curso-label">Hora de salida</span>
-                        <p>{salida.hora_salida.slice(0, 5)}</p>
+                        <p>{salida.hora_salida?.slice(0, 5) ?? 'No registrada'}</p>
                       </div>
                       <div className="salidas-en-curso-field">
                         <span className="salidas-en-curso-label">Regreso estimado</span>
-                        <p>{salida.hora_estimada.slice(0, 5)}</p>
+                        <p>{salida.hora_estimada?.slice(0, 5) ?? 'No registrada'}</p>
                       </div>
                     </div>
                   </div>

@@ -64,21 +64,24 @@ function finalizar_salida($pdo,$input,$usuario){
     $nuevo_estado = "FINALIZADO";
     date_default_timezone_set('America/Mexico_City');
     $hora_llegada = date('H:i:s');
-    $fecha_estimada = $salida['fecha'];
-    if ($salida['hora_estimada'] < $salida['hora_salida']) {
-        $fecha_estimada = date('Y-m-d', strtotime($fecha_estimada . ' +1 day'));
-    }
-
-    $llegada = new DateTimeImmutable(date('Y-m-d') . ' ' . $hora_llegada);
-    $llegada_estimada = new DateTimeImmutable($fecha_estimada . ' ' . $salida['hora_estimada']);
     $adeudo_tiempo = null;
 
-    if ($llegada > $llegada_estimada) {
-        $segundos_adeudo = $llegada->getTimestamp() - $llegada_estimada->getTimestamp();
-        $horas = intdiv($segundos_adeudo, 3600);
-        $minutos = intdiv($segundos_adeudo % 3600, 60);
-        $segundos = $segundos_adeudo % 60;
-        $adeudo_tiempo = sprintf('%02d:%02d:%02d', $horas, $minutos, $segundos);
+    if ($salida['hora_salida'] !== null && $salida['hora_estimada'] !== null) {
+        $fecha_estimada = $salida['fecha'];
+        if ($salida['hora_estimada'] < $salida['hora_salida']) {
+            $fecha_estimada = date('Y-m-d', strtotime($fecha_estimada . ' +1 day'));
+        }
+
+        $llegada = new DateTimeImmutable(date('Y-m-d') . ' ' . $hora_llegada);
+        $llegada_estimada = new DateTimeImmutable($fecha_estimada . ' ' . $salida['hora_estimada']);
+
+        if ($llegada > $llegada_estimada) {
+            $segundos_adeudo = $llegada->getTimestamp() - $llegada_estimada->getTimestamp();
+            $horas = intdiv($segundos_adeudo, 3600);
+            $minutos = intdiv($segundos_adeudo % 3600, 60);
+            $segundos = $segundos_adeudo % 60;
+            $adeudo_tiempo = sprintf('%02d:%02d:%02d', $horas, $minutos, $segundos);
+        }
     }
         
     $query = $pdo -> prepare(

@@ -78,7 +78,12 @@ function crear_solicitud($pdo, $input, $usuario) {
     }
 
     $puesto = (int) $solicitante['puesto'];
-    if (!in_array($puesto, [1, 2, 3, 4], true)) {
+    if (in_array($puesto, [1, 2], true)) {
+        http_response_code(403);
+        echo json_encode(["ERROR" => "El director y los subdirectores no necesitan registrar salidas"]);
+        exit;
+    }
+    if (!in_array($puesto, [3, 4], true)) {
         http_response_code(403);
         echo json_encode(["ERROR" => "El puesto no puede registrar salidas"]);
         exit;
@@ -136,14 +141,16 @@ function crear_solicitud($pdo, $input, $usuario) {
         ]);
         if (!$jefe_activo->fetch()) {
             http_response_code(409);
-            echo json_encode(["ERROR" => "El jefe directo no está activo; solicita revisión del subdirector"]);
+            $mensaje = $puesto === 3
+                ? "El subdirector asignado no está activo o no corresponde a tu subdirección; contacta a administración"
+                : "El jefe directo no está activo; solicita revisión del subdirector";
+            echo json_encode(["ERROR" => $mensaje]);
             exit;
         }
     }
 
     $fecha = date('Y-m-d');
-    $requiere_autorizacion = in_array($puesto, [3, 4], true);
-    $estado = $requiere_autorizacion ? "PENDIENTE" : "EN CURSO";
+    $estado = "PENDIENTE";
    
     try {
         $pdo->beginTransaction();

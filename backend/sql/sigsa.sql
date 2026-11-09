@@ -118,7 +118,7 @@ INSERT INTO `personal` (`id_personal`, `rfc`, `curp`, `nombre`, `apellido_p`, `a
 (15, 'son13valores3', 'rils060301hdgytba3', 'Luis', 'Jimenez', 'Delgado', 'delgado@gmail.com', '6181161704', 3, 7, 14, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
 (16, 'son13valores4', 'rils060301hdgytba4', 'Diego', 'Erre', 'So', 'diego@gmail.com', '6181161705', 4, 7, 15, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
 (18, 'son13valores5', 'rils060301hdgytba5', 'Jose', 'Lomas', 'Turbas', 'jose@gmail.com', '6181161706', 2, 1, 13, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
-(20, 'son13valores6', 'rils060301hdgytba6', 'Itzel', 'Ochoa', 'Gandara', 'itzel@gmail.com', '6181161707', 3, 8, 18, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
+(20, 'son13valores6', 'rils060301hdgytba6', 'Itzel', 'Ochoa', 'Gandara', 'itzel@gmail.com', '6181161707', 3, 8, 14, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
 (21, 'son13valores7', 'rils060301hdgytba7', 'Mafer', 'luna', 'soto', 'mafer@gmail.com', '6181161708', 4, 8, 20, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu');
 
 -- --------------------------------------------------------

@@ -27,6 +27,7 @@ export default function CrearSalida() {
     const [notice, setNotice] = useState<Notice | null>(null)
     const [loading, setLoading] = useState(false)
     const usuario = authService.getUsuarioActual()
+    const noRequiereRegistrarSalida = [1, 2].includes(Number(usuario?.puesto))
 
     function updateField<Field extends keyof SalidaForm>(field: Field, value: SalidaForm[Field]) {
         setForm((current) => ({ ...current, [field]: value }))
@@ -77,6 +78,11 @@ export default function CrearSalida() {
                     <p>Registra los datos de tu salida para que pueda ser revisada.</p>
                 </div>
 
+                {noRequiereRegistrarSalida ? (
+                    <div className="crear-salida-notice crear-salida-notice-success" role="status">
+                        El director y los subdirectores no necesitan registrar sus salidas.
+                    </div>
+                ) : (
                 <div className="crear-salida-layout">
                     <form className="crear-salida-form" onSubmit={handleSubmit}>
                         <div className="crear-salida-form-heading">
@@ -177,6 +183,7 @@ export default function CrearSalida() {
                         </div>
                     </aside>
                 </div>
+                )}
             </section>
         </main>
     )
