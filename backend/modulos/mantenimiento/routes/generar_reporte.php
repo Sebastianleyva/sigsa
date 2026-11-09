@@ -41,6 +41,12 @@ try{
 } catch (InvalidArgumentException $e) {
     http_response_code(400);
     echo json_encode(["ERROR" => $e->getMessage()]);
+} catch (OutOfBoundsException $e) {
+    http_response_code(404);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+} catch (DomainException $e) {
+    http_response_code(409);
+    echo json_encode(["ERROR" => $e->getMessage()]);
 } catch (Throwable $e) {
     error_log("Error inesperado al generar el reporte: " . $e->getMessage());
     http_response_code(500);

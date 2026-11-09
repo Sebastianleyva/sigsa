@@ -24,13 +24,27 @@ try{
         exit;
     }
 
-    $incidencia = rechazar_incidencia($pdo, $input);
+    $id_personal = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    $incidencia = rechazar_incidencia($pdo, $input, $id_personal);
 
     http_response_code(200);
     echo json_encode(["mensaje" => "Incidencia rechazada exitosamente",
         "incidencia" => $incidencia]);
 
-} catch (Exception $e) {
+} catch (InvalidArgumentException $e) {
+    http_response_code(400);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+    exit;
+} catch (OutOfBoundsException $e) {
+    http_response_code(404);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+    exit;
+} catch (DomainException $e) {
+    http_response_code(409);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+    exit;
+} catch (Throwable $e) {
+    error_log("Error al rechazar la incidencia: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(["ERROR" => "Error interno del servidor"]);
     exit;

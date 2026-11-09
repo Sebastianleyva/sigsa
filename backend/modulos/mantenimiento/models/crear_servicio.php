@@ -4,8 +4,12 @@ header('Content-Type: application/json');
 
 
 function crear_servicio($pdo, $input){
-    
-    if (!is_string($input['nombre']) || empty($input['periodicidad']) || !is_string($input['descripcion'])) {
+    if (!is_array($input)
+        || !isset($input['nombre'], $input['periodicidad'], $input['descripcion'])
+        || !is_string($input['nombre'])
+        || !is_int($input['periodicidad'])
+        || $input['periodicidad'] < 1
+        || !is_string($input['descripcion'])) {
         http_response_code(400);
         echo json_encode(["ERROR" => "Campos obligatorios faltantes (nombre, periodicidad, descripcion)"]);
         exit;
@@ -13,16 +17,13 @@ function crear_servicio($pdo, $input){
 
     $nombre = $input['nombre'];
     $periodicidad = $input['periodicidad'];
-    if(!is_int($periodicidad)){
-        throw new InvalidArgumentException('El campo periodicidad debe ser un entero');
-    }
     $descripcion = $input['descripcion'];
 
     try{$stm = $pdo -> prepare(
         "INSERT INTO servicios 
-        (nombre, periodicidad, descripcion) 
+        (nombre, periodicidad, descripcion, activo)
         VALUES 
-        (:nombre, :periodicidad, :descripcion)"
+        (:nombre, :periodicidad, :descripcion, 1)"
     );
     $stm -> execute([
         ':nombre' => $nombre,
@@ -38,6 +39,7 @@ function crear_servicio($pdo, $input){
         'id' => $pdo->lastInsertId(),
         'nombre' => $nombre,
         'periodicidad' => $periodicidad,
-        'descripcion' => $descripcion
+        'descripcion' => $descripcion,
+        'activo' => 1
     ];
 }

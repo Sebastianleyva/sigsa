@@ -4,19 +4,23 @@ function generar_requisicion($pdo,$input,$usuario){
     if(empty($input['id_reporte']) || !is_int($input['id_reporte'])){
         throw new InvalidArgumentException('El campo id_reporte es obligatorio y debe ser un entero');
     }
-    if(!is_string($input['justificacion']) || !is_string($input['fecha']) ||
-    !is_string($input['descripcion_servicio']) || !is_string($input['estado'])){
-        throw new InvalidArgumentException('Los campos justificacion, fecha, descripcion_servicio y estado son obligatorios y deben ser cadenas de texto');
+    if(!is_string($input['justificacion'] ?? null) || !is_string($input['fecha'] ?? null) ||
+    !is_string($input['descripcion_servicio'] ?? null) || !is_string($input['estado'] ?? null) ||
+    !is_string($input['tipo_financiamiento'] ?? null)){
+        throw new InvalidArgumentException('Los campos justificacion, fecha, descripcion_servicio, estado y tipo_financiamiento son obligatorios y deben ser cadenas de texto');
     }
     
     $id_solicita = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id_solicita === false) {
+        throw new InvalidArgumentException('El usuario solicitante no es válido');
+    }
 
     $stm = $pdo ->prepare(
         
         "INSERT INTO requisiciones 
-        (id_reporte, id_solicita, justificacion, fecha, descripcion_servicio, estado)
+        (id_reporte, id_solicita, justificacion, fecha, descripcion_servicio, estado, tipo_financiamiento)
         VALUES
-        (:id_reporte, :id_solicita, :justificacion, :fecha, :descripcion_servicio, :estado)"
+        (:id_reporte, :id_solicita, :justificacion, :fecha, :descripcion_servicio, :estado, :tipo_financiamiento)"
     );
     $stm->execute([
         ':id_reporte' => $input['id_reporte'],
@@ -24,7 +28,8 @@ function generar_requisicion($pdo,$input,$usuario){
         ':justificacion' => $input['justificacion'],
         ':fecha' => $input['fecha'],
         ':descripcion_servicio' => $input['descripcion_servicio'],
-        ':estado' => $input['estado']
+        ':estado' => $input['estado'],
+        ':tipo_financiamiento' => $input['tipo_financiamiento']
     ]);
 
     return [
@@ -34,7 +39,8 @@ function generar_requisicion($pdo,$input,$usuario){
         'justificacion' => $input['justificacion'],
         'fecha' => $input['fecha'],
         'descripcion_servicio' => $input['descripcion_servicio'],
-        'estado' => $input['estado']
+        'estado' => $input['estado'],
+        'tipo_financiamiento' => $input['tipo_financiamiento']
     ];
 
 
