@@ -2,10 +2,6 @@
 
 function aceptar_incidencia($pdo, $input, $id_personal){
 
-    if(!is_string($input['estado'])){
-        throw new Exception("El estado debe ser una cadena de texto");
-    }
-
     $estado = 'ACEPTADA';
     $id_incidencia =filter_var($input['id_incidencia'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
