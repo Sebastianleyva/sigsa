@@ -70,6 +70,7 @@ function MesCalendario({ anio, mes, servicios, fechaSeleccionada, onSeleccionarF
 
 export default function CalendarioMantenimiento() {
   const navigate = useNavigate()
+  const anioActual = new Date().getFullYear()
   const [anio, setAnio] = useState(() => new Date().getFullYear())
   const [calendario, setCalendario] = useState<CalendarioServicio[]>([])
   const [fechaSeleccionada, setFechaSeleccionada] = useState<string | null>(null)
@@ -100,6 +101,7 @@ export default function CalendarioMantenimiento() {
   }, [anio])
 
   function cambiarAnio(delta: number) {
+    if (anio + delta < anioActual - 1 || anio + delta > anioActual + 1) return
     setCargando(true)
     setError('')
     setFechaSeleccionada(null)
@@ -137,9 +139,9 @@ export default function CalendarioMantenimiento() {
             <p>Selecciona una fecha marcada para ver los servicios programados.</p>
           </div>
           <div className="calendario-anio-control" aria-label="Cambiar año">
-            <button type="button" aria-label="Año anterior" onClick={() => cambiarAnio(-1)}>←</button>
+            <button type="button" aria-label="Año anterior" disabled={anio <= anioActual - 1} onClick={() => cambiarAnio(-1)}>←</button>
             <span>{anio}</span>
-            <button type="button" aria-label="Año siguiente" onClick={() => cambiarAnio(1)}>→</button>
+            <button type="button" aria-label="Año siguiente" disabled={anio >= anioActual + 1} onClick={() => cambiarAnio(1)}>→</button>
           </div>
         </div>
 

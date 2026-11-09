@@ -5,20 +5,33 @@ import {
   consultarServicios,
   crearServicio,
   desactivarServicio,
+  actualizarFechaCalendario,
   type ServicioMantenimiento,
 } from '../../services/mantenimiento_services'
 import './styles/servicios_mantenimiento.css'
+
+function fechaLocal(fecha: Date) {
+  const anio = fecha.getFullYear()
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0')
+  const dia = String(fecha.getDate()).padStart(2, '0')
+  return `${anio}-${mes}-${dia}`
+}
 
 export default function ServiciosMantenimiento() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
   const esAdministrador = [1, 2, 3].includes(usuario?.puesto ?? 0)
+  const fechaMinima = fechaLocal(new Date())
+  const fechaMaxima = `${new Date().getFullYear() + 1}-12-31`
   const [servicios, setServicios] = useState<ServicioMantenimiento[]>([])
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
   const [periodicidad, setPeriodicidad] = useState('')
+  const [fechaInicio, setFechaInicio] = useState('')
+  const [fechasEditadas, setFechasEditadas] = useState<Record<number, string>>({})
   const [cargando, setCargando] = useState(true)
   const [guardando, setGuardando] = useState(false)
+  const [guardandoFecha, setGuardandoFecha] = useState<number | null>(null)
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
 
@@ -66,12 +79,14 @@ export default function ServiciosMantenimiento() {
         nombre: nombre.trim(),
         descripcion: descripcion.trim(),
         periodicidad: Number(periodicidad),
+        ...(fechaInicio ? { fecha_inicio: fechaInicio } : {}),
       })
       setServicios((actuales) => [...actuales, servicio].sort((a, b) => a.nombre.localeCompare(b.nombre)))
       setNombre('')
       setDescripcion('')
       setPeriodicidad('')
-      setMensaje('Servicio creado correctamente.')
+      setFechaInicio('')
+      setMensaje(`Servicio creado con ${servicio.fechas_destinadas.length} fechas programadas.`)
     } catch (errorCreacion: unknown) {
       setError(errorCreacion instanceof Error ? errorCreacion.message : 'No fue posible crear el servicio.')
     } finally {
@@ -90,6 +105,36 @@ export default function ServiciosMantenimiento() {
       setMensaje(`Se desactivó "${servicio.nombre}".`)
     } catch (errorDesactivacion: unknown) {
       setError(errorDesactivacion instanceof Error ? errorDesactivacion.message : 'No fue posible desactivar el servicio.')
+    }
+  }
+
+  async function manejarCambioFecha(id_calendario: number) {
+    const fecha_destinada = fechasEditadas[id_calendario]
+    if (!fecha_destinada) return
+
+    setError('')
+    setMensaje('')
+    setGuardandoFecha(id_calendario)
+    try {
+      const fechaActualizada = await actualizarFechaCalendario(id_calendario, fecha_destinada)
+      setServicios((actuales) => actuales.map((servicio) => ({
+        ...servicio,
+        fechas_destinadas: servicio.fechas_destinadas.map((fecha) =>
+          fecha.id_calendario === id_calendario
+            ? { ...fecha, fecha_destinada: fechaActualizada.fecha_destinada }
+            : fecha,
+        ),
+      })))
+      setFechasEditadas((actuales) => {
+        const siguientes = { ...actuales }
+        delete siguientes[id_calendario]
+        return siguientes
+      })
+      setMensaje('Fecha del mantenimiento actualizada.')
+    } catch (errorActualizacion: unknown) {
+      setError(errorActualizacion instanceof Error ? errorActualizacion.message : 'No fue posible cambiar la fecha.')
+    } finally {
+      setGuardandoFecha(null)
     }
   }
 
@@ -153,6 +198,19 @@ export default function ServiciosMantenimiento() {
                 onChange={(event) => setPeriodicidad(event.target.value)}
                 required
               />
+              <label htmlFor="servicio-fecha-inicio">Fecha inicial (opcional)</label>
+              <input
+                id="servicio-fecha-inicio"
+                name="fecha_inicio"
+                type="date"
+                value={fechaInicio}
+                min={fechaMinima}
+                max={fechaMaxima}
+                onChange={(event) => setFechaInicio(event.target.value)}
+              />
+              <p className="servicios-mantenimiento-help">
+                Si la dejas vacía se usará la fecha de registro. Se programará una fecha cada N semanas hasta fin de año y una sola ocurrencia adicional el año siguiente.
+              </p>
               <label htmlFor="servicio-descripcion">Descripción</label>
               <textarea
                 id="servicio-descripcion"
@@ -188,7 +246,38 @@ export default function ServiciosMantenimiento() {
                   <div>
                     <h3>{servicio.nombre}</h3>
                     <p>{servicio.descripcion}</p>
-                    <span>Periodicidad: {servicio.periodicidad}</span>
+                    <span>Periodicidad: cada {servicio.periodicidad} semanas</span>
+                    <div className="servicios-mantenimiento-fechas">
+                      <strong>Próximas fechas</strong>
+                      {servicio.fechas_destinadas.length === 0 && (
+                        <p className="servicios-mantenimiento-muted">No hay fechas pendientes por reprogramar.</p>
+                      )}
+                      {servicio.fechas_destinadas.map((fecha) => {
+                        const fechaActual = fechasEditadas[fecha.id_calendario] ?? fecha.fecha_destinada
+                        return (
+                          <div className="servicios-mantenimiento-fecha" key={fecha.id_calendario}>
+                            <input
+                              type="date"
+                              value={fechaActual}
+                              min={fechaMinima}
+                              max={fechaMaxima}
+                              aria-label={`Nueva fecha para ${servicio.nombre}, actualmente ${fecha.fecha_destinada}`}
+                              onChange={(event) => setFechasEditadas((actuales) => ({
+                                ...actuales,
+                                [fecha.id_calendario]: event.target.value,
+                              }))}
+                            />
+                            <button
+                              type="button"
+                              disabled={!fechaActual || fechaActual === fecha.fecha_destinada || guardandoFecha === fecha.id_calendario}
+                              onClick={() => void manejarCambioFecha(fecha.id_calendario)}
+                            >
+                              {guardandoFecha === fecha.id_calendario ? 'Guardando…' : 'Cambiar fecha'}
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
                   <button
                     className="servicios-mantenimiento-delete"
