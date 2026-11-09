@@ -144,6 +144,13 @@
   resize: vertical;
 }
 
+.servicios-mantenimiento-help {
+  margin: 7px 0 0;
+  color: var(--servicios-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
 .servicios-mantenimiento-panel input:focus,
 .servicios-mantenimiento-panel textarea:focus {
   border-color: var(--servicios-green);
@@ -218,6 +225,45 @@
 .servicios-mantenimiento-item span {
   color: var(--servicios-muted);
   font-size: 10px;
+}
+
+.servicios-mantenimiento-fechas {
+  display: grid;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.servicios-mantenimiento-fechas > strong {
+  font-size: 11px;
+}
+
+.servicios-mantenimiento-fecha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.servicios-mantenimiento-fecha input {
+  width: auto;
+  padding: 7px 8px;
+  font-size: 11px;
+}
+
+.servicios-mantenimiento-fecha button {
+  padding: 8px 10px;
+  border: 1px solid var(--servicios-line);
+  color: var(--servicios-green);
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.servicios-mantenimiento-fecha button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .servicios-mantenimiento-delete {

@@ -1,0 +1,414 @@
+.reportar-incidencia-page {
+  --incidencia-ink: #203431;
+  --incidencia-muted: #687973;
+  --incidencia-green: #176c58;
+  --incidencia-line: #d9e3dc;
+  min-height: 100svh;
+  color: var(--incidencia-ink);
+  background: #f2f6f3;
+}
+
+.reportar-incidencia-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 76px;
+  padding: 0 clamp(22px, 6vw, 88px);
+  border-bottom: 1px solid #e1e9e3;
+  background: rgb(255 255 255 / 72%);
+}
+
+.reportar-incidencia-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0;
+  border: 0;
+  color: var(--incidencia-ink);
+  background: transparent;
+  font-family: 'Manrope', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.reportar-incidencia-brand-mark {
+  display: grid;
+  grid-template: repeat(2, 8px) / repeat(2, 8px);
+  gap: 3px;
+  transform: rotate(-8deg);
+}
+
+.reportar-incidencia-brand-mark i {
+  border-radius: 2px;
+  background: #78b98d;
+}
+
+.reportar-incidencia-brand-mark i:nth-child(1),
+.reportar-incidencia-brand-mark i:nth-child(4) {
+  background: #d9734d;
+}
+
+.reportar-incidencia-topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--incidencia-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.reportar-incidencia-topbar-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d9734d;
+}
+
+.reportar-incidencia-content {
+  width: min(1080px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: clamp(32px, 5vw, 58px) 0 52px;
+  animation: reportar-incidencia-arrive 380ms ease-out both;
+}
+
+.reportar-incidencia-back {
+  padding: 0;
+  border: 0;
+  color: var(--incidencia-green);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reportar-incidencia-heading {
+  max-width: 700px;
+  margin: 30px 0 32px;
+}
+
+.reportar-incidencia-eyebrow,
+.reportar-incidencia-aside-index {
+  color: var(--incidencia-green);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.reportar-incidencia-heading h1 {
+  margin: 12px 0 8px;
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(32px, 5vw, 44px);
+  line-height: 1.13;
+}
+
+.reportar-incidencia-heading p {
+  margin: 0;
+  color: var(--incidencia-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.reportar-incidencia-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.75fr);
+  border-top: 1px solid var(--incidencia-line);
+  border-bottom: 1px solid var(--incidencia-line);
+  background: #fff;
+}
+
+.reportar-incidencia-form {
+  min-width: 0;
+  padding: 38px 40px;
+}
+
+.reportar-incidencia-form-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.reportar-incidencia-form-heading h2 {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 17px;
+}
+
+.reportar-incidencia-form-heading > span {
+  color: var(--incidencia-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.reportar-incidencia-form-heading b,
+.reportar-incidencia-field label b {
+  color: #bd5637;
+}
+
+.reportar-incidencia-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.reportar-incidencia-field label {
+  color: #334641;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.reportar-incidencia-field input,
+.reportar-incidencia-field select,
+.reportar-incidencia-field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #d4dfd8;
+  border-radius: 3px;
+  outline: none;
+  background: #fff;
+  color: var(--incidencia-ink);
+  font: inherit;
+  font-size: 13px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.reportar-incidencia-field textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.reportar-incidencia-field input::placeholder,
+.reportar-incidencia-field textarea::placeholder {
+  color: #9aa8a2;
+}
+
+.reportar-incidencia-field input:focus,
+.reportar-incidencia-field select:focus,
+.reportar-incidencia-field textarea:focus {
+  border-color: var(--incidencia-green);
+  box-shadow: 0 0 0 3px rgb(23 108 88 / 11%);
+}
+
+.reportar-incidencia-hint {
+  align-self: flex-end;
+  color: #7b8983;
+  font-size: 10px;
+}
+
+.reportar-incidencia-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.reportar-incidencia-notice-exito {
+  border-color: #c9e3d2;
+  background: #eef7f0;
+  color: #245b3d;
+}
+
+.reportar-incidencia-notice-error {
+  border-color: #efd2c8;
+  background: #fcf1ed;
+  color: #8a3f2b;
+}
+
+.reportar-incidencia-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 28px;
+  padding-top: 21px;
+  border-top: 1px solid #e7ece8;
+}
+
+.reportar-incidencia-actions > span {
+  color: var(--incidencia-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.reportar-incidencia-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--incidencia-green);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.reportar-incidencia-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #125744;
+}
+
+.reportar-incidencia-actions button:focus-visible,
+.reportar-incidencia-brand:focus-visible,
+.reportar-incidencia-back:focus-visible {
+  outline: 3px solid rgb(23 108 88 / 25%);
+  outline-offset: 3px;
+}
+
+.reportar-incidencia-actions button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.reportar-incidencia-actions button > span {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.reportar-incidencia-aside {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 35px 30px;
+  border-left: 1px solid var(--incidencia-line);
+  background: #f8faf8;
+}
+
+.reportar-incidencia-aside-rule {
+  width: 38px;
+  height: 3px;
+  margin-top: 26px;
+  background: #d9734d;
+}
+
+.reportar-incidencia-aside h2 {
+  margin: 24px 0 10px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.reportar-incidencia-aside > p {
+  margin: 0;
+  color: var(--incidencia-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.reportar-incidencia-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 28px;
+  color: #52645d;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.reportar-incidencia-status > span:first-child {
+  display: grid;
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8f2eb;
+  color: var(--incidencia-green);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@keyframes reportar-incidencia-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 760px) {
+  .reportar-incidencia-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .reportar-incidencia-form {
+    padding: 28px clamp(20px, 5vw, 36px) 32px;
+  }
+
+  .reportar-incidencia-aside {
+    min-height: auto;
+    padding: 26px clamp(20px, 5vw, 36px);
+    border-top: 1px solid var(--incidencia-line);
+    border-left: 0;
+  }
+
+  .reportar-incidencia-aside-rule {
+    margin-top: 18px;
+  }
+
+  .reportar-incidencia-aside h2 {
+    margin-top: 18px;
+  }
+
+  .reportar-incidencia-status {
+    margin-top: 18px;
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .reportar-incidencia-topbar {
+    min-height: 66px;
+  }
+
+  .reportar-incidencia-topbar-meta {
+    font-size: 9px;
+  }
+
+  .reportar-incidencia-content {
+    width: calc(100% - 36px);
+    padding-top: 34px;
+  }
+
+  .reportar-incidencia-form-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .reportar-incidencia-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .reportar-incidencia-actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reportar-incidencia-content {
+    animation: none;
+  }
+}

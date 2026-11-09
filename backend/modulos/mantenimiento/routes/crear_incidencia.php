@@ -30,7 +30,12 @@ try{
     echo json_encode(["mensaje" => "Incidencia creada exitosamente",
         "incidencia" => $incidencia]);
 
-} catch (Exception $e) {
+} catch (InvalidArgumentException $e) {
+    http_response_code(400);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+    exit;
+} catch (Throwable $e) {
+    error_log($e->getMessage());
     http_response_code(500);
     echo json_encode(["ERROR" => "Error interno del servidor"]);
     exit;

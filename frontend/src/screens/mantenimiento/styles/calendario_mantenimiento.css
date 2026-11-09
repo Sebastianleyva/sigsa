@@ -120,6 +120,11 @@
   cursor: pointer;
 }
 
+.calendario-anio-control button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .calendario-anio-control span {
   min-width: 46px;
   font-weight: 700;
