@@ -27,7 +27,7 @@ const modules: {
   {
     index: '03',
     title: 'Mantenimiento',
-    description: 'Mantén actualizados los catálogos y datos del sistema.',
+    description: 'Consulta el calendario, reporta incidencias y da seguimiento a los mantenimientos.',
     category: 'SISTEMA',
     path: '/mantenimiento',
   },
