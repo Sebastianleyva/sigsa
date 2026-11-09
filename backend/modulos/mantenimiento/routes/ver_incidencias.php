@@ -22,8 +22,9 @@ try{
     http_response_code(200);
     echo json_encode(["message"=>"Incidencias cargadas correctamente", 
         "data"=>$incidencias]);
-}catch (Exception $e) {
+}catch (Throwable $e) {
+    error_log("Error al cargar las incidencias: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(["ERROR"=>"Error al cargar las incidencias: " . $e->getMessage()]);
+    echo json_encode(["ERROR"=>"Error interno del servidor"]);
     exit;
 }

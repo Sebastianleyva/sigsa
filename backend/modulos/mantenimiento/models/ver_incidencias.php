@@ -1,22 +1,37 @@
 <?php
 
 function ver_incidencias($pdo) {
-    $estado = 'PENDIENTE';
-    try {
-        $query = $pdo->prepare(
-            "SELECT * FROM incidencias 
-            WHERE estado = :estado"
-        );
-        $query->execute([
-            ':estado' => $estado
-        ]);
-        $incidencias = $query->fetchAll(PDO::FETCH_ASSOC);
+    $query = $pdo->query(
+        "SELECT
+            i.id_incidencia,
+            i.id_personal,
+            i.id_autoriza,
+            i.descripcion,
+            i.fecha,
+            i.urgencia,
+            i.estado,
+            i.lugar,
+            p.nombre,
+            p.apellido_p,
+            p.apellido_m
+        FROM incidencias i
+        LEFT JOIN personal p ON p.id_personal = i.id_personal
+        ORDER BY i.fecha DESC, i.id_incidencia DESC"
+    );
+    $incidencias = $query->fetchAll(PDO::FETCH_ASSOC);
 
-        return $incidencias;
-
-    } catch (PDOException $e) {
-        http_response_code(500);
-        echo json_encode(["ERROR" => "Error al obtener las incidencias: " . $e->getMessage()]);
-        exit;
+    foreach ($incidencias as &$incidencia) {
+        $nombre = array_filter([
+            $incidencia['nombre'],
+            $incidencia['apellido_p'],
+            $incidencia['apellido_m'],
+        ], function ($parte) {
+            return is_string($parte) && trim($parte) !== '';
+        });
+        $incidencia['reportante'] = implode(' ', $nombre);
+        unset($incidencia['nombre'], $incidencia['apellido_p'], $incidencia['apellido_m']);
     }
+    unset($incidencia);
+
+    return $incidencias;
 }

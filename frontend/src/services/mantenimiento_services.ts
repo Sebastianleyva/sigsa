@@ -28,6 +28,17 @@ export type FechaServicio = {
 
 type RespuestaCalendario = { data: CalendarioServicio[] }
 type RespuestaServicios = { data: ServicioMantenimiento[] }
+export type IncidenciaMantenimiento = {
+  id_incidencia: number
+  id_personal: number
+  id_autoriza: number | null
+  reportante: string
+  descripcion: string
+  fecha: string
+  urgencia: string
+  estado: string
+  lugar: string
+}
 type DatosIncidencia = {
   lugar: string
   urgencia: string
@@ -74,6 +85,49 @@ export async function crearIncidencia(datos: DatosIncidencia): Promise<Incidenci
   } catch (error) {
     throw obtenerError(error, 'No fue posible registrar la incidencia.')
   }
+}
+
+export async function consultarIncidencias(): Promise<IncidenciaMantenimiento[]> {
+  try {
+    const response = await api.get<{ data: IncidenciaMantenimiento[] }>(
+      'mantenimiento/routes/ver_incidencias.php',
+    )
+    if (!Array.isArray(response.data?.data)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar incidencias.')
+    }
+    return response.data.data.map((incidencia) => ({
+      ...incidencia,
+      id_incidencia: Number(incidencia.id_incidencia),
+      id_personal: Number(incidencia.id_personal),
+      id_autoriza: incidencia.id_autoriza === null ? null : Number(incidencia.id_autoriza),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar las incidencias.')
+  }
+}
+
+async function procesarIncidencia(id_incidencia: number, decision: 'aceptar' | 'rechazar') {
+  try {
+    const response = await api.patch<{ incidencia: IncidenciaMantenimiento }>(
+      `mantenimiento/routes/${decision}_incidencia.php`,
+      { id_incidencia },
+    )
+    if (!response.data?.incidencia) {
+      throw new Error('El servidor devolvió una respuesta inválida al procesar la incidencia.')
+    }
+    return response.data.incidencia
+  } catch (error) {
+    const accion = decision === 'aceptar' ? 'aceptar' : 'rechazar'
+    throw obtenerError(error, `No fue posible ${accion} la incidencia.`)
+  }
+}
+
+export function aceptarIncidencia(id_incidencia: number) {
+  return procesarIncidencia(id_incidencia, 'aceptar')
+}
+
+export function rechazarIncidencia(id_incidencia: number) {
+  return procesarIncidencia(id_incidencia, 'rechazar')
 }
 
 export async function consultarServicios() {
