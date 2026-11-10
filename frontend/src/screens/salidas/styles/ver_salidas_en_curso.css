@@ -146,13 +146,54 @@
   cursor: pointer;
 }
 
+.salidas-en-curso-card-pendiente-justificante {
+  border-color: #d9734d;
+  background: #fff9f6;
+  box-shadow: 0 12px 30px rgb(169 78 54 / 10%);
+}
+
 .salidas-en-curso-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 9px;
   margin: -2px 0 18px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--salidas-en-curso-line);
+}
+
+.salidas-en-curso-justificante-pendiente {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 9px;
+  padding: 6px 9px;
+  border: 1px solid #efc7b8;
+  border-radius: 999px;
+  background: #fff0ea;
+  color: #a33f27;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.salidas-en-curso-justificante-requerido {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 9px;
+  padding: 6px 9px;
+  border: 1px solid #e8d8a8;
+  border-radius: 999px;
+  background: #fff9e8;
+  color: #80621a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.salidas-en-curso-justificante-pregunta {
+  margin-right: auto;
+  color: var(--salidas-en-curso-ink);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .salidas-en-curso-button {
@@ -172,6 +213,17 @@
 .salidas-en-curso-button:hover:not(:disabled) {
   transform: translateY(-1px);
   background: #105744;
+}
+
+.salidas-en-curso-button-pendiente {
+  border-color: #e8c8bd;
+  background: #fff8f5;
+  color: #a94e36;
+}
+
+.salidas-en-curso-button-pendiente:hover:not(:disabled) {
+  border-color: var(--salidas-en-curso-coral);
+  background: #fbece6;
 }
 
 .salidas-en-curso-button:focus-visible {

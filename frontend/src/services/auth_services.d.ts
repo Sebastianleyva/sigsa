@@ -120,6 +120,11 @@ export type VerSalidasEnCursoResponse = {
   fecha: string,
   hora_salida: string | null,
   hora_estimada: string | null,
+  hora_llegada: string | null,
+  fecha_llegada: string | null,
+  adeudo_tiempo: string | null,
+  requiere_justificante: number | boolean,
+  justificante_entregado: number | null,
   nombre: string,
   apellido_p: string,
   apellido_m: string,
@@ -132,6 +137,7 @@ export type VerSalidasEnCursoResponse = {
 
 export type AceptarSalidaData = {
   id_salida: number
+  requiere_justificante: boolean
 }
 
 export type AceptarSalidaResponse = {
@@ -141,6 +147,7 @@ export type AceptarSalidaResponse = {
     estado: string
     hora_salida: string
     hora_estimada: string
+    requiere_justificante: boolean
   }
 }
 
@@ -153,10 +160,20 @@ export type RechazarSalidaResponse = {
 
 export type FinalizarSalidaResponse = {
   message: string
+  salida: {
+    id_salida: number
+    estado: string
+    hora_llegada: string
+    fecha_llegada: string
+    adeudo_tiempo: string | null
+    requiere_justificante: boolean
+    justificante_entregado: number | null
+  }
 }
 
 export type FinalizarSalidaData = {
   id_salida: number
+  justificante_entregado: boolean | null
 }
 
 export type VerHistorialSalida = {

@@ -20,6 +20,7 @@ export default function Ver_Salidas_Pendientes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [confirmarJustificanteId, setConfirmarJustificanteId] = useState<number | null>(null);
   const [procesando, setProcesando] = useState<number | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -29,18 +30,21 @@ export default function Ver_Salidas_Pendientes() {
 
     if (id_salida === selectedId) {
       setSelectedId(null);
+      setConfirmarJustificanteId(null);
     } else {
       setSelectedId(id_salida);
+      setConfirmarJustificanteId(null);
     }
   };
 
-  async function handleAceptar(id_salida: number) {
+  async function handleAceptar(id_salida: number, requiere_justificante: boolean) {
     setProcesando(id_salida);
     setActionError(null);
     try {
-      await authService.AceptarSalida({ id_salida });
+      await authService.AceptarSalida({ id_salida, requiere_justificante });
       setSalidasPendientes((prev) => prev.filter((s) => s.id_salida !== id_salida));
       setSelectedId(null);
+      setConfirmarJustificanteId(null);
     } catch (error) {
       console.error('Error al aceptar salida:', error);
       setActionError(error instanceof Error ? error.message : 'No fue posible aceptar la solicitud.');
@@ -137,20 +141,56 @@ export default function Ver_Salidas_Pendientes() {
                 <article className="salidas-pendientes-card" key={salida.id_salida} onClick={() => toggle(salida.id_salida)}>
                   {selectedId === salida.id_salida && (
                     <div className="salidas-pendientes-actions" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        className="salidas-pendientes-button salidas-pendientes-button-accept"
-                        onClick={() => handleAceptar(salida.id_salida)}
-                        disabled={procesando === salida.id_salida}
-                      >
-                        {procesando === salida.id_salida ? 'Procesando…' : 'Aceptar'}
-                      </button>
-                      <button
-                        className="salidas-pendientes-button salidas-pendientes-button-reject"
-                        onClick={() => handleRechazar(salida.id_salida)}
-                        disabled={procesando === salida.id_salida}
-                      >
-                        Rechazar
-                      </button>
+                      {confirmarJustificanteId === salida.id_salida ? (
+                        <div className="salidas-pendientes-justificante-question">
+                          <span>¿Esta salida requiere justificante?</span>
+                          <div>
+                            <button
+                              className="salidas-pendientes-button salidas-pendientes-button-accept"
+                              type="button"
+                              onClick={() => handleAceptar(salida.id_salida, true)}
+                              disabled={procesando === salida.id_salida}
+                            >
+                              {procesando === salida.id_salida ? 'Procesando…' : 'Sí'}
+                            </button>
+                            <button
+                              className="salidas-pendientes-button salidas-pendientes-button-accept"
+                              type="button"
+                              onClick={() => handleAceptar(salida.id_salida, false)}
+                              disabled={procesando === salida.id_salida}
+                            >
+                              {procesando === salida.id_salida ? 'Procesando…' : 'No'}
+                            </button>
+                            <button
+                              className="salidas-pendientes-button salidas-pendientes-button-reject"
+                              type="button"
+                              onClick={() => setConfirmarJustificanteId(null)}
+                              disabled={procesando === salida.id_salida}
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            className="salidas-pendientes-button salidas-pendientes-button-accept"
+                            type="button"
+                            onClick={() => setConfirmarJustificanteId(salida.id_salida)}
+                            disabled={procesando === salida.id_salida}
+                          >
+                            Aceptar
+                          </button>
+                          <button
+                            className="salidas-pendientes-button salidas-pendientes-button-reject"
+                            type="button"
+                            onClick={() => handleRechazar(salida.id_salida)}
+                            disabled={procesando === salida.id_salida}
+                          >
+                            Rechazar
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
                   <div className="salidas-pendientes-card-header">

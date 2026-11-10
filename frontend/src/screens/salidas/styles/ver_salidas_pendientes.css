@@ -154,6 +154,24 @@
   border-bottom: 1px solid var(--salidas-pendientes-line);
 }
 
+.salidas-pendientes-justificante-question {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--salidas-pendientes-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.salidas-pendientes-justificante-question > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
 .salidas-pendientes-button {
   min-height: 38px;
   padding: 0 15px;

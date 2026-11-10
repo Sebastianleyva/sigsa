@@ -24,7 +24,9 @@ function ver_salidas_en_curso($pdo){
 
     $sql = $pdo -> prepare(
         'SELECT s.id_salida, s.tipo_salida, s.motivo, s.destino, s.fecha,
-                s.hora_salida, s.hora_estimada, s.id_personal,
+                s.hora_salida, s.hora_estimada, s.hora_llegada, s.fecha_llegada,
+                s.adeudo_tiempo, s.requiere_justificante, s.justificante_entregado,
+                s.id_personal,
                 p.nombre, p.apellido_p, p.apellido_m, p.puesto,
                 a.nombre AS autorizante_nombre,
                 a.apellido_p AS autorizante_apellido_p,

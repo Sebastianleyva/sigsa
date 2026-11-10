@@ -24,9 +24,10 @@ function aceptar_solicitud(PDO $pdo, array $input, array $usuario): void
 {
     $id_salida = filter_var($input['id_salida'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
     $id_autorizante = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-    if ($id_salida === false || $id_autorizante === false) {
+    $requiere_justificante = $input['requiere_justificante'] ?? null;
+    if ($id_salida === false || $id_autorizante === false || !is_bool($requiere_justificante)) {
         http_response_code(400);
-        echo json_encode(["ERROR" => "El identificador de la solicitud no es válido"]);
+        echo json_encode(["ERROR" => "La solicitud debe indicar si requiere justificante"]);
         return;
     }
 
@@ -55,13 +56,16 @@ function aceptar_solicitud(PDO $pdo, array $input, array $usuario): void
     $actualizar = $pdo->prepare(
         "UPDATE salidas
          SET estado = 'EN CURSO', hora_salida = :hora_salida,
-             hora_estimada = :hora_estimada, id_autoriza = :id_autoriza
+             hora_estimada = :hora_estimada, id_autoriza = :id_autoriza,
+             requiere_justificante = :requiere_justificante,
+             justificante_entregado = NULL
          WHERE id_salida = :id_salida AND estado = 'PENDIENTE'"
     );
     $actualizar->execute([
         'hora_salida' => $hora_salida,
         'hora_estimada' => $hora_estimada,
         'id_autoriza' => $id_autorizante,
+        'requiere_justificante' => $requiere_justificante ? 1 : 0,
         'id_salida' => $id_salida
     ]);
 
@@ -81,6 +85,7 @@ function aceptar_solicitud(PDO $pdo, array $input, array $usuario): void
             'estado' => 'EN CURSO',
             'hora_salida' => $hora_salida,
             'hora_estimada' => $hora_estimada,
+            'requiere_justificante' => $requiere_justificante,
             'id_autoriza' => $id_autorizante
         ]
     ]);

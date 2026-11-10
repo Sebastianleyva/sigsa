@@ -213,22 +213,23 @@ CREATE TABLE `salidas` (
   `id_personal` bigint(20) NOT NULL,
   `id_autoriza` bigint(20) DEFAULT NULL,
   `solicita_respaldo` tinyint(1) NOT NULL DEFAULT 0,
+  `requiere_justificante` tinyint(1) NOT NULL DEFAULT 0,
   `hora_estimada` time DEFAULT NULL,
   `adeudo_tiempo` time DEFAULT NULL,
-  `justificante` tinyint(1) DEFAULT NULL,
-  `fecha_llegada` date NOT NULL
+  `justificante_entregado` tinyint(1) DEFAULT NULL,
+  `fecha_llegada` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `salidas`
 --
 
-INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `solicita_respaldo`, `hora_estimada`, `adeudo_tiempo`, `justificante`, `fecha_llegada`) VALUES
-(7, 'PERSONAL', 'Voy por el festival del día de las madres en la escuela de mi hijo', 'Secundaria #3', '2026-10-22', '16:59:40', NULL, 'FINALIZADO', 21, NULL, 0, '18:59:40', NULL, 0, '0000-00-00'),
-(8, 'MEDICA', 'me duele la panza', 'issste', '2026-10-25', NULL, NULL, 'RECHAZADA', 21, NULL, 0, NULL, NULL, 0, '0000-00-00'),
-(9, 'PERSONAL', 'voy a cuidar a mi mama', 'manuel rosas #304', '2026-10-26', NULL, NULL, 'RECHAZADA', 21, NULL, 0, NULL, NULL, 0, '0000-00-00'),
-(10, 'MEDICA', 'me duele todo', 'xicoli 305', '2026-10-27', '08:42:30', '09:46:52', 'FINALIZADO', 21, 20, 0, '10:42:30', NULL, 0, '0000-00-00'),
-(11, 'MEDICA', 'me rompi la pierna', 'no se 103', '2026-10-28', '11:45:40', '11:46:02', 'FINALIZADO', 16, 15, 0, '13:45:40', NULL, 0, '0000-00-00');
+INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `solicita_respaldo`, `requiere_justificante`, `hora_estimada`, `adeudo_tiempo`, `justificante_entregado`, `fecha_llegada`) VALUES
+(7, 'PERSONAL', 'Voy por el festival del día de las madres en la escuela de mi hijo', 'Secundaria #3', '2026-10-22', '16:59:40', NULL, 'FINALIZADO', 21, NULL, 0, 0, '18:59:40', NULL, NULL, NULL),
+(8, 'MEDICA', 'me duele la panza', 'issste', '2026-10-25', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(9, 'PERSONAL', 'voy a cuidar a mi mama', 'manuel rosas #304', '2026-10-26', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(10, 'MEDICA', 'me duele todo', 'xicoli 305', '2026-10-27', '08:42:30', '09:46:52', 'FINALIZADO', 21, 20, 0, 0, '10:42:30', NULL, NULL, NULL),
+(11, 'MEDICA', 'me rompi la pierna', 'no se 103', '2026-10-28', '11:45:40', '11:46:02', 'FINALIZADO', 16, 15, 0, 0, '13:45:40', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
