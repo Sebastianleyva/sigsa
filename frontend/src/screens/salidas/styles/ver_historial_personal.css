@@ -222,6 +222,13 @@
   text-transform: uppercase;
 }
 
+.historial-personal-status-error {
+  border-color: #e7b5b5;
+  background: #fff7f7;
+  color: #9c2f2f;
+  font-weight: 700;
+}
+
 .historial-personal-empty {
   flex-direction: column;
   gap: 10px;

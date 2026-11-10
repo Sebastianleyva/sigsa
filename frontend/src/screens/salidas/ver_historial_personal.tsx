@@ -10,12 +10,38 @@ type Salida = {
     destino: string,
     horade_salida: string | null,
     horade_regreso: string | null,
-    adeudo: string | null
+    fecha_llegada: string | null,
+    adeudo_tiempo: string | null,
+    requiere_justificante: number | boolean,
+    justificante_entregado: number | null,
+    fecha_justificante_entregado: string | null
 };
+
+function estadoJustificante(
+    requiere: number | boolean,
+    entregado: number | null,
+    fechaLlegada: string | null,
+    horaLlegada: string | null,
+    fechaEntrega: string | null
+) {
+    if (Number(requiere) === 0) return 'No requerido';
+    if (entregado === null) return 'No registrado';
+    if (Number(entregado) !== 1) return 'Pendiente';
+    if (
+        fechaLlegada
+        && horaLlegada
+        && fechaEntrega
+        && fechaEntrega > `${fechaLlegada} ${horaLlegada}`
+    ) {
+        return 'Entregado a destiempo';
+    }
+    return 'Entregado';
+}
 
 export default function Ver_Historial_Personal() {
     const [salidas, setSalidas] = useState<Salida[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchSalidas() {
@@ -24,6 +50,11 @@ export default function Ver_Historial_Personal() {
                 setSalidas(datos);
             } catch (error) {
                 console.error("Error fetching salidas:", error);
+                setError(
+                    error instanceof Error
+                        ? error.message
+                        : "No fue posible obtener el historial personal."
+                );
             } finally {
                 setLoading(false);
             }
@@ -54,6 +85,10 @@ export default function Ver_Historial_Personal() {
 
                 {loading ? (
                     <div className="historial-personal-status historial-personal-status-loading">Cargando...</div>
+                ) : error ? (
+                    <div className="historial-personal-status historial-personal-status-error" role="alert">
+                        {error}
+                    </div>
                 ) : salidas.length === 0 ? (
                     <div className="historial-personal-empty">
                         <span className="historial-personal-empty-icon" aria-hidden="true">✓</span>
@@ -97,7 +132,25 @@ export default function Ver_Historial_Personal() {
 
                                     <div className="historial-personal-field historial-personal-field-adeudo">
                                         <span className="historial-personal-label">Adeudo</span>
-                                        <p>{salida.adeudo ?? 'No registrado'}</p>
+                                        <p>{salida.adeudo_tiempo ?? 'No registrado'}</p>
+                                    </div>
+
+                                    <div className="historial-personal-field">
+                                        <span className="historial-personal-label">Requiere justificante</span>
+                                        <p>{Number(salida.requiere_justificante) !== 0 ? 'Sí' : 'No'}</p>
+                                    </div>
+
+                                    <div className="historial-personal-field">
+                                        <span className="historial-personal-label">Estado del justificante</span>
+                                        <p>
+                                            {estadoJustificante(
+                                                salida.requiere_justificante,
+                                                salida.justificante_entregado,
+                                                salida.fecha_llegada,
+                                                salida.horade_regreso,
+                                                salida.fecha_justificante_entregado
+                                            )}
+                                        </p>
                                     </div>
                                 </div>
                             </article>

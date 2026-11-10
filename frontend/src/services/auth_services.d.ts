@@ -81,8 +81,12 @@ export type VerSalida = {
   destino: string
   horade_salida: string | null
   horade_regreso: string | null
+  fecha_llegada: string | null
   estado: string
-  adeudo: string | null
+  adeudo_tiempo: string | null
+  requiere_justificante: number | boolean
+  justificante_entregado: number | null
+  fecha_justificante_entregado: string | null
 }
 
 export type VerSalidasPendientesResponse = {
@@ -168,6 +172,7 @@ export type FinalizarSalidaResponse = {
     adeudo_tiempo: string | null
     requiere_justificante: boolean
     justificante_entregado: number | null
+    fecha_justificante_entregado: string | null
   }
 }
 
@@ -181,6 +186,7 @@ export type VerHistorialSalida = {
   destino: string
   motivo: string
   hora_llegada: string | null
+  fecha_llegada: string | null
   hora_salida: string | null
   id_personal: number
   id_autoriza: number | null
@@ -190,6 +196,9 @@ export type VerHistorialSalida = {
   apellido_p: string
   apellido_m: string
   area_nombre: string | null
+  requiere_justificante: number | boolean
+  justificante_entregado: number | null
+  fecha_justificante_entregado: string | null
   autorizante_nombre: string | null
   autorizante_apellido_p: string | null
   autorizante_apellido_m: string | null

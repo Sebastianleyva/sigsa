@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 09, 2026 at 04:18 PM
+-- Generation Time: Nov 10, 2026 at 02:50 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -66,8 +66,12 @@ CREATE TABLE `calendario` (
 --
 
 INSERT INTO `calendario` (`id_calendario`, `fecha_destinada`, `estado`, `id_servicio`) VALUES
-(13, '2026-11-05', 'pendiente', 2),
-(14, '2026-10-11', 'pendiente', 3);
+(15, '2026-11-10', 'PENDIENTE', 5),
+(16, '2026-12-15', 'PENDIENTE', 5),
+(17, '2027-01-19', 'PENDIENTE', 5),
+(18, '2026-11-16', 'PENDIENTE', 6),
+(19, '2026-12-14', 'PENDIENTE', 6),
+(20, '2027-01-11', 'PENDIENTE', 6);
 
 -- --------------------------------------------------------
 
@@ -85,6 +89,13 @@ CREATE TABLE `incidencias` (
   `estado` varchar(20) NOT NULL,
   `lugar` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `incidencias`
+--
+
+INSERT INTO `incidencias` (`id_incidencia`, `id_personal`, `id_autoriza`, `descripcion`, `fecha`, `urgencia`, `estado`, `lugar`) VALUES
+(2, 20, NULL, 'se cayó el techo y esta roto el suelo', '2026-11-09', 'MEDIA', 'PENDIENTE', 'pasillo afuera del departamento de sistemas');
 
 -- --------------------------------------------------------
 
@@ -225,11 +236,17 @@ CREATE TABLE `salidas` (
 --
 
 INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `solicita_respaldo`, `requiere_justificante`, `hora_estimada`, `adeudo_tiempo`, `justificante_entregado`, `fecha_llegada`) VALUES
-(7, 'PERSONAL', 'Voy por el festival del día de las madres en la escuela de mi hijo', 'Secundaria #3', '2026-10-22', '16:59:40', NULL, 'FINALIZADO', 21, NULL, 0, 0, '18:59:40', NULL, NULL, NULL),
-(8, 'MEDICA', 'me duele la panza', 'issste', '2026-10-25', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, NULL, NULL),
-(9, 'PERSONAL', 'voy a cuidar a mi mama', 'manuel rosas #304', '2026-10-26', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, NULL, NULL),
-(10, 'MEDICA', 'me duele todo', 'xicoli 305', '2026-10-27', '08:42:30', '09:46:52', 'FINALIZADO', 21, 20, 0, 0, '10:42:30', NULL, NULL, NULL),
-(11, 'MEDICA', 'me rompi la pierna', 'no se 103', '2026-10-28', '11:45:40', '11:46:02', 'FINALIZADO', 16, 15, 0, 0, '13:45:40', NULL, NULL, NULL);
+(7, 'PERSONAL', 'Voy por el festival del día de las madres en la escuela de mi hijo', 'Secundaria #3', '2026-10-22', '16:59:40', NULL, 'FINALIZADO', 21, NULL, 0, 0, '18:59:40', NULL, 0, '0000-00-00'),
+(8, 'MEDICA', 'me duele la panza', 'issste', '2026-10-25', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, 0, '0000-00-00'),
+(9, 'PERSONAL', 'voy a cuidar a mi mama', 'manuel rosas #304', '2026-10-26', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, 0, '0000-00-00'),
+(10, 'MEDICA', 'me duele todo', 'xicoli 305', '2026-10-27', '08:42:30', '09:46:52', 'FINALIZADO', 21, 20, 0, 0, '10:42:30', NULL, 0, '0000-00-00'),
+(11, 'MEDICA', 'me rompi la pierna', 'no se 103', '2026-10-28', '11:45:40', '11:46:02', 'FINALIZADO', 16, 15, 0, 0, '13:45:40', NULL, 0, '0000-00-00'),
+(12, 'PERSONAL', 'jjj', 'ñññ', '2026-11-09', '13:28:22', '13:28:45', 'FINALIZADO', 21, 20, 0, 0, '15:28:22', NULL, NULL, NULL),
+(14, 'MEDICA', 'ww', 'ww', '2026-11-09', NULL, '13:56:41', 'FINALIZADO', 13, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(15, 'MEDICA', '444', '444', '2026-11-09', NULL, NULL, 'PENDIENTE', 20, NULL, 0, 0, NULL, NULL, NULL, NULL),
+(16, 'MEDICA', 'sss', 'casa #403', '2026-11-09', '14:22:53', '14:26:18', 'FINALIZADO', 21, 20, 1, 0, '16:22:53', NULL, NULL, NULL),
+(17, 'MEDICA', '123', '7777', '2026-11-09', '14:28:46', '19:05:06', 'FINALIZADO', 21, 20, 0, 0, '16:28:46', '02:36:20', NULL, '2026-11-09'),
+(18, 'PERSONAL', 'qqqq', 'qqq', '2026-11-10', '19:05:53', '19:06:02', 'FINALIZADO', 21, 20, 0, 1, '21:05:53', NULL, 1, '2026-11-09');
 
 -- --------------------------------------------------------
 
@@ -251,7 +268,10 @@ CREATE TABLE `servicios` (
 
 INSERT INTO `servicios` (`id_servicio`, `nombre`, `periodicidad`, `descripcion`, `activo`) VALUES
 (2, 'ssss', 2, 'sss', 0),
-(3, 'revision de extintores', 4, 'revision del llenado y funcionalidad de los extintores', 0);
+(3, 'revision de extintores', 4, 'revision del llenado y funcionalidad de los extintores', 0),
+(4, 'impermeabilización de techos', 42, 'se tiene que impermeabilizar el techo con', 0),
+(5, 'mantenimiento de luminarias', 5, 'prender luminarias', 1),
+(6, 'areas verdes', 4, 'jjj', 1);
 
 --
 -- Indexes for dumped tables
@@ -345,13 +365,13 @@ ALTER TABLE `areas`
 -- AUTO_INCREMENT for table `calendario`
 --
 ALTER TABLE `calendario`
-  MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `personal`
@@ -381,13 +401,13 @@ ALTER TABLE `requisiciones`
 -- AUTO_INCREMENT for table `salidas`
 --
 ALTER TABLE `salidas`
-  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `servicios`
 --
 ALTER TABLE `servicios`
-  MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables

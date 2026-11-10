@@ -32,8 +32,11 @@ function ver_historial($pdo){
     }
 
     $sql = $pdo -> prepare(
-        'SELECT s.id_salida, s.destino, s.motivo, s.hora_llegada, s.hora_salida, s.id_personal, s.id_autoriza, s.fecha,
-        s.adeudo_tiempo, p.nombre, p.apellido_p, p.apellido_m, p.area,
+        'SELECT s.id_salida, s.destino, s.motivo, s.hora_llegada, s.fecha_llegada,
+        s.hora_salida, s.id_personal, s.id_autoriza, s.fecha,
+        s.adeudo_tiempo, s.requiere_justificante, s.justificante_entregado,
+        s.fecha_justificante_entregado,
+        p.nombre, p.apellido_p, p.apellido_m, p.area,
         ar.nombre AS area_nombre,
         a.nombre AS autorizante_nombre,
         a.apellido_p AS autorizante_apellido_p,
@@ -53,6 +56,13 @@ function ver_historial($pdo){
         'anio' => $anio,
     ]);
     $resultado = $sql -> fetchAll();
+    foreach ($resultado as &$salida) {
+        $salida['requiere_justificante'] = (int) $salida['requiere_justificante'];
+        $salida['justificante_entregado'] = $salida['justificante_entregado'] === null
+            ? null
+            : (int) $salida['justificante_entregado'];
+    }
+    unset($salida);
 
     http_response_code(200);
     echo json_encode(["message" => "Historial cargado correctamente",

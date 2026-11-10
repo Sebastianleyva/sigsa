@@ -109,12 +109,19 @@ function finalizar_salida($pdo,$input,$usuario){
     $valor_justificante_entregado = $requiere_justificante
         ? ($justificante_entregado ? 1 : 0)
         : null;
+    $fecha_justificante_entregado = null;
+    if ($requiere_justificante && $justificante_entregado) {
+        $fecha_justificante_entregado = $regreso_registrado
+            ? date('Y-m-d H:i:s')
+            : $fecha_llegada . ' ' . $hora_llegada;
+    }
 
     $query = $pdo->prepare(
         'UPDATE salidas
          SET estado = :nuevo_estado, hora_llegada = :hora_llegada,
              fecha_llegada = :fecha_llegada, adeudo_tiempo = :adeudo_tiempo,
-             justificante_entregado = :justificante_entregado
+             justificante_entregado = :justificante_entregado,
+             fecha_justificante_entregado = :fecha_justificante_entregado
          WHERE id_salida = :id_salida'
     );
     $query->execute([
@@ -123,7 +130,8 @@ function finalizar_salida($pdo,$input,$usuario){
         'hora_llegada' => $hora_llegada,
         'fecha_llegada' => $fecha_llegada,
         'adeudo_tiempo' => $adeudo_tiempo,
-        'justificante_entregado' => $valor_justificante_entregado
+        'justificante_entregado' => $valor_justificante_entregado,
+        'fecha_justificante_entregado' => $fecha_justificante_entregado
     ]);
 
     $pdo->commit();
@@ -139,7 +147,8 @@ function finalizar_salida($pdo,$input,$usuario){
             "fecha_llegada" => $fecha_llegada,
             "adeudo_tiempo" => $adeudo_tiempo,
             "requiere_justificante" => $requiere_justificante,
-            "justificante_entregado" => $valor_justificante_entregado
+            "justificante_entregado" => $valor_justificante_entregado,
+            "fecha_justificante_entregado" => $fecha_justificante_entregado
         ]
     ]);
 }

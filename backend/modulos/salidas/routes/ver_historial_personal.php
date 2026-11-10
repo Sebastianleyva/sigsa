@@ -32,7 +32,8 @@ function ver_historial_personal( $pdo,  $usuario){
 
     $sql = $pdo->prepare(
         'SELECT id_salida, tipo_salida, motivo, destino, hora_salida,
-                hora_llegada, estado, hora_estimada, adeudo_tiempo
+                hora_llegada, fecha_llegada, estado, hora_estimada, adeudo_tiempo,
+                requiere_justificante, justificante_entregado, fecha_justificante_entregado
         FROM salidas
         WHERE id_personal = :id_personal
         AND estado = :estado
@@ -54,8 +55,14 @@ function ver_historial_personal( $pdo,  $usuario){
             'destino' => $salida['destino'],
             'horade_salida' => $salida['hora_salida'] ?? null,
             'horade_regreso' => $salida['hora_llegada'] ?? null,
+            'fecha_llegada' => $salida['fecha_llegada'] ?? null,
             'estado' => $salida['estado'],
-            'adeudo_tiempo' => $salida['adeudo_tiempo'] ?? null
+            'adeudo_tiempo' => $salida['adeudo_tiempo'] ?? null,
+            'requiere_justificante' => (int) $salida['requiere_justificante'],
+            'justificante_entregado' => $salida['justificante_entregado'] === null
+                ? null
+                : (int) $salida['justificante_entregado'],
+            'fecha_justificante_entregado' => $salida['fecha_justificante_entregado'] ?? null
     ];
     }
 

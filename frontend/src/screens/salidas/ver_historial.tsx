@@ -16,6 +16,27 @@ function formatearHora(hora: string | null) {
   return hora ? hora.slice(0, 5) : 'No registrada';
 }
 
+function estadoJustificante(
+  requiere: number | boolean,
+  entregado: number | null,
+  fechaLlegada: string | null,
+  horaLlegada: string | null,
+  fechaEntrega: string | null,
+) {
+  if (Number(requiere) === 0) return 'No requerido';
+  if (entregado === null) return 'No registrado';
+  if (Number(entregado) !== 1) return 'Pendiente';
+  if (
+    fechaLlegada
+    && horaLlegada
+    && fechaEntrega
+    && fechaEntrega > `${fechaLlegada} ${horaLlegada}`
+  ) {
+    return 'Entregado a destiempo';
+  }
+  return 'Entregado';
+}
+
 function descargarExcel(salidas: VerHistorialSalida[], mesConsulta: Date) {
   const filas = salidas.map((salida) => ({
     'No.': `#${String(salida.id_salida).padStart(3, '0')}`,
@@ -30,6 +51,14 @@ function descargarExcel(salidas: VerHistorialSalida[], mesConsulta: Date) {
     'Hora de salida': formatearHora(salida.hora_salida),
     'Hora de regreso': formatearHora(salida.hora_llegada),
     'Adeudo de tiempo': salida.adeudo_tiempo ?? 'No registrado',
+    'Requiere justificante': Number(salida.requiere_justificante) !== 0 ? 'Sí' : 'No',
+    'Estado del justificante': estadoJustificante(
+      salida.requiere_justificante,
+      salida.justificante_entregado,
+      salida.fecha_llegada,
+      salida.hora_llegada,
+      salida.fecha_justificante_entregado,
+    ),
   }));
 
   const hoja = XLSX.utils.json_to_sheet(filas);
@@ -44,6 +73,8 @@ function descargarExcel(salidas: VerHistorialSalida[], mesConsulta: Date) {
     { wch: 18 },
     { wch: 18 },
     { wch: 20 },
+    { wch: 20 },
+    { wch: 24 },
   ];
   hoja['!freeze'] = { xSplit: 0, ySplit: 1 };
 
@@ -237,6 +268,22 @@ export default function VerHistorial() {
                     <div className="historial-field historial-field-adeudo">
                       <span className="historial-label">Adeudo de tiempo</span>
                       <p>{salida.adeudo_tiempo ?? 'No registrado'}</p>
+                    </div>
+                    <div className="historial-field">
+                      <span className="historial-label">Requiere justificante</span>
+                      <p>{Number(salida.requiere_justificante) !== 0 ? 'Sí' : 'No'}</p>
+                    </div>
+                    <div className="historial-field">
+                      <span className="historial-label">Estado del justificante</span>
+                      <p>
+                        {estadoJustificante(
+                          salida.requiere_justificante,
+                          salida.justificante_entregado,
+                          salida.fecha_llegada,
+                          salida.hora_llegada,
+                          salida.fecha_justificante_entregado,
+                        )}
+                      </p>
                     </div>
                   </div>
                 </article>
