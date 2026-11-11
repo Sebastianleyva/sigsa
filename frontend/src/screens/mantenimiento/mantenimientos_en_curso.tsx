@@ -32,6 +32,7 @@ export default function MantenimientosEnCurso() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
   const autorizado = [1, 2, 3].includes(Number(usuario?.puesto))
+  const puedeModificar = [1, 2].includes(Number(usuario?.puesto))
   const [reportes, setReportes] = useState<ReporteMantenimiento[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -139,7 +140,7 @@ export default function MantenimientosEnCurso() {
                       <span className={`mantenimientos-curso-status${reporte.estado.toLocaleUpperCase('es-MX').includes('ESPERA') ? ' mantenimientos-curso-status-espera' : ''}`}>
                         {mostrarEstado(reporte.estado)}
                       </span>
-                      {enCurso && (
+                      {enCurso && puedeModificar && (
                         <button
                           className="mantenimientos-curso-select"
                           type="button"
@@ -191,7 +192,7 @@ export default function MantenimientosEnCurso() {
                       </div>
                     )}
                   </dl>
-                  {seleccionado && enCurso && (
+                  {puedeModificar && seleccionado && enCurso && (
                     <div className="mantenimientos-curso-actions">
                       <span>El servicio está listo para registrar su conclusión.</span>
                       <button

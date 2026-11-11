@@ -213,6 +213,30 @@
   background: #fff4df;
 }
 
+.requisiciones-mantenimiento-request-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.requisiciones-mantenimiento-approve {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--requisiciones-green);
+  color: #fff;
+  background: var(--requisiciones-green);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.requisiciones-mantenimiento-approve:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .requisiciones-mantenimiento-form-panel {
   margin-top: 25px;
   padding: 23px 25px;

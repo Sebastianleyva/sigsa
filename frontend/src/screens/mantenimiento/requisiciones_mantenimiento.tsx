@@ -2,6 +2,7 @@ import { type FormEvent, useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { authService } from '../../services/auth_services.js'
 import {
+  aceptarRequisicion,
   consultarReportesRequisicion,
   crearRequisicion,
   type ReporteRequisicion,
@@ -42,11 +43,13 @@ export default function RequisicionesMantenimiento() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
   const autorizado = [1, 2, 3].includes(Number(usuario?.puesto))
+  const puedeAutorizar = [1, 2].includes(Number(usuario?.puesto))
   const [reportes, setReportes] = useState<ReporteRequisicion[]>([])
   const [reporteSeleccionado, setReporteSeleccionado] = useState<number | null>(null)
   const [formulario, setFormulario] = useState<FormularioRequisicion>(formularioVacio)
   const [cargando, setCargando] = useState(true)
   const [guardando, setGuardando] = useState(false)
+  const [procesandoId, setProcesandoId] = useState<number | null>(null)
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
   const [intentoCarga, setIntentoCarga] = useState(0)
@@ -121,6 +124,24 @@ export default function RequisicionesMantenimiento() {
       setError(errorCreacion instanceof Error ? errorCreacion.message : 'No fue posible crear la requisición.')
     } finally {
       setGuardando(false)
+    }
+  }
+
+  async function autorizarRequisicion(reporte: ReporteRequisicion) {
+    if (!puedeAutorizar || !reporte.id_requisicion || procesandoId !== null) return
+    setProcesandoId(reporte.id_reporte)
+    setError('')
+    setMensaje('')
+    try {
+      await aceptarRequisicion(reporte.id_requisicion)
+      setReportes((actuales) => actuales.filter((item) => item.id_reporte !== reporte.id_reporte))
+      setMensaje(`La requisición #${reporte.id_requisicion} fue aprobada y el mantenimiento quedó en curso.`)
+    } catch (errorAutorizacion: unknown) {
+      setError(errorAutorizacion instanceof Error
+        ? errorAutorizacion.message
+        : 'No fue posible aprobar la requisición.')
+    } finally {
+      setProcesandoId(null)
     }
   }
 
@@ -200,9 +221,23 @@ export default function RequisicionesMantenimiento() {
                       </span>
                     </div>
                     {tieneRequisicion ? (
-                      <span className="requisiciones-mantenimiento-status requisiciones-mantenimiento-status-waiting">
-                        Requisición en espera
-                      </span>
+                      <div className="requisiciones-mantenimiento-request-actions">
+                        <span className="requisiciones-mantenimiento-status requisiciones-mantenimiento-status-waiting">
+                          Requisición {reporte.estado_requisicion?.toLocaleLowerCase('es-MX') ?? 'registrada'}
+                        </span>
+                        {puedeAutorizar && ['EN ESPERA', 'PENDIENTE'].includes(
+                          reporte.estado_requisicion?.toLocaleUpperCase('es-MX') ?? '',
+                        ) && (
+                          <button
+                            className="requisiciones-mantenimiento-approve"
+                            type="button"
+                            disabled={procesandoId !== null}
+                            onClick={() => void autorizarRequisicion(reporte)}
+                          >
+                            {procesandoId === reporte.id_reporte ? 'Aprobando…' : 'Aceptar requisición'}
+                          </button>
+                        )}
+                      </div>
                     ) : (
                       <button
                         className="requisiciones-mantenimiento-select"

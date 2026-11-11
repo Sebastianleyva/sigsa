@@ -35,6 +35,7 @@ export default function VerIncidenciasMantenimiento() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
   const autorizado = [1, 2, 3].includes(Number(usuario?.puesto))
+  const puedeModificar = [1, 2].includes(Number(usuario?.puesto))
   const [incidencias, setIncidencias] = useState<IncidenciaMantenimiento[]>([])
   const [seleccionada, setSeleccionada] = useState<number | null>(null)
   const [aviso, setAviso] = useState<Aviso | null>(null)
@@ -202,7 +203,7 @@ export default function VerIncidenciasMantenimiento() {
                       <span className={`ver-incidencia-status ver-incidencia-status-${estado.toLowerCase()}`}>
                         {estado}
                       </span>
-                      {pendiente && (
+                      {pendiente && puedeModificar && (
                         <button
                           className="ver-incidencia-select"
                           type="button"
@@ -237,7 +238,7 @@ export default function VerIncidenciasMantenimiento() {
                     </div>
                   </dl>
 
-                  {estaSeleccionada && pendiente && (
+                  {puedeModificar && estaSeleccionada && pendiente && (
                     <div className="ver-incidencia-actions">
                       <span>Selecciona una decisión para esta incidencia.</span>
                       <div>

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'PATCH') {
 try {
     validar_jwt_requerido();
     validar_csrf_requerido();
-    requerir_rol([1, 2, 3]);
+    requerir_rol([1, 2]);
 
     $input = json_decode(file_get_contents('php://input'), true);
     if (!is_array($input)) {

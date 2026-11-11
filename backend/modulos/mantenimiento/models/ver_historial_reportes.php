@@ -1,7 +1,7 @@
 <?php
 
-function ver_historial_reportes($pdo) {
-    $query = $pdo->query(
+function ver_historial_reportes($pdo, $mes, $anio) {
+    $query = $pdo->prepare(
         "SELECT
             r.id_reporte,
             r.tipo,
@@ -33,8 +33,10 @@ function ver_historial_reportes($pdo) {
         LEFT JOIN personal pr ON pr.id_personal = r.id_personal
         LEFT JOIN calendario c ON c.id_calendario = r.id_calendario
         LEFT JOIN servicios s ON s.id_servicio = c.id_servicio
+        WHERE MONTH(r.fecha_inicio) = :mes AND YEAR(r.fecha_inicio) = :anio
         ORDER BY r.fecha_inicio DESC, r.id_reporte DESC"
     );
+    $query->execute([':mes' => $mes, ':anio' => $anio]);
     $reportes = $query->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($reportes as &$reporte) {

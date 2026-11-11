@@ -33,7 +33,7 @@ export default function ConcluirMantenimiento() {
   const idReporte = Number(idReporteParam)
   const idValido = Number.isSafeInteger(idReporte) && idReporte > 0
   const usuario = authService.getUsuarioActual()
-  const autorizado = [1, 2, 3].includes(Number(usuario?.puesto))
+  const autorizado = [1, 2].includes(Number(usuario?.puesto))
   const [reporte, setReporte] = useState<ReporteMantenimiento | null>(null)
   const [fechaFinal, setFechaFinal] = useState(() => fechaLocal(new Date()))
   const [descripcion, setDescripcion] = useState('')

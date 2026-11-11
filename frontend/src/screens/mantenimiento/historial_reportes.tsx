@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import * as XLSX from 'xlsx'
 import { authService } from '../../services/auth_services.js'
 import { consultarHistorialReportes, type ReporteHistorial } from '../../services/mantenimiento_services'
 import './styles/historial_reportes.css'
 
-function mostrarFecha(fecha: string | null) {
+function mostrarFecha(fecha: string | null | undefined) {
   if (!fecha) return 'No registrada'
   const fechaLocal = new Date(`${fecha}T00:00:00`)
   return Number.isNaN(fechaLocal.getTime())
@@ -33,6 +34,62 @@ function mostrarDescripcionReporte(reporte: ReporteHistorial) {
     : 'Aún no se ha registrado la descripción del servicio realizado.'
 }
 
+function descargarExcel(reportes: ReporteHistorial[], mesConsulta: Date) {
+  const filas = reportes.flatMap((reporte) => {
+    const requisiciones = reporte.requisiciones.length > 0 ? reporte.requisiciones : [null]
+    return requisiciones.map((requisicion) => ({
+      'No. de reporte': reporte.id_reporte,
+      Tipo: reporte.tipo,
+      Estado: reporte.estado,
+      'Fecha de inicio': mostrarFecha(reporte.fecha_inicio),
+      'Fecha de conclusión': mostrarFecha(reporte.fecha_final),
+      'Responsable del reporte': reporte.responsable_reporte
+        ?? (reporte.id_personal ? `Personal #${reporte.id_personal}` : 'No registrado'),
+      'Descripción del servicio realizado': mostrarDescripcionReporte(reporte),
+      'No. de incidencia': reporte.id_incidencia ?? '',
+      Lugar: reporte.lugar ?? '',
+      Urgencia: reporte.urgencia ?? '',
+      'Estado de incidencia': reporte.estado_incidencia ?? '',
+      'Fecha reportada': mostrarFecha(reporte.fecha_incidencia),
+      Reportante: reporte.reportante
+        ?? (reporte.id_reportante ? `Personal #${reporte.id_reportante}` : 'No registrado'),
+      'Autorizó incidencia': reporte.autorizador_incidencia
+        ?? (reporte.id_autoriza_incidencia ? `Personal #${reporte.id_autoriza_incidencia}` : 'No registrado'),
+      'Descripción de incidencia': reporte.descripcion_incidencia ?? '',
+      'No. de calendario': reporte.id_calendario ?? '',
+      Servicio: reporte.servicio ?? '',
+      'Estado del calendario': reporte.estado_calendario ?? '',
+      'Fecha programada': mostrarFecha(reporte.fecha_destinada),
+      'Descripción del servicio programado': reporte.descripcion_servicio_programado ?? '',
+      'No. de requisición': requisicion?.id_requisicion ?? '',
+      'Estado de requisición': requisicion?.estado ?? '',
+      'Fecha de requisición': mostrarFecha(requisicion?.fecha ?? null),
+      'Fecha de entrega de requisición': mostrarFecha(requisicion?.fecha_entrega ?? null),
+      Solicitante: requisicion?.solicitante ?? (requisicion ? `Personal #${requisicion.id_solicita}` : ''),
+      'Autorizó requisición': requisicion?.autorizador
+        ?? (requisicion?.id_autoriza ? `Personal #${requisicion.id_autoriza}` : ''),
+      'Tipo de financiamiento': requisicion?.tipo_financiamiento ?? '',
+      Justificación: requisicion?.justificacion ?? '',
+      'Descripción del servicio solicitado': requisicion?.descripcion_servicio ?? '',
+    }))
+  })
+
+  const hoja = XLSX.utils.json_to_sheet(filas)
+  hoja['!cols'] = [
+    { wch: 14 }, { wch: 18 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 28 },
+    { wch: 42 }, { wch: 14 }, { wch: 24 }, { wch: 16 }, { wch: 20 }, { wch: 26 },
+    { wch: 28 }, { wch: 28 }, { wch: 42 }, { wch: 16 }, { wch: 28 }, { wch: 22 },
+    { wch: 20 }, { wch: 42 }, { wch: 16 }, { wch: 20 }, { wch: 20 }, { wch: 22 },
+    { wch: 28 }, { wch: 28 }, { wch: 24 }, { wch: 42 }, { wch: 42 },
+  ]
+  hoja['!freeze'] = { xSplit: 0, ySplit: 1 }
+
+  const libro = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(libro, hoja, 'Historial de reportes')
+  const mes = String(mesConsulta.getMonth() + 1).padStart(2, '0')
+  XLSX.writeFile(libro, `historial_reportes_${mesConsulta.getFullYear()}-${mes}.xlsx`)
+}
+
 function Dato({ etiqueta, valor }: { etiqueta: string; valor: string | number | null }) {
   return (
     <div>
@@ -46,16 +103,27 @@ export default function HistorialReportesMantenimiento() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
   const autorizado = [1, 2, 3].includes(Number(usuario?.puesto))
+  const hoy = new Date()
+  const inicioDelAno = new Date(hoy.getFullYear(), 0, 1)
   const [reportes, setReportes] = useState<ReporteHistorial[]>([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [intentoCarga, setIntentoCarga] = useState(0)
+  const [mesConsulta, setMesConsulta] = useState(new Date(hoy.getFullYear(), hoy.getMonth(), 1))
+
+  function cambiarMes(cantidad: number) {
+    const nuevoMes = new Date(mesConsulta.getFullYear(), mesConsulta.getMonth() + cantidad, 1)
+    if (nuevoMes < inicioDelAno || nuevoMes > new Date(hoy.getFullYear(), hoy.getMonth(), 1)) return
+    setCargando(true)
+    setError('')
+    setMesConsulta(nuevoMes)
+  }
 
   useEffect(() => {
     if (!autorizado) return
 
     let vigente = true
-    consultarHistorialReportes()
+    consultarHistorialReportes(mesConsulta.getMonth() + 1, mesConsulta.getFullYear())
       .then((resultado) => {
         if (vigente) setReportes(resultado)
       })
@@ -73,7 +141,12 @@ export default function HistorialReportesMantenimiento() {
     return () => {
       vigente = false
     }
-  }, [autorizado, intentoCarga])
+  }, [autorizado, intentoCarga, mesConsulta])
+
+  const nombreMesConsulta = mesConsulta.toLocaleDateString('es-MX', {
+    month: 'long',
+    year: 'numeric',
+  })
 
   if (!autorizado) return <Navigate to="/mantenimiento" replace />
 
@@ -98,10 +171,41 @@ export default function HistorialReportesMantenimiento() {
             <h1>Historial de reportes</h1>
             <p>Consulta los reportes de mantenimiento, sus datos de origen y las requisiciones asociadas.</p>
           </div>
-          <span className="historial-reportes-count">
-            <strong>{reportes.length}</strong>
-            {reportes.length === 1 ? 'reporte' : 'reportes'}
-          </span>
+          {!cargando && !error && (
+            <div className="historial-reportes-actions">
+              <div className="historial-reportes-month-navigation" aria-label="Navegación por mes">
+                <button
+                  type="button"
+                  onClick={() => cambiarMes(-1)}
+                  disabled={mesConsulta <= inicioDelAno}
+                  aria-label="Consultar el mes anterior"
+                >
+                  ←
+                </button>
+                <span>{nombreMesConsulta}</span>
+                <button
+                  type="button"
+                  onClick={() => cambiarMes(1)}
+                  disabled={mesConsulta >= new Date(hoy.getFullYear(), hoy.getMonth(), 1)}
+                  aria-label="Consultar el mes siguiente"
+                >
+                  →
+                </button>
+              </div>
+              <span className="historial-reportes-count">
+                <strong>{reportes.length}</strong>
+                {reportes.length === 1 ? 'reporte' : 'reportes'}
+              </span>
+              <button
+                className="historial-reportes-export"
+                type="button"
+                onClick={() => descargarExcel(reportes, mesConsulta)}
+                disabled={reportes.length === 0}
+              >
+                Descargar Excel
+              </button>
+            </div>
+          )}
         </div>
 
         {error && (

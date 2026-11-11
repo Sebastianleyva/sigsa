@@ -199,10 +199,11 @@ export async function consultarReportesEnCurso(id_reporte?: number): Promise<Rep
   }
 }
 
-export async function consultarHistorialReportes(): Promise<ReporteHistorial[]> {
+export async function consultarHistorialReportes(mes: number, anio: number): Promise<ReporteHistorial[]> {
   try {
     const response = await api.get<{ data: ReporteHistorial[] }>(
       'mantenimiento/routes/ver_historial_reportes.php',
+      { params: { mes, anio } },
     )
     if (!Array.isArray(response.data?.data)) {
       throw new Error('El servidor devolvió una respuesta inválida al consultar el historial de reportes.')
@@ -285,6 +286,21 @@ export async function crearRequisicion(
     return response.data.requisicion
   } catch (error) {
     throw obtenerError(error, 'No fue posible crear la requisición.')
+  }
+}
+
+export async function aceptarRequisicion(id_requisicion: number) {
+  try {
+    const response = await api.patch<{ requisicion: { id_requisicion: number; estado: string } }>(
+      'mantenimiento/routes/aceptar_requisicion.php',
+      { id_requisicion },
+    )
+    if (!response.data?.requisicion) {
+      throw new Error('El servidor devolvió una respuesta inválida al aprobar la requisición.')
+    }
+    return response.data.requisicion
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible aprobar la requisición.')
   }
 }
 
