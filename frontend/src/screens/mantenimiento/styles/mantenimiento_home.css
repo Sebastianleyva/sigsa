@@ -178,8 +178,7 @@
   border-top: 1px solid var(--mantenimiento-line);
 }
 
-.mantenimiento-home-admin-grid .mantenimiento-home-card:nth-child(3) {
-  grid-column: 1 / -1;
+.mantenimiento-home-admin-grid .mantenimiento-home-card:nth-child(odd) {
   border-left: 0;
 }
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { authService } from '../../services/auth_services.js'
 import './styles/crear_salida.css'
 
@@ -23,6 +24,7 @@ type Notice = {
 }
 
 export default function CrearSalida() {
+    const navigate = useNavigate()
     const [form, setForm] =  useState<SalidaForm>(initialForm)
     const [notice, setNotice] = useState<Notice | null>(null)
     const [loading, setLoading] = useState(false)
@@ -39,15 +41,14 @@ export default function CrearSalida() {
         setLoading(true)
 
         try{
-            const result = await authService.CrearSalida({
+            await authService.CrearSalida({
                 tipo_salida: form.tipo_salida.trim(),
                 motivo: form.motivo.trim(),
                 destino: form.destino.trim(),
                 solicita_respaldo: form.solicita_respaldo
             })
             
-            setNotice ({kind: "success", text: result.message ?? "La salida fue creada con éxito"})
-            setForm({...initialForm})
+            navigate('/salidas')
         }
         catch(error){
             setNotice ({kind: "error",
