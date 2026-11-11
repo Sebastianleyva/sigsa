@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 10, 2026 at 02:50 AM
+-- Generation Time: Nov 10, 2026 at 06:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -28,10 +28,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `areas` (
-  `id_area` bigint(20) NOT NULL,
-  `nombre` text NOT NULL,
-  `descripcion` text NOT NULL,
-  `id_subdireccion` bigint(20) DEFAULT NULL
+  `id_area` bigint(20) NOT NULL COMMENT 'identificador de área\r\n',
+  `nombre` text NOT NULL COMMENT 'nombre de la subdirección o departamento',
+  `descripcion` text NOT NULL COMMENT 'descripción del trabajo realizado en el área de trabajo',
+  `id_subdireccion` bigint(20) DEFAULT NULL COMMENT 'identificador de la subdirección a la que pertenece el departamento'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -55,10 +55,10 @@ INSERT INTO `areas` (`id_area`, `nombre`, `descripcion`, `id_subdireccion`) VALU
 --
 
 CREATE TABLE `calendario` (
-  `id_calendario` bigint(20) NOT NULL,
-  `fecha_destinada` date NOT NULL,
-  `estado` varchar(20) NOT NULL,
-  `id_servicio` bigint(20) NOT NULL
+  `id_calendario` bigint(20) NOT NULL COMMENT 'identificador del calendario',
+  `fecha_destinada` date NOT NULL COMMENT 'fecha en la que se realizara el servicio',
+  `estado` varchar(20) NOT NULL COMMENT 'estado en el que se encuentra el servicio (pendiente, en proceso, realizado, atrasado)',
+  `id_servicio` bigint(20) NOT NULL COMMENT 'identificador del servicio'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -81,13 +81,13 @@ INSERT INTO `calendario` (`id_calendario`, `fecha_destinada`, `estado`, `id_serv
 
 CREATE TABLE `incidencias` (
   `id_incidencia` bigint(20) NOT NULL,
-  `id_personal` bigint(20) NOT NULL,
-  `id_autoriza` bigint(20) DEFAULT NULL,
-  `descripcion` text NOT NULL,
-  `fecha` date NOT NULL,
-  `urgencia` varchar(20) NOT NULL,
-  `estado` varchar(20) NOT NULL,
-  `lugar` varchar(60) NOT NULL
+  `id_personal` bigint(20) NOT NULL COMMENT 'identificador del personal',
+  `id_autoriza` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que autoriza o rechaza el seguimiento a la incidencia',
+  `descripcion` text NOT NULL COMMENT 'descripción de la incidencia',
+  `fecha` date NOT NULL COMMENT 'fecha en la que se reporta la incidencia',
+  `urgencia` varchar(20) NOT NULL COMMENT 'urgencia de la incidencia (baja, media o alta)',
+  `estado` varchar(20) NOT NULL COMMENT 'estado de revisión en que se encuentra la incidencia (pendiente, aceptada o rechazada)',
+  `lugar` varchar(60) NOT NULL COMMENT 'lugar de la dirección en el que ocurrió la incidencia'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -104,19 +104,19 @@ INSERT INTO `incidencias` (`id_incidencia`, `id_personal`, `id_autoriza`, `descr
 --
 
 CREATE TABLE `personal` (
-  `id_personal` bigint(20) NOT NULL,
-  `rfc` varchar(13) NOT NULL,
-  `curp` varchar(18) NOT NULL,
-  `nombre` varchar(20) NOT NULL,
-  `apellido_p` varchar(25) NOT NULL,
-  `apellido_m` varchar(25) NOT NULL,
-  `correo` varchar(150) NOT NULL,
-  `telefono` varchar(12) NOT NULL,
-  `puesto` bigint(20) NOT NULL,
-  `area` bigint(20) DEFAULT NULL,
-  `id_jefe` bigint(20) DEFAULT NULL,
-  `activo` char(1) NOT NULL,
-  `contrasena` varchar(255) NOT NULL
+  `id_personal` bigint(20) NOT NULL COMMENT 'identificador del personal',
+  `rfc` varchar(13) NOT NULL COMMENT 'rfc del personal',
+  `curp` varchar(18) NOT NULL COMMENT 'curp del personal',
+  `nombre` varchar(20) NOT NULL COMMENT 'nombre del personal',
+  `apellido_p` varchar(25) NOT NULL COMMENT 'apellido paterno del personal',
+  `apellido_m` varchar(25) NOT NULL COMMENT 'apellido materno del personal',
+  `correo` varchar(150) NOT NULL COMMENT 'correo asignado del personal. con este correo ingresará al sistema',
+  `telefono` varchar(12) NOT NULL COMMENT 'número de telefono del personal',
+  `puesto` bigint(20) NOT NULL COMMENT 'identificador del puesto del personal',
+  `area` bigint(20) DEFAULT NULL COMMENT 'identificador del departamento o subdirección a la que pertenece el personal',
+  `id_jefe` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que está a cargo del personal registrado',
+  `activo` char(1) NOT NULL COMMENT 'estado en el que se encuentra el personal (1=activo, 0=inactivo)',
+  `contrasena` varchar(255) NOT NULL COMMENT 'contraseña del personal para ingresar al sistema'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -139,9 +139,9 @@ INSERT INTO `personal` (`id_personal`, `rfc`, `curp`, `nombre`, `apellido_p`, `a
 --
 
 CREATE TABLE `puestos` (
-  `id_puesto` bigint(20) NOT NULL,
-  `nombre` text NOT NULL,
-  `descripcion` text NOT NULL
+  `id_puesto` bigint(20) NOT NULL COMMENT 'identificador del puesto',
+  `nombre` text NOT NULL COMMENT 'nombre del puesto de trabajo',
+  `descripcion` text NOT NULL COMMENT 'descripción del puesto de trabajo\r\n'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -161,15 +161,15 @@ INSERT INTO `puestos` (`id_puesto`, `nombre`, `descripcion`) VALUES
 --
 
 CREATE TABLE `reportes` (
-  `id_reporte` bigint(20) NOT NULL,
-  `tipo` text NOT NULL,
-  `id_calendario` bigint(20) DEFAULT NULL,
-  `id_incidencia` bigint(20) DEFAULT NULL,
-  `id_personal` bigint(20) DEFAULT NULL,
-  `fecha_inicio` date NOT NULL,
-  `fecha_final` date DEFAULT NULL,
-  `estado` varchar(20) NOT NULL,
-  `descripcion` text NOT NULL
+  `id_reporte` bigint(20) NOT NULL COMMENT 'identificador del reporte',
+  `tipo` text NOT NULL COMMENT 'guarda información sobre la procedencia del reporte (reporte por incidencia o calendario)',
+  `id_calendario` bigint(20) DEFAULT NULL COMMENT 'identificador del calendario',
+  `id_incidencia` bigint(20) DEFAULT NULL COMMENT 'identificador de la incidencia',
+  `id_personal` bigint(20) DEFAULT NULL COMMENT 'identificador del personal',
+  `fecha_inicio` date NOT NULL COMMENT 'fecha en la que se comienza el reporte del servicio',
+  `fecha_final` date DEFAULT NULL COMMENT 'fecha en la que se finaliza el servicio y su reporte',
+  `estado` varchar(20) NOT NULL COMMENT 'estado en el que se encuentra el servicio de mantenimiento (en curso, en espera de requisicon, finalizado)',
+  `descripcion` text NOT NULL COMMENT 'descripción del servicio realizado'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -186,16 +186,16 @@ INSERT INTO `reportes` (`id_reporte`, `tipo`, `id_calendario`, `id_incidencia`, 
 --
 
 CREATE TABLE `requisiciones` (
-  `id_requisicion` bigint(20) NOT NULL,
-  `id_reporte` bigint(20) NOT NULL,
-  `id_solicita` bigint(20) NOT NULL,
-  `id_autoriza` bigint(20) DEFAULT NULL,
-  `justificacion` text NOT NULL,
-  `fecha` date NOT NULL,
-  `fecha_entrega` date DEFAULT NULL,
-  `descripcion_servicio` text NOT NULL,
-  `estado` varchar(20) NOT NULL,
-  `tipo_financiamiento` text NOT NULL
+  `id_requisicion` bigint(20) NOT NULL COMMENT 'identificador de requisición',
+  `id_reporte` bigint(20) NOT NULL COMMENT 'identificador del reporte',
+  `id_solicita` bigint(20) NOT NULL COMMENT 'identificador del personal solicitante de la requisición',
+  `id_autoriza` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que autoriza la requisición',
+  `justificacion` text NOT NULL COMMENT 'justificación de la solicitud de la requisición',
+  `fecha` date NOT NULL COMMENT 'fecha en la que se realiza la requisición',
+  `fecha_entrega` date DEFAULT NULL COMMENT 'fecha en la que se entrega la requisición a las oficinas centrales',
+  `descripcion_servicio` text NOT NULL COMMENT 'descripción del servicio para el que se necesita la requisición',
+  `estado` varchar(20) NOT NULL COMMENT 'estado en el que se encuentra la requisición (pendiente, en curso, aprovada o rechazada)',
+  `tipo_financiamiento` text NOT NULL COMMENT 'tipo de financiamiento que recibe la requisición'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -213,40 +213,41 @@ INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_
 --
 
 CREATE TABLE `salidas` (
-  `id_salida` bigint(20) NOT NULL,
-  `tipo_salida` varchar(25) NOT NULL,
-  `motivo` text NOT NULL COMMENT 'razon de la salida',
-  `destino` text NOT NULL COMMENT 'el lugar a donde se dirije',
-  `fecha` date NOT NULL,
-  `hora_salida` time DEFAULT NULL,
-  `hora_llegada` time DEFAULT NULL,
+  `id_salida` bigint(20) NOT NULL COMMENT 'identificador de la salida',
+  `tipo_salida` varchar(25) NOT NULL COMMENT 'tipo de salida (medica, personal o cita)',
+  `motivo` text NOT NULL COMMENT 'razón del personal para realizar la salida',
+  `destino` text NOT NULL COMMENT 'el lugar a donde se dirije el personal',
+  `fecha` date NOT NULL COMMENT 'fecha en la que se realiza la salida',
+  `hora_salida` time DEFAULT NULL COMMENT 'hora en la que se aprueba la salida',
+  `hora_llegada` time DEFAULT NULL COMMENT 'hora en la que se registra el regreso del personal a la dirección',
   `estado` text NOT NULL COMMENT 'guarda el estaod de la salida (pendiente o concluida)',
-  `id_personal` bigint(20) NOT NULL,
-  `id_autoriza` bigint(20) DEFAULT NULL,
+  `id_personal` bigint(20) NOT NULL COMMENT 'identificador del personal que realiza la salida',
+  `id_autoriza` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que le da revisión a la salida',
   `solicita_respaldo` tinyint(1) NOT NULL DEFAULT 0,
-  `requiere_justificante` tinyint(1) NOT NULL DEFAULT 0,
-  `hora_estimada` time DEFAULT NULL,
-  `adeudo_tiempo` time DEFAULT NULL,
-  `justificante_entregado` tinyint(1) DEFAULT NULL,
-  `fecha_llegada` date DEFAULT NULL
+  `requiere_justificante` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'se refiere a si la salida requiere justificante o no, esto a consideración del personal que revise la salida (1=si, 0=no)',
+  `hora_estimada` time DEFAULT NULL COMMENT 'hora limite para el regreso del personal (2h después de iniciar la salida)',
+  `adeudo_tiempo` time DEFAULT NULL COMMENT 'en caso de que el personal haya cerrado su salida después de la hora estimada, este campo guarda el tiempo de diferencia que hubo',
+  `justificante_entregado` tinyint(1) DEFAULT NULL COMMENT 'guarda la información sobre si se entregó el justificante o no en caso de ser necesario (1=si, 0=no)',
+  `fecha_justificante_entregado` datetime DEFAULT NULL COMMENT 'fecha en la que se entregó el justificante en caso de que haya sido solicitado',
+  `fecha_llegada` date DEFAULT NULL COMMENT 'fecha que registra cuando se cerro por completo la salida en caso de que haya habido complicaciones con el justificante'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `salidas`
 --
 
-INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `solicita_respaldo`, `requiere_justificante`, `hora_estimada`, `adeudo_tiempo`, `justificante_entregado`, `fecha_llegada`) VALUES
-(7, 'PERSONAL', 'Voy por el festival del día de las madres en la escuela de mi hijo', 'Secundaria #3', '2026-10-22', '16:59:40', NULL, 'FINALIZADO', 21, NULL, 0, 0, '18:59:40', NULL, 0, '0000-00-00'),
-(8, 'MEDICA', 'me duele la panza', 'issste', '2026-10-25', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, 0, '0000-00-00'),
-(9, 'PERSONAL', 'voy a cuidar a mi mama', 'manuel rosas #304', '2026-10-26', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, 0, '0000-00-00'),
-(10, 'MEDICA', 'me duele todo', 'xicoli 305', '2026-10-27', '08:42:30', '09:46:52', 'FINALIZADO', 21, 20, 0, 0, '10:42:30', NULL, 0, '0000-00-00'),
-(11, 'MEDICA', 'me rompi la pierna', 'no se 103', '2026-10-28', '11:45:40', '11:46:02', 'FINALIZADO', 16, 15, 0, 0, '13:45:40', NULL, 0, '0000-00-00'),
-(12, 'PERSONAL', 'jjj', 'ñññ', '2026-11-09', '13:28:22', '13:28:45', 'FINALIZADO', 21, 20, 0, 0, '15:28:22', NULL, NULL, NULL),
-(14, 'MEDICA', 'ww', 'ww', '2026-11-09', NULL, '13:56:41', 'FINALIZADO', 13, NULL, 0, 0, NULL, NULL, NULL, NULL),
-(15, 'MEDICA', '444', '444', '2026-11-09', NULL, NULL, 'PENDIENTE', 20, NULL, 0, 0, NULL, NULL, NULL, NULL),
-(16, 'MEDICA', 'sss', 'casa #403', '2026-11-09', '14:22:53', '14:26:18', 'FINALIZADO', 21, 20, 1, 0, '16:22:53', NULL, NULL, NULL),
-(17, 'MEDICA', '123', '7777', '2026-11-09', '14:28:46', '19:05:06', 'FINALIZADO', 21, 20, 0, 0, '16:28:46', '02:36:20', NULL, '2026-11-09'),
-(18, 'PERSONAL', 'qqqq', 'qqq', '2026-11-10', '19:05:53', '19:06:02', 'FINALIZADO', 21, 20, 0, 1, '21:05:53', NULL, 1, '2026-11-09');
+INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`, `hora_salida`, `hora_llegada`, `estado`, `id_personal`, `id_autoriza`, `solicita_respaldo`, `requiere_justificante`, `hora_estimada`, `adeudo_tiempo`, `justificante_entregado`, `fecha_justificante_entregado`, `fecha_llegada`) VALUES
+(7, 'PERSONAL', 'Voy por el festival del día de las madres en la escuela de mi hijo', 'Secundaria #3', '2026-10-22', '16:59:40', NULL, 'FINALIZADO', 21, NULL, 0, 0, '18:59:40', NULL, 0, NULL, '0000-00-00'),
+(8, 'MEDICA', 'me duele la panza', 'issste', '2026-10-25', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, 0, NULL, '0000-00-00'),
+(9, 'PERSONAL', 'voy a cuidar a mi mama', 'manuel rosas #304', '2026-10-26', NULL, NULL, 'RECHAZADA', 21, NULL, 0, 0, NULL, NULL, 0, NULL, '0000-00-00'),
+(10, 'MEDICA', 'me duele todo', 'xicoli 305', '2026-10-27', '08:42:30', '09:46:52', 'FINALIZADO', 21, 20, 0, 0, '10:42:30', NULL, 0, NULL, '0000-00-00'),
+(11, 'MEDICA', 'me rompi la pierna', 'no se 103', '2026-10-28', '11:45:40', '11:46:02', 'FINALIZADO', 16, 15, 0, 0, '13:45:40', NULL, 0, NULL, '0000-00-00'),
+(12, 'PERSONAL', 'jjj', 'ñññ', '2026-11-09', '13:28:22', '13:28:45', 'FINALIZADO', 21, 20, 0, 0, '15:28:22', NULL, NULL, NULL, NULL),
+(14, 'MEDICA', 'ww', 'ww', '2026-11-09', NULL, '13:56:41', 'FINALIZADO', 13, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL),
+(15, 'MEDICA', '444', '444', '2026-11-09', NULL, NULL, 'PENDIENTE', 20, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL),
+(16, 'MEDICA', 'sss', 'casa #403', '2026-11-09', '14:22:53', '14:26:18', 'FINALIZADO', 21, 20, 1, 0, '16:22:53', NULL, NULL, NULL, NULL),
+(17, 'MEDICA', '123', '7777', '2026-11-09', '14:28:46', '19:05:06', 'FINALIZADO', 21, 20, 0, 0, '16:28:46', '02:36:20', NULL, NULL, '2026-11-09'),
+(18, 'PERSONAL', 'qqqq', 'qqq', '2026-11-10', '19:05:53', '19:06:02', 'FINALIZADO', 21, 20, 0, 1, '21:05:53', NULL, 1, NULL, '2026-11-09');
 
 -- --------------------------------------------------------
 
@@ -255,11 +256,11 @@ INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`,
 --
 
 CREATE TABLE `servicios` (
-  `id_servicio` bigint(20) NOT NULL,
-  `nombre` varchar(150) NOT NULL,
-  `periodicidad` int(3) NOT NULL,
-  `descripcion` text NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `id_servicio` bigint(20) NOT NULL COMMENT 'identificador del servicio',
+  `nombre` varchar(150) NOT NULL COMMENT 'nombre del servicio',
+  `periodicidad` int(3) NOT NULL COMMENT 'periodicidad del servicio en semanas',
+  `descripcion` text NOT NULL COMMENT 'descricpción del trabajo que se realiza para el servicio',
+  `activo` tinyint(1) NOT NULL COMMENT 'guarda información sobre si el servicio sigue siendo realizado por el personal o no (1=si, 0=no)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -359,13 +360,13 @@ ALTER TABLE `servicios`
 -- AUTO_INCREMENT for table `areas`
 --
 ALTER TABLE `areas`
-  MODIFY `id_area` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_area` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de área\r\n', AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `calendario`
 --
 ALTER TABLE `calendario`
-  MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del calendario', AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `incidencias`
@@ -377,37 +378,37 @@ ALTER TABLE `incidencias`
 -- AUTO_INCREMENT for table `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `id_personal` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_personal` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del personal', AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `puestos`
 --
 ALTER TABLE `puestos`
-  MODIFY `id_puesto` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_puesto` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del puesto', AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `reportes`
 --
 ALTER TABLE `reportes`
-  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `requisiciones`
 --
 ALTER TABLE `requisiciones`
-  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de requisición', AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `salidas`
 --
 ALTER TABLE `salidas`
-  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de la salida', AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `servicios`
 --
 ALTER TABLE `servicios`
-  MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del servicio', AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
