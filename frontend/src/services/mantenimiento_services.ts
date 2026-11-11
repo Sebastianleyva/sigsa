@@ -68,6 +68,46 @@ export type RequisicionMantenimiento = {
   estado: string
   tipo_financiamiento: string
 }
+export type RequisicionReporte = {
+  id_requisicion: number
+  id_reporte: number
+  id_solicita: number
+  id_autoriza: number | null
+  justificacion: string
+  fecha: string
+  fecha_entrega: string | null
+  descripcion_servicio: string
+  estado: string
+  tipo_financiamiento: string
+  solicitante: string | null
+  autorizador: string | null
+}
+export type ReporteHistorial = {
+  id_reporte: number
+  tipo: string
+  id_calendario: number | null
+  id_incidencia: number | null
+  id_personal: number | null
+  fecha_inicio: string
+  fecha_final: string | null
+  estado: string
+  descripcion: string
+  fecha_destinada: string | null
+  estado_calendario: string | null
+  servicio: string | null
+  descripcion_servicio_programado: string | null
+  fecha_incidencia: string | null
+  lugar: string | null
+  urgencia: string | null
+  estado_incidencia: string | null
+  id_reportante: number | null
+  id_autoriza_incidencia: number | null
+  descripcion_incidencia: string | null
+  reportante: string | null
+  autorizador_incidencia: string | null
+  responsable_reporte: string | null
+  requisiciones: RequisicionReporte[]
+}
 type ReporteIncidenciaCreado = {
   id_reporte: number | string
   estado: string
@@ -156,6 +196,37 @@ export async function consultarReportesEnCurso(id_reporte?: number): Promise<Rep
     }))
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar los mantenimientos en curso.')
+  }
+}
+
+export async function consultarHistorialReportes(): Promise<ReporteHistorial[]> {
+  try {
+    const response = await api.get<{ data: ReporteHistorial[] }>(
+      'mantenimiento/routes/ver_historial_reportes.php',
+    )
+    if (!Array.isArray(response.data?.data)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar el historial de reportes.')
+    }
+    return response.data.data.map((reporte) => ({
+      ...reporte,
+      id_reporte: Number(reporte.id_reporte),
+      id_calendario: reporte.id_calendario === null ? null : Number(reporte.id_calendario),
+      id_incidencia: reporte.id_incidencia === null ? null : Number(reporte.id_incidencia),
+      id_personal: reporte.id_personal === null ? null : Number(reporte.id_personal),
+      id_reportante: reporte.id_reportante === null ? null : Number(reporte.id_reportante),
+      id_autoriza_incidencia: reporte.id_autoriza_incidencia === null
+        ? null
+        : Number(reporte.id_autoriza_incidencia),
+      requisiciones: reporte.requisiciones.map((requisicion) => ({
+        ...requisicion,
+        id_requisicion: Number(requisicion.id_requisicion),
+        id_reporte: Number(requisicion.id_reporte),
+        id_solicita: Number(requisicion.id_solicita),
+        id_autoriza: requisicion.id_autoriza === null ? null : Number(requisicion.id_autoriza),
+      })),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar el historial de reportes.')
   }
 }
 
