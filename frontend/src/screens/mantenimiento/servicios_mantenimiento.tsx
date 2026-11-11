@@ -1,6 +1,7 @@
 import { type FormEvent, useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '../../services/auth_services.js'
+import ConfirmationDialog from '../../components/ConfirmationDialog'
 import {
   consultarServicios,
   crearServicio,
@@ -32,6 +33,7 @@ export default function ServiciosMantenimiento() {
   const [cargando, setCargando] = useState(true)
   const [guardando, setGuardando] = useState(false)
   const [guardandoFecha, setGuardandoFecha] = useState<number | null>(null)
+  const [servicioAConfirmar, setServicioAConfirmar] = useState<ServicioMantenimiento | null>(null)
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
 
@@ -95,8 +97,6 @@ export default function ServiciosMantenimiento() {
   }
 
   async function manejarDesactivacion(servicio: ServicioMantenimiento) {
-    if (!window.confirm(`¿Deseas desactivar el servicio "${servicio.nombre}"?`)) return
-
     setError('')
     setMensaje('')
     try {
@@ -282,7 +282,7 @@ export default function ServiciosMantenimiento() {
                   <button
                     className="servicios-mantenimiento-delete"
                     type="button"
-                    onClick={() => void manejarDesactivacion(servicio)}
+                    onClick={() => setServicioAConfirmar(servicio)}
                     aria-label={`Desactivar ${servicio.nombre}`}
                   >
                     Desactivar
@@ -293,6 +293,24 @@ export default function ServiciosMantenimiento() {
           </section>
         </div>
       </section>
+      {servicioAConfirmar && (
+        <ConfirmationDialog
+          open
+          title="¿Desactivar este servicio?"
+          message={`"${servicioAConfirmar.nombre}" dejará de aparecer para nuevas programaciones. El historial existente se conservará.`}
+          cancelLabel="Conservar servicio"
+          onCancel={() => setServicioAConfirmar(null)}
+          actions={[{
+            label: 'Desactivar servicio',
+            variant: 'danger',
+            onClick: () => {
+              const servicio = servicioAConfirmar
+              setServicioAConfirmar(null)
+              void manejarDesactivacion(servicio)
+            },
+          }]}
+        />
+      )}
     </main>
   )
 }

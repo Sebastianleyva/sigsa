@@ -15,6 +15,7 @@ if($_SERVER['REQUEST_METHOD'] !== 'POST'){
 try{
     $usuario = validar_jwt_requerido();
     validar_csrf_requerido();
+    requerir_rol([1, 2, 3]);
     
     $input = json_decode(file_get_contents('php://input'), true);
     if (!is_array($input)) {
@@ -33,7 +34,16 @@ try{
     http_response_code(400);
     echo json_encode(["ERROR" => $e->getMessage()]);
     exit;
-} catch (Exception $e) {
+} catch (OutOfBoundsException $e) {
+    http_response_code(404);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+    exit;
+} catch (DomainException $e) {
+    http_response_code(409);
+    echo json_encode(["ERROR" => $e->getMessage()]);
+    exit;
+} catch (Throwable $e) {
+    error_log("Error al generar la requisición: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(["ERROR" => "Error interno del servidor"]);
     exit;

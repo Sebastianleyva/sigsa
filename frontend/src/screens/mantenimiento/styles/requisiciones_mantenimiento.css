@@ -1,0 +1,417 @@
+.requisiciones-mantenimiento-page {
+  --requisiciones-ink: #203431;
+  --requisiciones-muted: #687973;
+  --requisiciones-green: #176c58;
+  --requisiciones-line: #d9e3dc;
+  min-height: 100svh;
+  color: var(--requisiciones-ink);
+  background: #f2f6f3;
+}
+
+.requisiciones-mantenimiento-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 76px;
+  padding: 0 clamp(22px, 6vw, 88px);
+  border-bottom: 1px solid #e1e9e3;
+  background: rgb(255 255 255 / 72%);
+  color: var(--requisiciones-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.requisiciones-mantenimiento-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0;
+  border: 0;
+  color: var(--requisiciones-ink);
+  background: transparent;
+  font-family: 'Manrope', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.requisiciones-mantenimiento-brand-mark {
+  display: grid;
+  grid-template: repeat(2, 8px) / repeat(2, 8px);
+  gap: 3px;
+  transform: rotate(-8deg);
+}
+
+.requisiciones-mantenimiento-brand-mark i {
+  border-radius: 2px;
+  background: #78b98d;
+}
+
+.requisiciones-mantenimiento-brand-mark i:nth-child(1),
+.requisiciones-mantenimiento-brand-mark i:nth-child(4) {
+  background: #d9734d;
+}
+
+.requisiciones-mantenimiento-content {
+  width: min(1080px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: clamp(32px, 5vw, 58px) 0 48px;
+}
+
+.requisiciones-mantenimiento-back {
+  padding: 0;
+  border: 0;
+  color: var(--requisiciones-green);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.requisiciones-mantenimiento-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 32px 0 28px;
+}
+
+.requisiciones-mantenimiento-eyebrow,
+.requisiciones-mantenimiento-section-index {
+  color: var(--requisiciones-green);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+}
+
+.requisiciones-mantenimiento-heading h1 {
+  margin: 12px 0 8px;
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(32px, 5vw, 44px);
+  line-height: 1.13;
+}
+
+.requisiciones-mantenimiento-heading p,
+.requisiciones-mantenimiento-form-heading p {
+  margin: 0;
+  color: var(--requisiciones-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.requisiciones-mantenimiento-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.requisiciones-mantenimiento-summary span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 11px;
+  border: 1px solid var(--requisiciones-line);
+  background: #fff;
+  color: var(--requisiciones-muted);
+  font-size: 10px;
+}
+
+.requisiciones-mantenimiento-summary strong {
+  color: var(--requisiciones-ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+}
+
+.requisiciones-mantenimiento-list {
+  display: grid;
+  gap: 12px;
+}
+
+.requisiciones-mantenimiento-card {
+  padding: 20px 22px;
+  border: 1px solid var(--requisiciones-line);
+  background: #fff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.requisiciones-mantenimiento-card-selected {
+  border-color: var(--requisiciones-green);
+  box-shadow: 0 0 0 2px rgb(23 108 88 / 9%);
+}
+
+.requisiciones-mantenimiento-card-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.requisiciones-mantenimiento-card-kicker {
+  color: var(--requisiciones-green);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+}
+
+.requisiciones-mantenimiento-card h2 {
+  margin: 6px 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.requisiciones-mantenimiento-card p {
+  max-width: 700px;
+  margin: 0 0 7px;
+  color: var(--requisiciones-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.requisiciones-mantenimiento-card-date {
+  color: var(--requisiciones-muted);
+  font-size: 10px;
+}
+
+.requisiciones-mantenimiento-select,
+.requisiciones-mantenimiento-cancel,
+.requisiciones-mantenimiento-form-footer button {
+  flex: 0 0 auto;
+  min-height: 37px;
+  padding: 0 13px;
+  border: 1px solid var(--requisiciones-line);
+  color: var(--requisiciones-green);
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.requisiciones-mantenimiento-select:hover,
+.requisiciones-mantenimiento-cancel:hover {
+  border-color: var(--requisiciones-green);
+  background: #eef7f0;
+}
+
+.requisiciones-mantenimiento-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  flex: 0 0 auto;
+  padding: 0 10px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+.requisiciones-mantenimiento-status-waiting {
+  color: #875b11;
+  background: #fff4df;
+}
+
+.requisiciones-mantenimiento-form-panel {
+  margin-top: 25px;
+  padding: 23px 25px;
+  border: 1px solid var(--requisiciones-line);
+  background: #fff;
+}
+
+.requisiciones-mantenimiento-form-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e7ece8;
+}
+
+.requisiciones-mantenimiento-form-heading h2 {
+  margin: 8px 0 6px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 19px;
+}
+
+.requisiciones-mantenimiento-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.65fr);
+  gap: 9px 16px;
+  padding-top: 15px;
+}
+
+.requisiciones-mantenimiento-form label {
+  align-self: end;
+  color: var(--requisiciones-ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.requisiciones-mantenimiento-form label span {
+  color: #b94d32;
+}
+
+.requisiciones-mantenimiento-form textarea,
+.requisiciones-mantenimiento-form input {
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 11px;
+  border: 1px solid var(--requisiciones-line);
+  border-radius: 0;
+  color: var(--requisiciones-ink);
+  background: #fbfcfb;
+  font: inherit;
+  font-size: 12px;
+}
+
+.requisiciones-mantenimiento-form textarea {
+  grid-column: 1 / -1;
+  resize: vertical;
+}
+
+.requisiciones-mantenimiento-form input:focus,
+.requisiciones-mantenimiento-form textarea:focus {
+  border-color: var(--requisiciones-green);
+  outline: 2px solid #cce2d3;
+}
+
+.requisiciones-mantenimiento-form-footer {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #e7ece8;
+  color: var(--requisiciones-muted);
+  font-size: 10px;
+}
+
+.requisiciones-mantenimiento-form-footer strong {
+  color: #875b11;
+}
+
+.requisiciones-mantenimiento-form-footer button {
+  border-color: var(--requisiciones-green);
+  color: #fff;
+  background: var(--requisiciones-green);
+}
+
+.requisiciones-mantenimiento-form-footer button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.requisiciones-mantenimiento-success,
+.requisiciones-mantenimiento-error,
+.requisiciones-mantenimiento-message {
+  margin: 0 0 15px;
+  padding: 11px 14px;
+  border: 1px solid #bad6c3;
+  color: #20533e;
+  background: #edf6ef;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.requisiciones-mantenimiento-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-color: #e8c1b2;
+  color: #8d3c25;
+  background: #fff6f2;
+}
+
+.requisiciones-mantenimiento-error button {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid #e8c1b2;
+  color: #8d3c25;
+  background: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.requisiciones-mantenimiento-message {
+  border-color: var(--requisiciones-line);
+  color: var(--requisiciones-muted);
+  background: #fff;
+}
+
+.requisiciones-mantenimiento-empty {
+  padding: 42px 22px;
+  border: 1px solid var(--requisiciones-line);
+  background: #fff;
+  text-align: center;
+}
+
+.requisiciones-mantenimiento-empty > span {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 13px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--requisiciones-green);
+  background: #e8f4eb;
+}
+
+.requisiciones-mantenimiento-empty h2 {
+  margin: 0 0 7px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+}
+
+.requisiciones-mantenimiento-empty p {
+  margin: 0;
+  color: var(--requisiciones-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  .requisiciones-mantenimiento-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .requisiciones-mantenimiento-card-main {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .requisiciones-mantenimiento-topbar {
+    min-height: 66px;
+    font-size: 9px;
+  }
+
+  .requisiciones-mantenimiento-content {
+    width: calc(100% - 36px);
+  }
+
+  .requisiciones-mantenimiento-form {
+    grid-template-columns: 1fr;
+  }
+
+  .requisiciones-mantenimiento-form-heading {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 460px) {
+  .requisiciones-mantenimiento-form-panel {
+    padding: 19px 16px;
+  }
+
+  .requisiciones-mantenimiento-form-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

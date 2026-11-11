@@ -39,6 +39,34 @@ export type IncidenciaMantenimiento = {
   estado: string
   lugar: string
 }
+export type ReporteMantenimiento = {
+  id_reporte: number
+  tipo: string
+  id_incidencia: number | null
+  id_calendario: number | null
+  fecha_inicio: string
+  fecha_final: string | null
+  estado: string
+  descripcion: string
+  lugar: string | null
+  urgencia: string | null
+  fecha_destinada: string | null
+  servicio: string | null
+  reportante: string | null
+}
+export type ReporteRequisicion = ReporteMantenimiento & {
+  id_requisicion: number | null
+  estado_requisicion: string | null
+}
+export type RequisicionMantenimiento = {
+  id_requisicion: number | string
+  id_reporte: number
+  justificacion: string
+  fecha: string
+  descripcion_servicio: string
+  estado: string
+  tipo_financiamiento: string
+}
 type ReporteIncidenciaCreado = {
   id_reporte: number | string
   estado: string
@@ -107,6 +135,62 @@ export async function consultarIncidencias(): Promise<IncidenciaMantenimiento[]>
     }))
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar las incidencias.')
+  }
+}
+
+export async function consultarReportesEnCurso(): Promise<ReporteMantenimiento[]> {
+  try {
+    const response = await api.get<{ data: ReporteMantenimiento[] }>(
+      'mantenimiento/routes/ver_reportes_en_curso.php',
+    )
+    if (!Array.isArray(response.data?.data)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar reportes en curso.')
+    }
+    return response.data.data.map((reporte) => ({
+      ...reporte,
+      id_reporte: Number(reporte.id_reporte),
+      id_incidencia: reporte.id_incidencia === null ? null : Number(reporte.id_incidencia),
+      id_calendario: reporte.id_calendario === null ? null : Number(reporte.id_calendario),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar los mantenimientos en curso.')
+  }
+}
+
+export async function consultarReportesRequisicion(): Promise<ReporteRequisicion[]> {
+  try {
+    const response = await api.get<{ data: ReporteRequisicion[] }>(
+      'mantenimiento/routes/ver_reportes_requisicion.php',
+    )
+    if (!Array.isArray(response.data?.data)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar requisiciones.')
+    }
+    return response.data.data.map((reporte) => ({
+      ...reporte,
+      id_reporte: Number(reporte.id_reporte),
+      id_incidencia: reporte.id_incidencia === null ? null : Number(reporte.id_incidencia),
+      id_calendario: reporte.id_calendario === null ? null : Number(reporte.id_calendario),
+      id_requisicion: reporte.id_requisicion === null ? null : Number(reporte.id_requisicion),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar las requisiciones.')
+  }
+}
+
+export async function crearRequisicion(
+  datos: Pick<RequisicionMantenimiento, 'id_reporte' | 'justificacion' | 'fecha' | 'descripcion_servicio' | 'tipo_financiamiento'>,
+): Promise<RequisicionMantenimiento> {
+  try {
+    const response = await api.post<{ requisicion: RequisicionMantenimiento }>(
+      'mantenimiento/routes/generar_requisicion.php',
+      datos,
+    )
+    if (!response.data?.requisicion) {
+      throw new Error('El servidor devolvió una respuesta inválida al crear la requisición.')
+    }
+    return response.data.requisicion
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible crear la requisición.')
   }
 }
 

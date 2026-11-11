@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { authService } from '../../services/auth_services.js'
+import ConfirmationDialog from '../../components/ConfirmationDialog'
 import {
   aceptarIncidencia,
   consultarIncidencias,
@@ -12,6 +13,11 @@ import './styles/ver_incidencias.css'
 type Aviso = {
   tipo: 'exito' | 'error'
   mensaje: string
+}
+
+type ConfirmacionIncidencia = {
+  id: number
+  decision: 'aceptar' | 'rechazar'
 }
 
 function mostrarFecha(fecha: string) {
@@ -35,6 +41,7 @@ export default function VerIncidenciasMantenimiento() {
   const [cargando, setCargando] = useState(true)
   const [procesandoId, setProcesandoId] = useState<number | null>(null)
   const [intentoCarga, setIntentoCarga] = useState(0)
+  const [confirmacion, setConfirmacion] = useState<ConfirmacionIncidencia | null>(null)
 
   useEffect(() => {
     if (!autorizado) return
@@ -67,31 +74,29 @@ export default function VerIncidenciasMantenimiento() {
     (incidencia) => normalizarEstado(incidencia.estado) === 'PENDIENTE',
   )
 
-  async function procesarSeleccion(decision: 'aceptar' | 'rechazar') {
-    if (seleccionada === null || procesandoId !== null) return
-    const incidencia = incidencias.find((item) => item.id_incidencia === seleccionada)
+  async function procesarSeleccion(
+    id_incidencia: number,
+    decision: 'aceptar' | 'rechazar',
+    requiereRequisicion = false,
+  ) {
+    if (procesandoId !== null) return
+    const incidencia = incidencias.find((item) => item.id_incidencia === id_incidencia)
     if (!incidencia || normalizarEstado(incidencia.estado) !== 'PENDIENTE') return
 
     const accion = decision === 'aceptar' ? 'aceptar' : 'rechazar'
-    const requiereRequisicion = decision === 'aceptar'
-      ? window.confirm(
-          `¿El servicio para la incidencia #${incidencia.id_incidencia} requerirá una requisición?\n\nSelecciona Aceptar para Sí o Cancelar para No.`,
-        )
-      : false
-    if (decision === 'rechazar' && !window.confirm(`¿Confirmas que deseas rechazar la incidencia #${incidencia.id_incidencia}?`)) return
 
-    setProcesandoId(seleccionada)
+    setProcesandoId(id_incidencia)
     setAviso(null)
     try {
       let mensaje: string
       if (decision === 'aceptar') {
-        const resultado = await aceptarIncidencia(seleccionada, requiereRequisicion)
-        setIncidencias((actuales) => actuales.filter((item) => item.id_incidencia !== seleccionada))
+        const resultado = await aceptarIncidencia(id_incidencia, requiereRequisicion)
+        setIncidencias((actuales) => actuales.filter((item) => item.id_incidencia !== id_incidencia))
         mensaje = `La incidencia #${incidencia.id_incidencia} fue aceptada. Se creó un reporte ${resultado.reporte.estado.toLocaleLowerCase('es-MX')}.`
       } else {
-        const resultado = await rechazarIncidencia(seleccionada)
+        const resultado = await rechazarIncidencia(id_incidencia)
         setIncidencias((actuales) => actuales.map((item) => (
-          item.id_incidencia === seleccionada
+          item.id_incidencia === id_incidencia
             ? {
                 ...item,
                 estado: resultado.estado,
@@ -240,7 +245,7 @@ export default function VerIncidenciasMantenimiento() {
                           type="button"
                           className="ver-incidencia-reject"
                           disabled={procesandoId !== null}
-                          onClick={() => void procesarSeleccion('rechazar')}
+                          onClick={() => setConfirmacion({ id: incidencia.id_incidencia, decision: 'rechazar' })}
                         >
                           {procesandoId === incidencia.id_incidencia ? 'Procesando…' : 'Rechazar'}
                         </button>
@@ -248,7 +253,7 @@ export default function VerIncidenciasMantenimiento() {
                           type="button"
                           className="ver-incidencia-accept"
                           disabled={procesandoId !== null}
-                          onClick={() => void procesarSeleccion('aceptar')}
+                          onClick={() => setConfirmacion({ id: incidencia.id_incidencia, decision: 'aceptar' })}
                         >
                           {procesandoId === incidencia.id_incidencia ? 'Procesando…' : 'Aceptar'}
                         </button>
@@ -261,6 +266,48 @@ export default function VerIncidenciasMantenimiento() {
           </section>
         )}
       </section>
+      {confirmacion && (
+        <ConfirmationDialog
+          open
+          title={confirmacion.decision === 'aceptar'
+            ? '¿El servicio requiere requisición?'
+            : '¿Rechazar esta incidencia?'}
+          message={confirmacion.decision === 'aceptar'
+            ? 'Si la requiere, el reporte quedará en espera de requisición. Si no, el mantenimiento iniciará en curso.'
+            : `La incidencia #${confirmacion.id} se marcará como rechazada.`}
+          onCancel={() => setConfirmacion(null)}
+          actions={confirmacion.decision === 'aceptar'
+            ? [
+                {
+                  label: 'No, iniciar en curso',
+                  variant: 'primary',
+                  onClick: () => {
+                    const id = confirmacion.id
+                    setConfirmacion(null)
+                    void procesarSeleccion(id, 'aceptar', false)
+                  },
+                },
+                {
+                  label: 'Sí, requiere requisición',
+                  variant: 'secondary',
+                  onClick: () => {
+                    const id = confirmacion.id
+                    setConfirmacion(null)
+                    void procesarSeleccion(id, 'aceptar', true)
+                  },
+                },
+              ]
+            : [{
+                label: 'Rechazar incidencia',
+                variant: 'danger',
+                onClick: () => {
+                  const id = confirmacion.id
+                  setConfirmacion(null)
+                  void procesarSeleccion(id, 'rechazar')
+                },
+              }]}
+        />
+      )}
     </main>
   )
 }

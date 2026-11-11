@@ -50,7 +50,7 @@ function aceptar_incidencia($pdo, $input, $id_personal){
         }
 
         $estado_reporte = $input['requiere_requisicion']
-            ? 'EN ESPERA DE REQUISICIÓN'
+            ? 'ESPERA REQUISICIÓN'
             : 'EN CURSO';
         $fecha_inicio = date('Y-m-d');
         $query = $pdo->prepare(

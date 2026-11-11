@@ -63,6 +63,14 @@ const opcionesAdministrativas: OpcionMantenimiento[] = [
         action: 'Administrar servicios',
         path: '/mantenimiento/servicios',
     },
+    {
+        index: '07',
+        category: 'GESTIÓN',
+        title: 'Requisiciones',
+        description: 'Consulta los mantenimientos que requieren requisición y crea su solicitud.',
+        action: 'Ver requisiciones',
+        path: '/mantenimiento/requisiciones',
+    },
 ]
 
 const destinos: Record<string, string> = {
@@ -72,6 +80,7 @@ const destinos: Record<string, string> = {
     '/mantenimiento/reportes/historial': 'Historial de reportes',
     '/mantenimiento/reportes/en-curso': 'Mantenimientos en curso',
     '/mantenimiento/servicios': 'Servicios',
+    '/mantenimiento/requisiciones': 'Requisiciones',
 }
 
 export default function MantenimientoHome() {
