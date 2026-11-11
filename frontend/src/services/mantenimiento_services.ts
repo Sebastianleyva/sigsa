@@ -48,6 +48,7 @@ export type ReporteMantenimiento = {
   fecha_final: string | null
   estado: string
   descripcion: string
+  descripcion_incidencia: string | null
   lugar: string | null
   urgencia: string | null
   fecha_destinada: string | null
@@ -138,10 +139,11 @@ export async function consultarIncidencias(): Promise<IncidenciaMantenimiento[]>
   }
 }
 
-export async function consultarReportesEnCurso(): Promise<ReporteMantenimiento[]> {
+export async function consultarReportesEnCurso(id_reporte?: number): Promise<ReporteMantenimiento[]> {
   try {
     const response = await api.get<{ data: ReporteMantenimiento[] }>(
       'mantenimiento/routes/ver_reportes_en_curso.php',
+      id_reporte === undefined ? undefined : { params: { id_reporte } },
     )
     if (!Array.isArray(response.data?.data)) {
       throw new Error('El servidor devolvió una respuesta inválida al consultar reportes en curso.')
@@ -154,6 +156,27 @@ export async function consultarReportesEnCurso(): Promise<ReporteMantenimiento[]
     }))
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar los mantenimientos en curso.')
+  }
+}
+
+export async function finalizarReporte(
+  id_reporte: number,
+  fecha_final: string,
+  descripcion: string,
+) {
+  try {
+    const response = await api.patch<{
+      reporte: Pick<ReporteMantenimiento, 'id_reporte' | 'fecha_final' | 'estado' | 'descripcion'>
+    }>(
+      'mantenimiento/routes/finalizar_reporte.php',
+      { id_reporte, fecha_final, descripcion },
+    )
+    if (!response.data?.reporte) {
+      throw new Error('El servidor devolvió una respuesta inválida al concluir el servicio.')
+    }
+    return response.data.reporte
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible concluir el servicio.')
   }
 }
 

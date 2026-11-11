@@ -17,10 +17,24 @@ try {
     validar_csrf_requerido();
     requerir_rol([1, 2, 3]);
 
+    $id_reporte = null;
+    if (isset($_GET['id_reporte'])) {
+        $id_reporte = filter_var(
+            $_GET['id_reporte'],
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+        if ($id_reporte === false) {
+            http_response_code(400);
+            echo json_encode(["ERROR" => "El id_reporte debe ser un entero positivo"]);
+            exit;
+        }
+    }
+
     http_response_code(200);
     echo json_encode([
         "mensaje" => "Reportes en curso cargados correctamente",
-        "data" => ver_reportes_en_curso($pdo)
+        "data" => ver_reportes_en_curso($pdo, $id_reporte)
     ]);
 } catch (Throwable $e) {
     error_log("Error al consultar reportes de mantenimiento en curso: " . $e->getMessage());

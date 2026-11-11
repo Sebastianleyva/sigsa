@@ -130,6 +130,11 @@
   background: #fff;
 }
 
+.mantenimientos-curso-card-selected {
+  border-color: var(--curso-green);
+  box-shadow: 0 0 0 2px rgb(23 108 88 / 9%);
+}
+
 .mantenimientos-curso-card-header {
   display: flex;
   align-items: flex-start;
@@ -171,6 +176,32 @@
   color: #875b11;
 }
 
+.mantenimientos-curso-card-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.mantenimientos-curso-select {
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--curso-line);
+  color: var(--curso-green);
+  background: #fff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mantenimientos-curso-select:hover,
+.mantenimientos-curso-select[aria-pressed='true'] {
+  border-color: var(--curso-green);
+  background: #eef7f0;
+}
+
 .mantenimientos-curso-details {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -202,6 +233,48 @@
 
 .mantenimientos-curso-description dd {
   white-space: pre-wrap;
+}
+
+.mantenimientos-curso-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e7ece8;
+  color: var(--curso-muted);
+  font-size: 11px;
+}
+
+.mantenimientos-curso-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  color: #fff;
+  background: var(--curso-green);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mantenimientos-curso-actions button:hover {
+  background: #125642;
+}
+
+.mantenimientos-curso-actions button:focus-visible,
+.mantenimientos-curso-select:focus-visible {
+  outline: 3px solid #d9734d;
+  outline-offset: 2px;
+}
+
+.mantenimientos-curso-actions button > span {
+  font-size: 16px;
+  line-height: 1;
 }
 
 .mantenimientos-curso-message,
@@ -291,6 +364,11 @@
   }
 
   .mantenimientos-curso-card-header {
+    flex-direction: column;
+  }
+
+  .mantenimientos-curso-actions {
+    align-items: flex-start;
     flex-direction: column;
   }
 

@@ -12,6 +12,7 @@ function ver_reportes_requisicion($pdo) {
             r.estado,
             r.descripcion,
             i.lugar,
+            i.descripcion AS descripcion_incidencia,
             i.urgencia,
             c.fecha_destinada,
             s.nombre AS servicio,

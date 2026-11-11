@@ -36,6 +36,7 @@ export default function MantenimientosEnCurso() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [intentoCarga, setIntentoCarga] = useState(0)
+  const [seleccionadoId, setSeleccionadoId] = useState<number | null>(null)
 
   useEffect(() => {
     if (!autorizado) return
@@ -118,51 +119,93 @@ export default function MantenimientosEnCurso() {
 
         {!cargando && reportes.length > 0 && (
           <section className="mantenimientos-curso-list" aria-label="Reportes de mantenimiento activos">
-            {reportes.map((reporte) => (
-              <article className="mantenimientos-curso-card" key={reporte.id_reporte}>
-                <header className="mantenimientos-curso-card-header">
-                  <div>
-                    <span className="mantenimientos-curso-card-kicker">REPORTE #{reporte.id_reporte}</span>
-                    <h2>{mostrarOrigen(reporte)}</h2>
-                  </div>
-                  <span className={`mantenimientos-curso-status${reporte.estado.toLocaleUpperCase('es-MX').includes('ESPERA') ? ' mantenimientos-curso-status-espera' : ''}`}>
-                    {mostrarEstado(reporte.estado)}
-                  </span>
-                </header>
-                <dl className="mantenimientos-curso-details">
-                  <div>
-                    <dt>Origen</dt>
-                    <dd>{reporte.tipo.toLocaleLowerCase('es-MX') === 'incidencia' ? 'Incidencia reportada' : reporte.tipo}</dd>
-                  </div>
-                  <div>
-                    <dt>Inicio</dt>
-                    <dd>{mostrarFecha(reporte.fecha_inicio)}</dd>
-                  </div>
-                  {reporte.urgencia && (
+            {reportes.map((reporte) => {
+              const enCurso = reporte.estado.toLocaleUpperCase('es-MX') === 'EN CURSO'
+              const seleccionado = seleccionadoId === reporte.id_reporte
+              const descripcionReporte = reporte.descripcion.trim()
+              const descripcionIncidencia = reporte.descripcion_incidencia?.trim() ?? ''
+
+              return (
+                <article
+                  className={`mantenimientos-curso-card${seleccionado ? ' mantenimientos-curso-card-selected' : ''}`}
+                  key={reporte.id_reporte}
+                >
+                  <header className="mantenimientos-curso-card-header">
                     <div>
-                      <dt>Urgencia</dt>
-                      <dd>{reporte.urgencia}</dd>
+                      <span className="mantenimientos-curso-card-kicker">REPORTE #{reporte.id_reporte}</span>
+                      <h2>{mostrarOrigen(reporte)}</h2>
+                    </div>
+                    <div className="mantenimientos-curso-card-actions">
+                      <span className={`mantenimientos-curso-status${reporte.estado.toLocaleUpperCase('es-MX').includes('ESPERA') ? ' mantenimientos-curso-status-espera' : ''}`}>
+                        {mostrarEstado(reporte.estado)}
+                      </span>
+                      {enCurso && (
+                        <button
+                          className="mantenimientos-curso-select"
+                          type="button"
+                          aria-pressed={seleccionado}
+                          onClick={() => setSeleccionadoId(seleccionado ? null : reporte.id_reporte)}
+                        >
+                          {seleccionado ? 'Seleccionado' : 'Seleccionar'}
+                        </button>
+                      )}
+                    </div>
+                  </header>
+                  <dl className="mantenimientos-curso-details">
+                    <div>
+                      <dt>Origen</dt>
+                      <dd>{reporte.tipo.toLocaleLowerCase('es-MX') === 'incidencia' ? 'Incidencia reportada' : reporte.tipo}</dd>
+                    </div>
+                    <div>
+                      <dt>Inicio</dt>
+                      <dd>{mostrarFecha(reporte.fecha_inicio)}</dd>
+                    </div>
+                    {reporte.urgencia && (
+                      <div>
+                        <dt>Urgencia</dt>
+                        <dd>{reporte.urgencia}</dd>
+                      </div>
+                    )}
+                    {reporte.reportante && (
+                      <div>
+                        <dt>Reportó</dt>
+                        <dd>{reporte.reportante}</dd>
+                      </div>
+                    )}
+                    {reporte.fecha_destinada && (
+                      <div>
+                        <dt>Fecha programada</dt>
+                        <dd>{mostrarFecha(reporte.fecha_destinada)}</dd>
+                      </div>
+                    )}
+                    {descripcionIncidencia && (
+                      <div className="mantenimientos-curso-description">
+                        <dt>Descripción de la incidencia</dt>
+                        <dd>{descripcionIncidencia}</dd>
+                      </div>
+                    )}
+                    {descripcionReporte && descripcionReporte !== descripcionIncidencia && (
+                      <div className="mantenimientos-curso-description">
+                        <dt>Descripción del servicio realizado</dt>
+                        <dd>{descripcionReporte}</dd>
+                      </div>
+                    )}
+                  </dl>
+                  {seleccionado && enCurso && (
+                    <div className="mantenimientos-curso-actions">
+                      <span>El servicio está listo para registrar su conclusión.</span>
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/mantenimiento/reportes/${reporte.id_reporte}/concluir`)}
+                      >
+                        Concluir servicio
+                        <span aria-hidden="true">→</span>
+                      </button>
                     </div>
                   )}
-                  {reporte.reportante && (
-                    <div>
-                      <dt>Reportó</dt>
-                      <dd>{reporte.reportante}</dd>
-                    </div>
-                  )}
-                  {reporte.fecha_destinada && (
-                    <div>
-                      <dt>Fecha programada</dt>
-                      <dd>{mostrarFecha(reporte.fecha_destinada)}</dd>
-                    </div>
-                  )}
-                  <div className="mantenimientos-curso-description">
-                    <dt>Descripción</dt>
-                    <dd>{reporte.descripcion}</dd>
-                  </div>
-                </dl>
-              </article>
-            ))}
+                </article>
+              )
+            })}
           </section>
         )}
       </section>

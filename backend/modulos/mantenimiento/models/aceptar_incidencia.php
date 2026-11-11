@@ -63,7 +63,7 @@ function aceptar_incidencia($pdo, $input, $id_personal){
             ':id_incidencia' => $id_incidencia,
             ':fecha_inicio' => $fecha_inicio,
             ':estado' => $estado_reporte,
-            ':descripcion' => $incidencia['descripcion']
+            ':descripcion' => ''
         ]);
         $id_reporte = $pdo->lastInsertId();
 
