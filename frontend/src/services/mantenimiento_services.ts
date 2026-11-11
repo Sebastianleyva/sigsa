@@ -39,6 +39,10 @@ export type IncidenciaMantenimiento = {
   estado: string
   lugar: string
 }
+type ReporteIncidenciaCreado = {
+  id_reporte: number | string
+  estado: string
+}
 type DatosIncidencia = {
   lugar: string
   urgencia: string
@@ -106,28 +110,42 @@ export async function consultarIncidencias(): Promise<IncidenciaMantenimiento[]>
   }
 }
 
-async function procesarIncidencia(id_incidencia: number, decision: 'aceptar' | 'rechazar') {
+async function procesarIncidencia(
+  id_incidencia: number,
+  decision: 'aceptar' | 'rechazar',
+  requiere_requisicion?: boolean,
+) {
   try {
-    const response = await api.patch<{ incidencia: IncidenciaMantenimiento }>(
+    const response = await api.patch<{
+      incidencia: IncidenciaMantenimiento
+      reporte?: ReporteIncidenciaCreado
+    }>(
       `mantenimiento/routes/${decision}_incidencia.php`,
-      { id_incidencia },
+      decision === 'aceptar'
+        ? { id_incidencia, requiere_requisicion }
+        : { id_incidencia },
     )
-    if (!response.data?.incidencia) {
+    if (!response.data?.incidencia || (decision === 'aceptar' && !response.data.reporte)) {
       throw new Error('El servidor devolvió una respuesta inválida al procesar la incidencia.')
     }
-    return response.data.incidencia
+    return response.data
   } catch (error) {
     const accion = decision === 'aceptar' ? 'aceptar' : 'rechazar'
     throw obtenerError(error, `No fue posible ${accion} la incidencia.`)
   }
 }
 
-export function aceptarIncidencia(id_incidencia: number) {
-  return procesarIncidencia(id_incidencia, 'aceptar')
+export async function aceptarIncidencia(id_incidencia: number, requiere_requisicion: boolean) {
+  const resultado = await procesarIncidencia(id_incidencia, 'aceptar', requiere_requisicion)
+  if (!resultado.reporte) {
+    throw new Error('El servidor no devolvió el reporte creado para la incidencia.')
+  }
+  return { incidencia: resultado.incidencia, reporte: resultado.reporte }
 }
 
-export function rechazarIncidencia(id_incidencia: number) {
-  return procesarIncidencia(id_incidencia, 'rechazar')
+export async function rechazarIncidencia(id_incidencia: number) {
+  const resultado = await procesarIncidencia(id_incidencia, 'rechazar')
+  return resultado.incidencia
 }
 
 export async function consultarServicios() {

@@ -73,27 +73,38 @@ export default function VerIncidenciasMantenimiento() {
     if (!incidencia || normalizarEstado(incidencia.estado) !== 'PENDIENTE') return
 
     const accion = decision === 'aceptar' ? 'aceptar' : 'rechazar'
-    if (!window.confirm(`¿Confirmas que deseas ${accion} la incidencia #${incidencia.id_incidencia}?`)) return
+    const requiereRequisicion = decision === 'aceptar'
+      ? window.confirm(
+          `¿El servicio para la incidencia #${incidencia.id_incidencia} requerirá una requisición?\n\nSelecciona Aceptar para Sí o Cancelar para No.`,
+        )
+      : false
+    if (decision === 'rechazar' && !window.confirm(`¿Confirmas que deseas rechazar la incidencia #${incidencia.id_incidencia}?`)) return
 
     setProcesandoId(seleccionada)
     setAviso(null)
     try {
-      const resultado = decision === 'aceptar'
-        ? await aceptarIncidencia(seleccionada)
-        : await rechazarIncidencia(seleccionada)
-      setIncidencias((actuales) => actuales.map((item) => (
-        item.id_incidencia === seleccionada
-          ? {
-              ...item,
-              estado: resultado.estado,
-              id_autoriza: resultado.id_autoriza === null ? item.id_autoriza : Number(resultado.id_autoriza),
-            }
-          : item
-      )))
+      let mensaje: string
+      if (decision === 'aceptar') {
+        const resultado = await aceptarIncidencia(seleccionada, requiereRequisicion)
+        setIncidencias((actuales) => actuales.filter((item) => item.id_incidencia !== seleccionada))
+        mensaje = `La incidencia #${incidencia.id_incidencia} fue aceptada. Se creó un reporte ${resultado.reporte.estado.toLocaleLowerCase('es-MX')}.`
+      } else {
+        const resultado = await rechazarIncidencia(seleccionada)
+        setIncidencias((actuales) => actuales.map((item) => (
+          item.id_incidencia === seleccionada
+            ? {
+                ...item,
+                estado: resultado.estado,
+                id_autoriza: resultado.id_autoriza === null ? item.id_autoriza : Number(resultado.id_autoriza),
+              }
+            : item
+        )))
+        mensaje = `La incidencia #${incidencia.id_incidencia} fue rechazada.`
+      }
       setSeleccionada(null)
       setAviso({
         tipo: 'exito',
-        mensaje: `La incidencia #${incidencia.id_incidencia} fue ${decision === 'aceptar' ? 'aceptada' : 'rechazada'}.`,
+        mensaje,
       })
     } catch (error) {
       setAviso({

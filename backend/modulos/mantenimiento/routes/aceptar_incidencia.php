@@ -25,11 +25,12 @@ try{
     }
 
     $id_personal = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-    $incidencia = aceptar_incidencia($pdo, $input, $id_personal);
+    $resultado = aceptar_incidencia($pdo, $input, $id_personal);
 
     http_response_code(200);
     echo json_encode(["mensaje" => "Incidencia aceptada exitosamente",
-        "incidencia" => $incidencia]);
+        "incidencia" => $resultado['incidencia'],
+        "reporte" => $resultado['reporte']]);
 
 } catch (InvalidArgumentException $e) {
     http_response_code(400);

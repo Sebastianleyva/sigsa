@@ -16,6 +16,7 @@ function ver_incidencias($pdo) {
             p.apellido_m
         FROM incidencias i
         LEFT JOIN personal p ON p.id_personal = i.id_personal
+        WHERE UPPER(i.estado) <> 'ACEPTADA'
         ORDER BY i.fecha DESC, i.id_incidencia DESC"
     );
     $incidencias = $query->fetchAll(PDO::FETCH_ASSOC);
