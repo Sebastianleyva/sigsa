@@ -218,12 +218,25 @@ export default function CrearRequisicionMantenimiento() {
                   {opciones.director ? nombreCompleto(opciones.director) : 'No hay director activo configurado'}
                 </div>
               </div>
-              <div className="requisiciones-mantenimiento-elabora"><span>Elabora</span><strong>{elabora ? nombreCompleto(elabora) : 'No disponible'}</strong><small>{elabora?.correo} · Extensión Cisco: {elabora?.telefono ?? 'No registrada'}</small></div>
+              <div className="requisiciones-mantenimiento-elabora">
+                <span>Elabora</span>
+                <strong>{elabora ? nombreCompleto(elabora) : 'No disponible'}</strong>
+                <small>{elabora?.correo} · Extensión Cisco: {elabora?.telefono ?? 'No registrada'}</small>
+              </div>
               {error && <p className="requisiciones-mantenimiento-error" role="alert">{error}</p>}
               {idRequisicion ? (
-                <div className="requisiciones-mantenimiento-success" role="status"><p>La requisición #{idRequisicion} fue registrada correctamente.</p><button className="requisiciones-mantenimiento-pdf-button" type="button" onClick={() => { const ventana = window.open('', '_blank'); void obtenerPdfRequisicion(idRequisicion).then((url) => { if (ventana) ventana.location.href = url }).catch(() => { ventana?.close(); setError('No fue posible generar el documento oficial.') }) }}>Imprimir / Descargar PDF Oficial</button></div>
+                <div className="requisiciones-mantenimiento-success" role="status">
+                  <p>La requisición #{idRequisicion} fue registrada correctamente.</p>
+                  <button className="requisiciones-mantenimiento-pdf-button" type="button" onClick={() => {
+                    const ventana = window.open('', '_blank'); void obtenerPdfRequisicion(idRequisicion).then((url) => { if (ventana) ventana.location.href = url }).catch(() => { ventana?.close(); setError('No fue posible generar el documento oficial.') })
+                  }}>Imprimir / Descargar PDF Oficial</button>
+                </div>
               ) : (
-                <div className="requisiciones-mantenimiento-form-footer"><button type="button" className="requisiciones-mantenimiento-cancel" onClick={() => navigate('/mantenimiento/requisiciones')}>Cancelar</button><button type="submit" disabled={guardando}>{guardando ? 'Guardando…' : 'Enviar requisición'}</button></div>
+                <div className="requisiciones-mantenimiento-form-footer">
+                  <button type="button" className="requisiciones-mantenimiento-cancel" onClick={() =>
+                    navigate('/mantenimiento/requisiciones')}>Cancelar</button>
+                  <button type="submit" disabled={guardando}>{guardando ? 'Guardando…' : 'Enviar requisición'}</button>
+                </div>
               )}
             </section>
           </form>
