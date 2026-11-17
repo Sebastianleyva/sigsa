@@ -33,7 +33,9 @@ function ver_historial_reportes($pdo, $mes, $anio) {
         LEFT JOIN personal pr ON pr.id_personal = r.id_personal
         LEFT JOIN calendario c ON c.id_calendario = r.id_calendario
         LEFT JOIN servicios s ON s.id_servicio = c.id_servicio
-        WHERE MONTH(r.fecha_inicio) = :mes AND YEAR(r.fecha_inicio) = :anio
+        WHERE UPPER(TRIM(r.estado)) = 'FINALIZADO'
+          AND MONTH(r.fecha_inicio) = :mes
+          AND YEAR(r.fecha_inicio) = :anio
         ORDER BY r.fecha_inicio DESC, r.id_reporte DESC"
     );
     $query->execute([':mes' => $mes, ':anio' => $anio]);
