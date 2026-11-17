@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 17, 2026 at 05:20 PM
+-- Generation Time: Nov 17, 2026 at 07:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -99,7 +99,9 @@ INSERT INTO `incidencias` (`id_incidencia`, `id_personal`, `id_autoriza`, `descr
 (3, 20, 20, 'se murio', '2026-11-11', 'ALTA', 'ACEPTADA', 'en el departamento de sistrenas'),
 (4, 20, 20, 'ssss', '2026-11-11', 'MEDIA', 'ACEPTADA', 'ennnn'),
 (5, 20, 20, 'se fundió un foco y quemo el techo', '2026-11-11', 'BAJA', 'ACEPTADA', 'departamento de sistemas'),
-(6, 20, 13, 'se rompió el suelo', '2026-11-17', 'MEDIA', 'ACEPTADA', 'pasillo de la cocina');
+(6, 20, 13, 'se rompió el suelo', '2026-11-17', 'MEDIA', 'ACEPTADA', 'pasillo de la cocina'),
+(7, 13, 13, 'sse rompio una puerta', '2026-11-17', 'MEDIA', 'ACEPTADA', 'en la cocina'),
+(8, 20, 18, 'exploto el microondas', '2026-11-17', 'MEDIA', 'ACEPTADA', 'cocina');
 
 -- --------------------------------------------------------
 
@@ -169,7 +171,7 @@ CREATE TABLE `reportes` (
   `tipo` text NOT NULL COMMENT 'guarda información sobre la procedencia del reporte (reporte por incidencia o calendario)',
   `id_calendario` bigint(20) DEFAULT NULL COMMENT 'identificador del calendario',
   `id_incidencia` bigint(20) DEFAULT NULL COMMENT 'identificador de la incidencia',
-  `id_personal` bigint(20) DEFAULT NULL COMMENT 'identificador de la persona que generó el reporte',
+  `id_personal` bigint(20) DEFAULT NULL COMMENT 'identificador del personal',
   `fecha_inicio` date NOT NULL COMMENT 'fecha en la que se comienza el reporte del servicio',
   `fecha_final` date DEFAULT NULL COMMENT 'fecha en la que se finaliza el servicio y su reporte',
   `estado` varchar(20) NOT NULL COMMENT 'estado en el que se encuentra el servicio de mantenimiento (en curso, en espera de requisicon, finalizado)',
@@ -185,7 +187,9 @@ INSERT INTO `reportes` (`id_reporte`, `tipo`, `id_calendario`, `id_incidencia`, 
 (3, 'incidencia', NULL, 3, NULL, '2026-11-11', '2026-11-17', 'FINALIZADO', 'lo revivieron'),
 (4, 'incidencia', NULL, 4, NULL, '2026-11-11', NULL, 'ESPERA REQUISICIÓN', 'ssss'),
 (5, 'incidencia', NULL, 5, NULL, '2026-11-11', '2026-11-10', 'FINALIZADO', 'se compró un nuevo foco en tal sucursal con tal dinero y lo puso tal poersona'),
-(6, 'incidencia', NULL, 6, NULL, '2026-11-17', '2026-11-17', 'FINALIZADO', 'se resano el piso con dos horas de antricipacion');
+(6, 'incidencia', NULL, 6, NULL, '2026-11-17', '2026-11-17', 'FINALIZADO', 'se resano el piso con dos horas de antricipacion'),
+(7, 'incidencia', NULL, 7, NULL, '2026-11-17', NULL, 'ESPERA REQUISICIÓN', ''),
+(8, 'incidencia', NULL, 8, 18, '2026-11-17', NULL, 'ESPERA REQUISICIÓN', '');
 
 -- --------------------------------------------------------
 
@@ -200,6 +204,7 @@ CREATE TABLE `requisiciones` (
   `id_autoriza` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que autoriza la requisición',
   `fecha` date NOT NULL COMMENT 'fecha en la que se realiza la requisición',
   `fecha_entrega` date DEFAULT NULL COMMENT 'fecha en la que se entrega la requisición a las oficinas centrales',
+  `justificacion` text DEFAULT NULL,
   `descripcion_servicio` text NOT NULL COMMENT 'descripción del servicio para el que se necesita la requisición',
   `estado` varchar(20) NOT NULL COMMENT 'estado en el que se encuentra la requisición (pendiente, en curso, aprovada o rechazada)',
   `tipo_financiamiento` text NOT NULL COMMENT 'tipo de financiamiento que recibe la requisición',
@@ -210,9 +215,9 @@ CREATE TABLE `requisiciones` (
 -- Dumping data for table `requisiciones`
 --
 
-INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `fecha`, `fecha_entrega`, `descripcion_servicio`, `estado`, `tipo_financiamiento`, `id_elabora`) VALUES
-(2, 2, 14, 13, '2026-11-04', NULL, 'necesito dos panes', 'pendiente', 'est', 0),
-(3, 2, 14, NULL, '2026-11-04', NULL, 'sss', 'sss', 'sss', 0);
+INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `fecha`, `fecha_entrega`, `justificacion`, `descripcion_servicio`, `estado`, `tipo_financiamiento`, `id_elabora`) VALUES
+(2, 2, 14, 13, '2026-11-04', NULL, NULL, 'necesito dos panes', 'pendiente', 'est', 0),
+(3, 2, 14, NULL, '2026-11-04', NULL, NULL, 'sss', 'sss', 'sss', 0);
 
 -- --------------------------------------------------------
 
@@ -403,7 +408,7 @@ ALTER TABLE `calendario`
 -- AUTO_INCREMENT for table `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `personal`
@@ -421,7 +426,7 @@ ALTER TABLE `puestos`
 -- AUTO_INCREMENT for table `reportes`
 --
 ALTER TABLE `reportes`
-  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=7;
+  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `requisiciones`
