@@ -2,24 +2,25 @@ import { type FormEvent, useEffect, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { authService } from '../../services/auth_services.js'
 import {
+  consultarOpcionesRequisicion,
   consultarReportesRequisicion,
   crearRequisicion,
+  obtenerPdfRequisicion,
+  type DetalleRequisicion,
+  type OpcionesRequisicion,
   type ReporteRequisicion,
 } from '../../services/mantenimiento_services'
 import './styles/requisiciones_mantenimiento.css'
 
-type FormularioRequisicion = {
-  justificacion: string
-  fecha: string
-  descripcion_servicio: string
-  tipo_financiamiento: string
+const AREA_SOLICITANTE = 'DIRECCIÓN DE SISTEMAS Y TECNOLOGÍAS'
+const CUENTA_CARGO = '1-99999-51351001-5101-25021-1-2110008020010-2501-134020506-5050001-61015-015'
+
+function fechaActual() {
+  return new Date().toISOString().slice(0, 10)
 }
 
-const formularioVacio: FormularioRequisicion = {
-  justificacion: '',
-  fecha: '',
-  descripcion_servicio: '',
-  tipo_financiamiento: '',
+function nombreCompleto(persona: { nombre: string; apellido_p: string; apellido_m: string }) {
+  return `${persona.nombre} ${persona.apellido_p} ${persona.apellido_m}`.trim()
 }
 
 function mostrarFecha(fecha: string) {
@@ -38,6 +39,10 @@ function mostrarOrigen(reporte: ReporteRequisicion) {
   return 'Mantenimiento'
 }
 
+function detalleVacio(): DetalleRequisicion {
+  return { num_lote: '', cantidad: null, descripcion: '' }
+}
+
 export default function CrearRequisicionMantenimiento() {
   const navigate = useNavigate()
   const { id_reporte: idReporteParam } = useParams()
@@ -46,40 +51,43 @@ export default function CrearRequisicionMantenimiento() {
   const idReporte = Number(idReporteParam)
   const parametroValido = Number.isInteger(idReporte) && idReporte > 0
   const [reporte, setReporte] = useState<ReporteRequisicion | null>(null)
-  const [formulario, setFormulario] = useState<FormularioRequisicion>(formularioVacio)
+  const [opciones, setOpciones] = useState<OpcionesRequisicion | null>(null)
+  const [fecha, setFecha] = useState(fechaActual)
+  const [fechaEntrega, setFechaEntrega] = useState('')
+  const [justificacion, setJustificacion] = useState('')
+  const [idSolicita, setIdSolicita] = useState('')
+  const [idAutoriza, setIdAutoriza] = useState('')
+  const [detalles, setDetalles] = useState<DetalleRequisicion[]>([detalleVacio()])
   const [cargando, setCargando] = useState(true)
   const [guardando, setGuardando] = useState(false)
+  const [errorCarga, setErrorCarga] = useState('')
   const [error, setError] = useState('')
-  const [mensaje, setMensaje] = useState('')
+  const [idRequisicion, setIdRequisicion] = useState<number | null>(null)
 
   useEffect(() => {
     if (!autorizado || !parametroValido) return
-
     let vigente = true
-    consultarReportesRequisicion()
-      .then((reportes) => {
+    Promise.all([consultarReportesRequisicion(), consultarOpcionesRequisicion()])
+      .then(([reportes, opcionesCargadas]) => {
         if (!vigente) return
         const resultado = reportes.find((item) => item.id_reporte === idReporte) ?? null
-        setReporte(resultado)
-        if (resultado) {
-          setFormulario((actual) => ({
-            ...actual,
-            descripcion_servicio: resultado.descripcion,
-          }))
+        if (!resultado) {
+          setErrorCarga('El reporte no está disponible para requisición.')
+        } else if (resultado.id_requisicion !== null) {
+          setErrorCarga('Este reporte ya tiene una requisición registrada.')
+        } else {
+          setReporte(resultado)
+          setOpciones(opcionesCargadas)
+          setIdSolicita(String(opcionesCargadas.elabora?.id_personal ?? ''))
+          setIdAutoriza(String(opcionesCargadas.personal.find((persona) => persona.id_personal !== opcionesCargadas.elabora?.id_personal)?.id_personal ?? ''))
         }
-        if (!resultado) setError('El reporte no está disponible para requisición.')
       })
       .catch((errorCarga: unknown) => {
-        if (vigente) {
-          setError(errorCarga instanceof Error
-            ? errorCarga.message
-            : 'No fue posible consultar el reporte.')
-        }
+        if (vigente) setErrorCarga(errorCarga instanceof Error ? errorCarga.message : 'No fue posible cargar el formulario.')
       })
       .finally(() => {
         if (vigente) setCargando(false)
       })
-
     return () => {
       vigente = false
     }
@@ -87,32 +95,54 @@ export default function CrearRequisicionMantenimiento() {
 
   if (!autorizado) return <Navigate to="/mantenimiento" replace />
 
-  function actualizarCampo(campo: keyof FormularioRequisicion, valor: string) {
-    setFormulario((actual) => ({ ...actual, [campo]: valor }))
+  function actualizarDetalle(indice: number, campo: keyof DetalleRequisicion, valor: string) {
+    setDetalles((actuales) => actuales.map((detalle, actual) => {
+      if (actual !== indice) return detalle
+      if (campo === 'cantidad') return { ...detalle, cantidad: valor === '' ? null : Number(valor) }
+      return { ...detalle, [campo]: valor }
+    }))
+  }
+
+  function agregarDetalle() {
+    setDetalles((actuales) => [...actuales, detalleVacio()])
+  }
+
+  function eliminarDetalle(indice: number) {
+    setDetalles((actuales) => actuales.length === 1 ? actuales : actuales.filter((_, actual) => actual !== indice))
   }
 
   async function enviarFormulario(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!reporte || guardando || reporte.id_requisicion !== null) return
-
+    if (!reporte || !opciones || guardando) return
+    if (!detalles.some((detalle) => detalle.descripcion.trim() !== '')) {
+      setError('Agrega al menos un renglón con descripción.')
+      return
+    }
+    if (!idSolicita || !idAutoriza) {
+      setError('Selecciona quién solicita y quién autoriza la requisición.')
+      return
+    }
     setError('')
-    setMensaje('')
     setGuardando(true)
     try {
-      const requisicion = await crearRequisicion({
+      const resultado = await crearRequisicion({
         id_reporte: reporte.id_reporte,
-        ...formulario,
+        fecha,
+        fecha_entrega: fechaEntrega || null,
+        justificacion: justificacion.trim(),
+        id_solicita: Number(idSolicita),
+        id_autoriza: Number(idAutoriza),
+        detalles: detalles.filter((detalle) => detalle.descripcion.trim() !== ''),
       })
-      setMensaje(`La requisición #${requisicion.id_requisicion} quedó registrada y está en espera.`)
-      setReporte((actual) => actual
-        ? { ...actual, id_requisicion: Number(requisicion.id_requisicion), estado_requisicion: requisicion.estado }
-        : actual)
+      setIdRequisicion(Number(resultado.id_requisicion))
     } catch (errorCreacion: unknown) {
       setError(errorCreacion instanceof Error ? errorCreacion.message : 'No fue posible crear la requisición.')
     } finally {
       setGuardando(false)
     }
   }
+
+  const elabora = opciones?.elabora
 
   return (
     <main className="requisiciones-mantenimiento-page">
@@ -124,91 +154,91 @@ export default function CrearRequisicionMantenimiento() {
         <span>GESTIÓN DE REQUISICIONES</span>
       </header>
 
-      <section className="requisiciones-mantenimiento-content">
+      <section className="requisiciones-mantenimiento-content requisiciones-mantenimiento-form-page">
         <button className="requisiciones-mantenimiento-back" type="button" onClick={() => navigate('/mantenimiento/requisiciones')}>
           ← Volver a requisiciones
         </button>
-
         <div className="requisiciones-mantenimiento-heading">
           <div>
             <span className="requisiciones-mantenimiento-eyebrow">ADMINISTRACIÓN · SIGSA</span>
             <h1>Nueva requisición</h1>
-            <p>Completa los datos de la requisición para el mantenimiento seleccionado.</p>
+            <p>Completa los datos oficiales de la solicitud vinculada al reporte #{idReporteParam}.</p>
           </div>
         </div>
 
-        {parametroValido && cargando && <p className="requisiciones-mantenimiento-message" role="status">Cargando reporte…</p>}
         {!parametroValido && <p className="requisiciones-mantenimiento-error" role="alert">El número de reporte no es válido.</p>}
-        {!cargando && error && <p className="requisiciones-mantenimiento-error" role="alert">{error}</p>}
-        {!cargando && !error && reporte && reporte.id_requisicion !== null && (
-          <p className="requisiciones-mantenimiento-error" role="alert">Este reporte ya tiene una requisición registrada.</p>
-        )}
-        {!cargando && !error && reporte && reporte.id_requisicion === null && (
-          <section className="requisiciones-mantenimiento-form-panel" aria-labelledby="requisicion-form-title">
-            <div className="requisiciones-mantenimiento-form-heading">
-              <div>
-                <span className="requisiciones-mantenimiento-section-index">
-                  REPORTE #{reporte.id_reporte} · {mostrarOrigen(reporte)}
-                </span>
-                <h2 id="requisicion-form-title">Completa los datos de la solicitud</h2>
-                <p>
-                  Inicio del mantenimiento: {mostrarFecha(reporte.fecha_inicio)}. La requisición se guardará en espera.
-                </p>
+        {parametroValido && cargando && <p className="requisiciones-mantenimiento-message" role="status">Cargando datos del reporte…</p>}
+        {!cargando && errorCarga && <p className="requisiciones-mantenimiento-error" role="alert">{errorCarga}</p>}
+        {!cargando && !errorCarga && reporte && opciones && (
+          <form className="requisiciones-mantenimiento-official-form" onSubmit={(event) => void enviarFormulario(event)}>
+            <section className="requisiciones-mantenimiento-official-header" aria-label="Datos institucionales">
+              <div><span>Área solicitante</span><strong>{AREA_SOLICITANTE}</strong></div>
+              <div><span>Cuenta(s) cargo</span><strong>{CUENTA_CARGO}</strong></div>
+              <div><span>Financiamiento</span><strong>FONE</strong></div>
+              <div><span>Programas federales</span><strong>N/A</strong></div>
+              <div><span>Folio</span><strong>Se asigna en oficinas centrales</strong></div>
+            </section>
+
+            <section className="requisiciones-mantenimiento-form-panel" aria-labelledby="datos-tramite-title">
+              <div className="requisiciones-mantenimiento-form-heading">
+                <div>
+                  <span className="requisiciones-mantenimiento-section-index">DATOS GENERALES · REPORTE #{reporte.id_reporte}</span>
+                  <h2 id="datos-tramite-title">Datos generales del trámite</h2>
+                  <p>{mostrarOrigen(reporte)} · Inicio: {mostrarFecha(reporte.fecha_inicio)}</p>
+                </div>
               </div>
-            </div>
-
-            {mensaje && <p className="requisiciones-mantenimiento-success" role="status">{mensaje}</p>}
-            <form className="requisiciones-mantenimiento-form" onSubmit={(event) => void enviarFormulario(event)}>
-              <label htmlFor="requisicion-justificacion">Justificación <span>*</span></label>
-              <textarea
-                id="requisicion-justificacion"
-                value={formulario.justificacion}
-                onChange={(event) => actualizarCampo('justificacion', event.target.value)}
-                rows={3}
-                required
-              />
-
-              <label htmlFor="requisicion-fecha">Fecha de solicitud <span>*</span></label>
-              <input
-                id="requisicion-fecha"
-                type="date"
-                value={formulario.fecha}
-                onChange={(event) => actualizarCampo('fecha', event.target.value)}
-                required
-              />
-
-              <label htmlFor="requisicion-descripcion">Descripción del servicio <span>*</span></label>
-              <textarea
-                id="requisicion-descripcion"
-                value={formulario.descripcion_servicio}
-                onChange={(event) => actualizarCampo('descripcion_servicio', event.target.value)}
-                rows={4}
-                required
-              />
-
-              <label htmlFor="requisicion-financiamiento">Tipo de financiamiento <span>*</span></label>
-              <input
-                id="requisicion-financiamiento"
-                value={formulario.tipo_financiamiento}
-                onChange={(event) => actualizarCampo('tipo_financiamiento', event.target.value)}
-                required
-              />
-
-              <div className="requisiciones-mantenimiento-form-footer">
-                <button type="button" className="requisiciones-mantenimiento-cancel" onClick={() => navigate('/mantenimiento/requisiciones')}>
-                  Cancelar
-                </button>
-                <button type="submit" disabled={guardando}>
-                  {guardando ? 'Guardando…' : 'Enviar requisición'}
-                </button>
+              <div className="requisiciones-mantenimiento-form-grid">
+                <label htmlFor="requisicion-fecha">Fecha <span>*</span></label>
+                <input id="requisicion-fecha" type="date" value={fecha} onChange={(event) => setFecha(event.target.value)} required />
+                <label htmlFor="requisicion-fecha-entrega">Fecha de entrega</label>
+                <input id="requisicion-fecha-entrega" type="date" value={fechaEntrega} onChange={(event) => setFechaEntrega(event.target.value)} />
               </div>
-            </form>
-          </section>
-        )}
-        {mensaje && reporte?.id_requisicion !== null && (
-          <button type="button" className="requisiciones-mantenimiento-select" onClick={() => navigate('/mantenimiento/requisiciones')}>
-            Volver a requisiciones
-          </button>
+            </section>
+
+            <section className="requisiciones-mantenimiento-form-panel" aria-labelledby="partidas-title">
+              <div className="requisiciones-mantenimiento-form-heading">
+                <div><span className="requisiciones-mantenimiento-section-index">REQUISICIÓN · PARTIDAS</span><h2 id="partidas-title">Partidas y conceptos</h2></div>
+                <button className="requisiciones-mantenimiento-add-row" type="button" onClick={agregarDetalle}>+ Agregar renglón</button>
+              </div>
+              <div className="requisiciones-mantenimiento-details-table">
+                <div className="requisiciones-mantenimiento-details-header"><span>Núm. lote</span><span>Cantidad</span><span>Descripción del servicio y/o especificaciones</span><span aria-hidden="true" /></div>
+                {detalles.map((detalle, indice) => (
+                  <div className="requisiciones-mantenimiento-detail-row" key={indice}>
+                    <input aria-label={`Núm. lote del renglón ${indice + 1}`} value={detalle.num_lote} onChange={(event) => actualizarDetalle(indice, 'num_lote', event.target.value)} />
+                    <input aria-label={`Cantidad del renglón ${indice + 1}`} type="number" min="0" step="1" value={detalle.cantidad ?? ''} onChange={(event) => actualizarDetalle(indice, 'cantidad', event.target.value)} />
+                    <textarea aria-label={`Descripción del renglón ${indice + 1}`} value={detalle.descripcion} onChange={(event) => actualizarDetalle(indice, 'descripcion', event.target.value)} required rows={2} />
+                    <button className="requisiciones-mantenimiento-remove-row" type="button" onClick={() => eliminarDetalle(indice)} disabled={detalles.length === 1} aria-label={`Eliminar renglón ${indice + 1}`}>×</button>
+                  </div>
+                ))}
+              </div>
+              <small className="requisiciones-mantenimiento-hint">Núm. lote y cantidad son opcionales; pueden quedar vacíos para subtítulos o encabezados.</small>
+            </section>
+
+            <section className="requisiciones-mantenimiento-form-panel" aria-labelledby="firmas-title">
+              <div className="requisiciones-mantenimiento-form-heading"><div><span className="requisiciones-mantenimiento-section-index">JUSTIFICACIÓN Y FIRMAS</span><h2 id="firmas-title">Responsables del trámite</h2></div></div>
+              <label htmlFor="requisicion-justificacion">Justificación técnica <span>*</span></label>
+              <textarea id="requisicion-justificacion" value={justificacion} onChange={(event) => setJustificacion(event.target.value)} rows={4} required />
+              <div className="requisiciones-mantenimiento-form-grid">
+                <label htmlFor="requisicion-solicita">Solicita <span>*</span></label>
+                <select id="requisicion-solicita" value={idSolicita} onChange={(event) => setIdSolicita(event.target.value)} required>
+                  <option value="">Selecciona una persona</option>
+                  {opciones.personal.map((persona) => <option key={persona.id_personal} value={persona.id_personal}>{nombreCompleto(persona)}</option>)}
+                </select>
+                <label htmlFor="requisicion-autoriza">Autoriza <span>*</span></label>
+                <select id="requisicion-autoriza" value={idAutoriza} onChange={(event) => setIdAutoriza(event.target.value)} required>
+                  <option value="">Selecciona una persona</option>
+                  {opciones.personal.map((persona) => <option key={persona.id_personal} value={persona.id_personal}>{nombreCompleto(persona)}</option>)}
+                </select>
+              </div>
+              <div className="requisiciones-mantenimiento-elabora"><span>Elabora</span><strong>{elabora ? nombreCompleto(elabora) : 'No disponible'}</strong><small>{elabora?.correo} · Extensión Cisco: {elabora?.telefono ?? 'No registrada'}</small></div>
+              {error && <p className="requisiciones-mantenimiento-error" role="alert">{error}</p>}
+              {idRequisicion ? (
+                <div className="requisiciones-mantenimiento-success" role="status"><p>La requisición #{idRequisicion} fue registrada correctamente.</p><button className="requisiciones-mantenimiento-pdf-button" type="button" onClick={() => { const ventana = window.open('', '_blank'); void obtenerPdfRequisicion(idRequisicion).then((url) => { if (ventana) ventana.location.href = url }).catch(() => { ventana?.close(); setError('No fue posible generar el documento oficial.') }) }}>Imprimir / Descargar PDF Oficial</button></div>
+              ) : (
+                <div className="requisiciones-mantenimiento-form-footer"><button type="button" className="requisiciones-mantenimiento-cancel" onClick={() => navigate('/mantenimiento/requisiciones')}>Cancelar</button><button type="submit" disabled={guardando}>{guardando ? 'Guardando…' : 'Enviar requisición'}</button></div>
+              )}
+            </section>
+          </form>
         )}
       </section>
     </main>

@@ -68,6 +68,24 @@ export type RequisicionMantenimiento = {
   estado: string
   tipo_financiamiento: string
 }
+export type DetalleRequisicion = {
+  num_lote: string
+  cantidad: number | null
+  descripcion: string
+}
+export type PersonaRequisicion = {
+  id_personal: number
+  nombre: string
+  apellido_p: string
+  apellido_m: string
+  correo: string
+  telefono: string
+  puesto: number
+}
+export type OpcionesRequisicion = {
+  personal: PersonaRequisicion[]
+  elabora: PersonaRequisicion | null
+}
 export type RequisicionReporte = {
   id_requisicion: number
   id_reporte: number
@@ -273,7 +291,15 @@ export async function consultarReportesRequisicion(): Promise<ReporteRequisicion
 }
 
 export async function crearRequisicion(
-  datos: Pick<RequisicionMantenimiento, 'id_reporte' | 'justificacion' | 'fecha' | 'descripcion_servicio' | 'tipo_financiamiento'>,
+  datos: {
+    id_reporte: number
+    fecha: string
+    fecha_entrega: string | null
+    justificacion: string
+    id_solicita: number
+    id_autoriza: number
+    detalles: DetalleRequisicion[]
+  },
 ): Promise<RequisicionMantenimiento> {
   try {
     const response = await api.post<{ requisicion: RequisicionMantenimiento }>(
@@ -287,6 +313,26 @@ export async function crearRequisicion(
   } catch (error) {
     throw obtenerError(error, 'No fue posible crear la requisición.')
   }
+}
+
+export async function consultarOpcionesRequisicion(): Promise<OpcionesRequisicion> {
+  try {
+    const response = await api.get<OpcionesRequisicion>('mantenimiento/routes/opciones_requisicion.php')
+    if (!Array.isArray(response.data?.personal) || !response.data?.elabora) {
+      throw new Error('El servidor devolvió opciones inválidas para la requisición.')
+    }
+    return response.data
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar el personal para la requisición.')
+  }
+}
+
+export async function obtenerPdfRequisicion(id_requisicion: number) {
+  const response = await api.get<Blob>(
+    `mantenimiento/routes/generar_pdf_requisicion.php?id=${id_requisicion}`,
+    { responseType: 'blob' },
+  )
+  return URL.createObjectURL(response.data)
 }
 
 export async function aceptarRequisicion(id_requisicion: number) {

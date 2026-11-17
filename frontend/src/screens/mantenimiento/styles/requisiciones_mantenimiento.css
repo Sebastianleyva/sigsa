@@ -3,6 +3,7 @@
   --requisiciones-muted: #687973;
   --requisiciones-green: #176c58;
   --requisiciones-line: #d9e3dc;
+  --requisiciones-coral: #d9734d;
   min-height: 100svh;
   color: var(--requisiciones-ink);
   background: #f2f6f3;
@@ -244,6 +245,175 @@
   background: #fff;
 }
 
+.requisiciones-mantenimiento-official-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.requisiciones-mantenimiento-official-header {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  border: 1px solid var(--requisiciones-line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--requisiciones-line);
+}
+
+.requisiciones-mantenimiento-official-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 16px;
+  background: #fff;
+}
+
+.requisiciones-mantenimiento-official-header span,
+.requisiciones-mantenimiento-elabora span {
+  color: var(--requisiciones-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.requisiciones-mantenimiento-official-header strong,
+.requisiciones-mantenimiento-elabora strong {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.requisiciones-mantenimiento-form-grid {
+  display: grid;
+  grid-template-columns: minmax(130px, .35fr) minmax(220px, 1fr);
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.requisiciones-mantenimiento-form-grid input,
+.requisiciones-mantenimiento-form-grid select,
+.requisiciones-mantenimiento-form-panel > label + textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--requisiciones-line);
+  border-radius: 9px;
+  background: #fbfcfb;
+  color: var(--requisiciones-ink);
+  font: inherit;
+}
+
+.requisiciones-mantenimiento-form-grid label,
+.requisiciones-mantenimiento-form-panel > label {
+  color: var(--requisiciones-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.requisiciones-mantenimiento-form-grid label span,
+.requisiciones-mantenimiento-form-panel > label span {
+  color: var(--requisiciones-coral);
+}
+
+.requisiciones-mantenimiento-details-table {
+  overflow-x: auto;
+}
+
+.requisiciones-mantenimiento-details-header,
+.requisiciones-mantenimiento-detail-row {
+  display: grid;
+  grid-template-columns: 130px 110px minmax(280px, 1fr) 36px;
+  gap: 10px;
+  align-items: start;
+  min-width: 620px;
+}
+
+.requisiciones-mantenimiento-details-header {
+  padding: 0 8px 8px;
+  color: var(--requisiciones-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.requisiciones-mantenimiento-detail-row {
+  padding: 8px;
+  border-top: 1px solid var(--requisiciones-line);
+}
+
+.requisiciones-mantenimiento-detail-row input,
+.requisiciones-mantenimiento-detail-row textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border: 1px solid var(--requisiciones-line);
+  border-radius: 8px;
+  background: #fbfcfb;
+  color: var(--requisiciones-ink);
+  font: inherit;
+}
+
+.requisiciones-mantenimiento-detail-row textarea {
+  resize: vertical;
+}
+
+.requisiciones-mantenimiento-add-row,
+.requisiciones-mantenimiento-remove-row,
+.requisiciones-mantenimiento-pdf-button {
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.requisiciones-mantenimiento-add-row {
+  padding: 9px 12px;
+  background: #edf6ef;
+  color: var(--requisiciones-green);
+}
+
+.requisiciones-mantenimiento-remove-row {
+  width: 32px;
+  height: 32px;
+  background: #fff1ed;
+  color: var(--requisiciones-coral);
+  font-size: 20px;
+}
+
+.requisiciones-mantenimiento-remove-row:disabled {
+  cursor: not-allowed;
+  opacity: .4;
+}
+
+.requisiciones-mantenimiento-hint,
+.requisiciones-mantenimiento-elabora small {
+  color: var(--requisiciones-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.requisiciones-mantenimiento-elabora {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid var(--requisiciones-line);
+  border-radius: 10px;
+  background: #f7faf8;
+}
+
+.requisiciones-mantenimiento-pdf-button {
+  display: inline-block;
+  padding: 12px 16px;
+  background: var(--requisiciones-green);
+  color: #fff;
+  text-decoration: none;
+}
+
 .requisiciones-mantenimiento-form-heading {
   display: flex;
   align-items: flex-start;
@@ -437,5 +607,13 @@
   .requisiciones-mantenimiento-form-footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .requisiciones-mantenimiento-official-header {
+    grid-template-columns: 1fr;
+  }
+
+  .requisiciones-mantenimiento-form-grid {
+    grid-template-columns: 1fr;
   }
 }
