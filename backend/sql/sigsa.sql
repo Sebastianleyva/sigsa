@@ -169,7 +169,7 @@ CREATE TABLE `reportes` (
   `tipo` text NOT NULL COMMENT 'guarda información sobre la procedencia del reporte (reporte por incidencia o calendario)',
   `id_calendario` bigint(20) DEFAULT NULL COMMENT 'identificador del calendario',
   `id_incidencia` bigint(20) DEFAULT NULL COMMENT 'identificador de la incidencia',
-  `id_personal` bigint(20) DEFAULT NULL COMMENT 'identificador del personal',
+  `id_personal` bigint(20) DEFAULT NULL COMMENT 'identificador de la persona que generó el reporte',
   `fecha_inicio` date NOT NULL COMMENT 'fecha en la que se comienza el reporte del servicio',
   `fecha_final` date DEFAULT NULL COMMENT 'fecha en la que se finaliza el servicio y su reporte',
   `estado` varchar(20) NOT NULL COMMENT 'estado en el que se encuentra el servicio de mantenimiento (en curso, en espera de requisicon, finalizado)',

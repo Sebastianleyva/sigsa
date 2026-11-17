@@ -265,7 +265,7 @@ export default function HistorialReportesMantenimiento() {
 
                 {reporte.id_incidencia !== null && (
                   <section className="historial-reportes-section">
-                    <h3>Incidencia de origen</h3>
+                    <h3>Datos de la incidencia</h3>
                     <dl className="historial-reportes-details">
                       <Dato etiqueta="Número de incidencia" valor={reporte.id_incidencia} />
                       <Dato etiqueta="Lugar" valor={reporte.lugar} />

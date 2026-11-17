@@ -13,8 +13,13 @@ if($_SERVER['REQUEST_METHOD'] !== 'POST'){
 }
 
 try{
-    validar_jwt_requerido();
+    $usuario = validar_jwt_requerido();
     validar_csrf_requerido();
+
+    $id_personal = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id_personal === false) {
+        throw new InvalidArgumentException('El usuario generador del reporte no es válido');
+    }
 
     $input = json_decode(file_get_contents('php://input'), true);
     if (!is_array($input)) {
@@ -23,7 +28,7 @@ try{
         exit;
     }
 
-    $reporte = generar_reporte($pdo, $input);
+    $reporte = generar_reporte($pdo, $input, $id_personal);
 
     http_response_code(201);
     echo json_encode([

@@ -1,7 +1,7 @@
 <?php
 require_once '../../../includes/auth.php';
 
-function generar_reporte($pdo,$input){
+function generar_reporte($pdo, $input, $id_personal){
     if(!is_array($input)){
         throw new InvalidArgumentException('La entrada debe ser un JSON valido');
     }
@@ -52,7 +52,10 @@ function generar_reporte($pdo,$input){
         }
     }
 
-    $id_personal = $input['id_personal'] ?? null;
+    $id_personal = filter_var($id_personal, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id_personal === false) {
+        throw new InvalidArgumentException('El usuario generador del reporte no es válido');
+    }
     $fecha_inicio = $input['fecha_inicio'];
     $estado = $input['estado'];
     $descripcion = $input['descripcion'];
@@ -67,7 +70,7 @@ function generar_reporte($pdo,$input){
         'tipo' => $tipo,
         'id_calendario' => $id_calendario,
         'id_incidencia' => $id_incidencia,
-        'id_personal' => $id_personal ?? null,
+        'id_personal' => $id_personal,
         'fecha_inicio' => $fecha_inicio,
         'estado' => $estado,
         'descripcion' => $descripcion
@@ -78,7 +81,7 @@ function generar_reporte($pdo,$input){
         'tipo' => $tipo,
         'id_calendario' => $id_calendario,
         'id_incidencia' => $id_incidencia,
-        'id_personal' => $id_personal ?? null,
+        'id_personal' => $id_personal,
         'fecha_inicio' => $fecha_inicio,
         'estado' => $estado,
         'descripcion' => $descripcion

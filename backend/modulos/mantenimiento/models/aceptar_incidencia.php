@@ -57,10 +57,11 @@ function aceptar_incidencia($pdo, $input, $id_personal){
             "INSERT INTO reportes
             (tipo, id_calendario, id_incidencia, id_personal, fecha_inicio, estado, descripcion)
             VALUES
-            ('incidencia', NULL, :id_incidencia, NULL, :fecha_inicio, :estado, :descripcion)"
+            ('incidencia', NULL, :id_incidencia, :id_personal, :fecha_inicio, :estado, :descripcion)"
         );
         $query->execute([
             ':id_incidencia' => $id_incidencia,
+            ':id_personal' => $id_personal,
             ':fecha_inicio' => $fecha_inicio,
             ':estado' => $estado_reporte,
             ':descripcion' => ''
@@ -80,6 +81,7 @@ function aceptar_incidencia($pdo, $input, $id_personal){
             'incidencia' => $incidencia_actualizada,
             'reporte' => [
                 'id_reporte' => $id_reporte,
+                'id_personal' => $id_personal,
                 'estado' => $estado_reporte
             ]
         ];
