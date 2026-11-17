@@ -1,27 +1,12 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { authService } from '../../services/auth_services.js'
 import {
   aceptarRequisicion,
   consultarReportesRequisicion,
-  crearRequisicion,
   type ReporteRequisicion,
 } from '../../services/mantenimiento_services'
 import './styles/requisiciones_mantenimiento.css'
-
-type FormularioRequisicion = {
-  justificacion: string
-  fecha: string
-  descripcion_servicio: string
-  tipo_financiamiento: string
-}
-
-const formularioVacio: FormularioRequisicion = {
-  justificacion: '',
-  fecha: '',
-  descripcion_servicio: '',
-  tipo_financiamiento: '',
-}
 
 function mostrarFecha(fecha: string) {
   const fechaLocal = new Date(`${fecha}T00:00:00`)
@@ -45,10 +30,7 @@ export default function RequisicionesMantenimiento() {
   const autorizado = [1, 2, 3].includes(Number(usuario?.puesto))
   const puedeAutorizar = [1, 2].includes(Number(usuario?.puesto))
   const [reportes, setReportes] = useState<ReporteRequisicion[]>([])
-  const [reporteSeleccionado, setReporteSeleccionado] = useState<number | null>(null)
-  const [formulario, setFormulario] = useState<FormularioRequisicion>(formularioVacio)
   const [cargando, setCargando] = useState(true)
-  const [guardando, setGuardando] = useState(false)
   const [procesandoId, setProcesandoId] = useState<number | null>(null)
   const [error, setError] = useState('')
   const [mensaje, setMensaje] = useState('')
@@ -80,51 +62,12 @@ export default function RequisicionesMantenimiento() {
 
   if (!autorizado) return <Navigate to="/mantenimiento" replace />
 
-  const seleccion = reportes.find((reporte) => reporte.id_reporte === reporteSeleccionado) ?? null
   const disponibles = reportes.filter((reporte) => reporte.id_requisicion === null).length
   const requisicionesEnEspera = reportes.length - disponibles
 
   function seleccionarReporte(reporte: ReporteRequisicion) {
     if (reporte.id_requisicion !== null) return
-    setReporteSeleccionado(reporte.id_reporte)
-    setFormulario({ ...formularioVacio, descripcion_servicio: reporte.descripcion })
-    setError('')
-    setMensaje('')
-  }
-
-  function actualizarCampo(campo: keyof FormularioRequisicion, valor: string) {
-    setFormulario((actual) => ({ ...actual, [campo]: valor }))
-  }
-
-  async function enviarFormulario(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    if (!seleccion || guardando) return
-
-    setError('')
-    setMensaje('')
-    setGuardando(true)
-    try {
-      const requisicion = await crearRequisicion({
-        id_reporte: seleccion.id_reporte,
-        ...formulario,
-      })
-      setReportes((actuales) => actuales.map((reporte) => (
-        reporte.id_reporte === seleccion.id_reporte
-          ? {
-              ...reporte,
-              id_requisicion: Number(requisicion.id_requisicion),
-              estado_requisicion: requisicion.estado,
-            }
-          : reporte
-      )))
-      setReporteSeleccionado(null)
-      setFormulario(formularioVacio)
-      setMensaje(`La requisición #${requisicion.id_requisicion} quedó registrada y está en espera.`)
-    } catch (errorCreacion: unknown) {
-      setError(errorCreacion instanceof Error ? errorCreacion.message : 'No fue posible crear la requisición.')
-    } finally {
-      setGuardando(false)
-    }
+    navigate(`/mantenimiento/requisiciones/${reporte.id_reporte}`)
   }
 
   async function autorizarRequisicion(reporte: ReporteRequisicion) {
@@ -204,11 +147,10 @@ export default function RequisicionesMantenimiento() {
           <section className="requisiciones-mantenimiento-list" aria-label="Mantenimientos que requieren requisición">
             {reportes.map((reporte) => {
               const tieneRequisicion = reporte.id_requisicion !== null
-              const seleccionado = reporteSeleccionado === reporte.id_reporte
 
               return (
                 <article
-                  className={`requisiciones-mantenimiento-card${seleccionado ? ' requisiciones-mantenimiento-card-selected' : ''}`}
+                  className="requisiciones-mantenimiento-card"
                   key={reporte.id_reporte}
                 >
                   <div className="requisiciones-mantenimiento-card-main">
@@ -242,10 +184,9 @@ export default function RequisicionesMantenimiento() {
                       <button
                         className="requisiciones-mantenimiento-select"
                         type="button"
-                        aria-pressed={seleccionado}
                         onClick={() => seleccionarReporte(reporte)}
                       >
-                        {seleccionado ? 'Seleccionado' : 'Crear requisición'}
+                        Crear requisición
                       </button>
                     )}
                   </div>
@@ -255,72 +196,6 @@ export default function RequisicionesMantenimiento() {
           </section>
         )}
 
-        {seleccion && (
-          <section className="requisiciones-mantenimiento-form-panel" aria-labelledby="requisicion-form-title">
-            <div className="requisiciones-mantenimiento-form-heading">
-              <div>
-                <span className="requisiciones-mantenimiento-section-index">NUEVA REQUISICIÓN · REPORTE #{seleccion.id_reporte}</span>
-                <h2 id="requisicion-form-title">Completa los datos de la solicitud</h2>
-                <p>La descripción del mantenimiento se tomó del reporte. La requisición se guardará en espera.</p>
-              </div>
-              <button
-                type="button"
-                className="requisiciones-mantenimiento-cancel"
-                onClick={() => {
-                  setReporteSeleccionado(null)
-                  setFormulario(formularioVacio)
-                  setError('')
-                }}
-              >
-                Cancelar
-              </button>
-            </div>
-
-            <form className="requisiciones-mantenimiento-form" onSubmit={(event) => void enviarFormulario(event)}>
-              <label htmlFor="requisicion-justificacion">Justificación <span>*</span></label>
-              <textarea
-                id="requisicion-justificacion"
-                value={formulario.justificacion}
-                onChange={(event) => actualizarCampo('justificacion', event.target.value)}
-                rows={3}
-                required
-              />
-
-              <label htmlFor="requisicion-fecha">Fecha de solicitud <span>*</span></label>
-              <input
-                id="requisicion-fecha"
-                type="date"
-                value={formulario.fecha}
-                onChange={(event) => actualizarCampo('fecha', event.target.value)}
-                required
-              />
-
-              <label htmlFor="requisicion-descripcion">Descripción del servicio <span>*</span></label>
-              <textarea
-                id="requisicion-descripcion"
-                value={formulario.descripcion_servicio}
-                onChange={(event) => actualizarCampo('descripcion_servicio', event.target.value)}
-                rows={4}
-                required
-              />
-
-              <label htmlFor="requisicion-financiamiento">Tipo de financiamiento <span>*</span></label>
-              <input
-                id="requisicion-financiamiento"
-                value={formulario.tipo_financiamiento}
-                onChange={(event) => actualizarCampo('tipo_financiamiento', event.target.value)}
-                required
-              />
-
-              <div className="requisiciones-mantenimiento-form-footer">
-                <span>Estado al guardar: <strong>EN ESPERA</strong></span>
-                <button type="submit" disabled={guardando}>
-                  {guardando ? 'Guardando…' : 'Enviar requisición'}
-                </button>
-              </div>
-            </form>
-          </section>
-        )}
       </section>
     </main>
   )
