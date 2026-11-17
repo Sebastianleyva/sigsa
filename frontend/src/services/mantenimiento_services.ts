@@ -58,6 +58,8 @@ export type ReporteMantenimiento = {
 export type ReporteRequisicion = ReporteMantenimiento & {
   id_requisicion: number | null
   estado_requisicion: string | null
+  id_solicita: number | null
+  solicitante: string | null
 }
 export type RequisicionMantenimiento = {
   id_requisicion: number | string
@@ -85,6 +87,7 @@ export type PersonaRequisicion = {
 export type OpcionesRequisicion = {
   personal: PersonaRequisicion[]
   elabora: PersonaRequisicion | null
+  director: PersonaRequisicion | null
 }
 export type RequisicionReporte = {
   id_requisicion: number
@@ -284,6 +287,7 @@ export async function consultarReportesRequisicion(): Promise<ReporteRequisicion
       id_incidencia: reporte.id_incidencia === null ? null : Number(reporte.id_incidencia),
       id_calendario: reporte.id_calendario === null ? null : Number(reporte.id_calendario),
       id_requisicion: reporte.id_requisicion === null ? null : Number(reporte.id_requisicion),
+      id_solicita: reporte.id_solicita === null ? null : Number(reporte.id_solicita),
     }))
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar las requisiciones.')
@@ -296,8 +300,6 @@ export async function crearRequisicion(
     fecha: string
     fecha_entrega: string | null
     justificacion: string
-    id_solicita: number
-    id_autoriza: number
     detalles: DetalleRequisicion[]
   },
 ): Promise<RequisicionMantenimiento> {
@@ -318,7 +320,7 @@ export async function crearRequisicion(
 export async function consultarOpcionesRequisicion(): Promise<OpcionesRequisicion> {
   try {
     const response = await api.get<OpcionesRequisicion>('mantenimiento/routes/opciones_requisicion.php')
-    if (!Array.isArray(response.data?.personal) || !response.data?.elabora) {
+    if (!Array.isArray(response.data?.personal) || !response.data?.elabora || !response.data?.director) {
       throw new Error('El servidor devolvió opciones inválidas para la requisición.')
     }
     return response.data

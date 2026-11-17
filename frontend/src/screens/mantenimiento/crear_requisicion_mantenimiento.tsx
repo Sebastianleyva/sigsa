@@ -55,8 +55,6 @@ export default function CrearRequisicionMantenimiento() {
   const [fecha, setFecha] = useState(fechaActual)
   const [fechaEntrega, setFechaEntrega] = useState('')
   const [justificacion, setJustificacion] = useState('')
-  const [idSolicita, setIdSolicita] = useState('')
-  const [idAutoriza, setIdAutoriza] = useState('')
   const [detalles, setDetalles] = useState<DetalleRequisicion[]>([detalleVacio()])
   const [cargando, setCargando] = useState(true)
   const [guardando, setGuardando] = useState(false)
@@ -78,8 +76,6 @@ export default function CrearRequisicionMantenimiento() {
         } else {
           setReporte(resultado)
           setOpciones(opcionesCargadas)
-          setIdSolicita(String(opcionesCargadas.elabora?.id_personal ?? ''))
-          setIdAutoriza(String(opcionesCargadas.personal.find((persona) => persona.id_personal !== opcionesCargadas.elabora?.id_personal)?.id_personal ?? ''))
         }
       })
       .catch((errorCarga: unknown) => {
@@ -118,10 +114,6 @@ export default function CrearRequisicionMantenimiento() {
       setError('Agrega al menos un renglón con descripción.')
       return
     }
-    if (!idSolicita || !idAutoriza) {
-      setError('Selecciona quién solicita y quién autoriza la requisición.')
-      return
-    }
     setError('')
     setGuardando(true)
     try {
@@ -130,8 +122,6 @@ export default function CrearRequisicionMantenimiento() {
         fecha,
         fecha_entrega: fechaEntrega || null,
         justificacion: justificacion.trim(),
-        id_solicita: Number(idSolicita),
-        id_autoriza: Number(idAutoriza),
         detalles: detalles.filter((detalle) => detalle.descripcion.trim() !== ''),
       })
       setIdRequisicion(Number(resultado.id_requisicion))
@@ -220,15 +210,13 @@ export default function CrearRequisicionMantenimiento() {
               <textarea id="requisicion-justificacion" value={justificacion} onChange={(event) => setJustificacion(event.target.value)} rows={4} required />
               <div className="requisiciones-mantenimiento-form-grid">
                 <label htmlFor="requisicion-solicita">Solicita <span>*</span></label>
-                <select id="requisicion-solicita" value={idSolicita} onChange={(event) => setIdSolicita(event.target.value)} required>
-                  <option value="">Selecciona una persona</option>
-                  {opciones.personal.map((persona) => <option key={persona.id_personal} value={persona.id_personal}>{nombreCompleto(persona)}</option>)}
-                </select>
+                <div id="requisicion-solicita" className="requisiciones-mantenimiento-readonly-field">
+                  {reporte.solicitante ?? 'No hay autorizador de incidencia registrado'}
+                </div>
                 <label htmlFor="requisicion-autoriza">Autoriza <span>*</span></label>
-                <select id="requisicion-autoriza" value={idAutoriza} onChange={(event) => setIdAutoriza(event.target.value)} required>
-                  <option value="">Selecciona una persona</option>
-                  {opciones.personal.map((persona) => <option key={persona.id_personal} value={persona.id_personal}>{nombreCompleto(persona)}</option>)}
-                </select>
+                <div id="requisicion-autoriza" className="requisiciones-mantenimiento-readonly-field">
+                  {opciones.director ? nombreCompleto(opciones.director) : 'No hay director activo configurado'}
+                </div>
               </div>
               <div className="requisiciones-mantenimiento-elabora"><span>Elabora</span><strong>{elabora ? nombreCompleto(elabora) : 'No disponible'}</strong><small>{elabora?.correo} · Extensión Cisco: {elabora?.telefono ?? 'No registrada'}</small></div>
               {error && <p className="requisiciones-mantenimiento-error" role="alert">{error}</p>}

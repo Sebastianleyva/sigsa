@@ -294,6 +294,7 @@
 
 .requisiciones-mantenimiento-form-grid input,
 .requisiciones-mantenimiento-form-grid select,
+.requisiciones-mantenimiento-form-grid .requisiciones-mantenimiento-readonly-field,
 .requisiciones-mantenimiento-form-panel > label + textarea {
   width: 100%;
   box-sizing: border-box;
@@ -303,6 +304,14 @@
   background: #fbfcfb;
   color: var(--requisiciones-ink);
   font: inherit;
+}
+
+.requisiciones-mantenimiento-readonly-field {
+  min-height: 18px;
+  overflow-wrap: anywhere;
+  background: #eef3ef !important;
+  color: var(--requisiciones-muted) !important;
+  cursor: not-allowed;
 }
 
 .requisiciones-mantenimiento-form-grid label,

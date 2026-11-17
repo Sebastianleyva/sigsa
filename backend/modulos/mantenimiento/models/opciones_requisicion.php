@@ -17,5 +17,13 @@ function obtener_opciones_requisicion($pdo, $id_elabora) {
         }
     }
 
-    return ['personal' => $personal, 'elabora' => $elabora];
+    $director = null;
+    foreach ($personal as $persona) {
+        if ((int) $persona['puesto'] === 1) {
+            $director = $persona;
+            break;
+        }
+    }
+
+    return ['personal' => $personal, 'elabora' => $elabora, 'director' => $director];
 }

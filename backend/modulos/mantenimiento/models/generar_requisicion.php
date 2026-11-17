@@ -2,8 +2,6 @@
 
 function generar_requisicion($pdo, $input, $usuario) {
     $id_reporte = validar_entero_positivo($input['id_reporte'] ?? null, 'id_reporte');
-    $id_solicita = validar_entero_positivo($input['id_solicita'] ?? null, 'id_solicita');
-    $id_autoriza = validar_entero_positivo($input['id_autoriza'] ?? null, 'id_autoriza');
     $id_elabora = validar_entero_positivo($usuario['sub'] ?? null, 'id_elabora');
     $justificacion = validar_texto_obligatorio($input['justificacion'] ?? null, 'justificacion');
     $fecha = validar_fecha($input['fecha'] ?? null, 'fecha');
@@ -41,12 +39,30 @@ function generar_requisicion($pdo, $input, $usuario) {
 
     $pdo->beginTransaction();
     try {
-        $query = $pdo->prepare("SELECT estado FROM reportes WHERE id_reporte = :id_reporte FOR UPDATE");
+        $query = $pdo->prepare("SELECT estado, id_incidencia FROM reportes WHERE id_reporte = :id_reporte FOR UPDATE");
         $query->execute([':id_reporte' => $id_reporte]);
         $reporte = $query->fetch(PDO::FETCH_ASSOC);
         if (!$reporte) throw new OutOfBoundsException('Reporte no encontrado');
         if (!in_array(strtoupper(trim($reporte['estado'])), ['ESPERA REQUISICIÓN', 'EN ESPERA DE REQUISICIÓN'], true)) {
             throw new DomainException('El reporte no está pendiente de requisición');
+        }
+
+        if (!$reporte['id_incidencia']) {
+            throw new DomainException('El reporte no tiene una incidencia autorizada asociada');
+        }
+        $query = $pdo->prepare("SELECT id_autoriza FROM incidencias WHERE id_incidencia = :id_incidencia");
+        $query->execute([':id_incidencia' => $reporte['id_incidencia']]);
+        $id_solicita = $query->fetchColumn();
+        if (!$id_solicita) {
+            throw new DomainException('La incidencia no tiene una persona autorizadora registrada');
+        }
+
+        $query = $pdo->query(
+            "SELECT id_personal FROM personal WHERE activo = '1' AND puesto = 1 ORDER BY id_personal LIMIT 1"
+        );
+        $id_autoriza = $query->fetchColumn();
+        if (!$id_autoriza) {
+            throw new DomainException('No hay un director activo configurado para autorizar la requisición');
         }
 
         $query = $pdo->prepare("SELECT id_requisicion FROM requisiciones WHERE id_reporte = :id_reporte LIMIT 1");

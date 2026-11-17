@@ -13,15 +13,18 @@ function ver_reportes_requisicion($pdo) {
             r.descripcion,
             i.lugar,
             i.descripcion AS descripcion_incidencia,
+            i.id_autoriza AS id_solicita,
             i.urgencia,
             c.fecha_destinada,
             s.nombre AS servicio,
             NULLIF(TRIM(CONCAT_WS(' ', p.nombre, p.apellido_p, p.apellido_m)), '') AS reportante,
+            NULLIF(TRIM(CONCAT_WS(' ', pa.nombre, pa.apellido_p, pa.apellido_m)), '') AS solicitante,
             q.id_requisicion,
             q.estado AS estado_requisicion
         FROM reportes r
         LEFT JOIN incidencias i ON i.id_incidencia = r.id_incidencia
         LEFT JOIN personal p ON p.id_personal = i.id_personal
+        LEFT JOIN personal pa ON pa.id_personal = i.id_autoriza
         LEFT JOIN calendario c ON c.id_calendario = r.id_calendario
         LEFT JOIN servicios s ON s.id_servicio = c.id_servicio
         LEFT JOIN requisiciones q ON q.id_requisicion = (
