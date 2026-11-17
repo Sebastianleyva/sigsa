@@ -75,8 +75,8 @@ function generar_requisicion($pdo, $input, $usuario) {
 
         $query = $pdo->prepare(
             "INSERT INTO requisiciones
-            (id_reporte, id_solicita, id_autoriza, fecha, fecha_entrega, descripcion_servicio, estado, tipo_financiamiento, id_elabora)
-            VALUES (:id_reporte, :id_solicita, :id_autoriza, :fecha, :fecha_entrega, :descripcion_servicio, 'EN ESPERA', 'FONE', :id_elabora)"
+            (id_reporte, id_solicita, id_autoriza, fecha, fecha_entrega, justificacion, descripcion_servicio, estado, tipo_financiamiento, id_elabora)
+            VALUES (:id_reporte, :id_solicita, :id_autoriza, :fecha, :fecha_entrega, :justificacion, :descripcion_servicio, 'EN ESPERA', 'FONE', :id_elabora)"
         );
         $query->execute([
             ':id_reporte' => $id_reporte,
@@ -84,6 +84,7 @@ function generar_requisicion($pdo, $input, $usuario) {
             ':id_autoriza' => $id_autoriza,
             ':fecha' => $fecha,
             ':fecha_entrega' => $fecha_entrega,
+            ':justificacion' => $justificacion,
             ':descripcion_servicio' => $descripcion_servicio,
             ':id_elabora' => $id_elabora,
         ]);
