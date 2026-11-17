@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 10, 2026 at 06:34 PM
+-- Generation Time: Nov 17, 2026 at 05:20 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -95,7 +95,11 @@ CREATE TABLE `incidencias` (
 --
 
 INSERT INTO `incidencias` (`id_incidencia`, `id_personal`, `id_autoriza`, `descripcion`, `fecha`, `urgencia`, `estado`, `lugar`) VALUES
-(2, 20, NULL, 'se cayó el techo y esta roto el suelo', '2026-11-09', 'MEDIA', 'PENDIENTE', 'pasillo afuera del departamento de sistemas');
+(2, 20, 20, 'se cayó el techo y esta roto el suelo', '2026-11-09', 'MEDIA', 'ACEPTADA', 'pasillo afuera del departamento de sistemas'),
+(3, 20, 20, 'se murio', '2026-11-11', 'ALTA', 'ACEPTADA', 'en el departamento de sistrenas'),
+(4, 20, 20, 'ssss', '2026-11-11', 'MEDIA', 'ACEPTADA', 'ennnn'),
+(5, 20, 20, 'se fundió un foco y quemo el techo', '2026-11-11', 'BAJA', 'ACEPTADA', 'departamento de sistemas'),
+(6, 20, 13, 'se rompió el suelo', '2026-11-17', 'MEDIA', 'ACEPTADA', 'pasillo de la cocina');
 
 -- --------------------------------------------------------
 
@@ -169,7 +173,7 @@ CREATE TABLE `reportes` (
   `fecha_inicio` date NOT NULL COMMENT 'fecha en la que se comienza el reporte del servicio',
   `fecha_final` date DEFAULT NULL COMMENT 'fecha en la que se finaliza el servicio y su reporte',
   `estado` varchar(20) NOT NULL COMMENT 'estado en el que se encuentra el servicio de mantenimiento (en curso, en espera de requisicon, finalizado)',
-  `descripcion` text NOT NULL COMMENT 'descripción del servicio realizado'
+  `descripcion` text DEFAULT NULL COMMENT 'descripción del servicio realizado'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -177,7 +181,11 @@ CREATE TABLE `reportes` (
 --
 
 INSERT INTO `reportes` (`id_reporte`, `tipo`, `id_calendario`, `id_incidencia`, `id_personal`, `fecha_inicio`, `fecha_final`, `estado`, `descripcion`) VALUES
-(2, 'incidencia', NULL, NULL, NULL, '2026-11-04', NULL, 'pendiente', 'si');
+(2, 'incidencia', NULL, NULL, NULL, '2026-11-04', NULL, 'pendiente', 'si'),
+(3, 'incidencia', NULL, 3, NULL, '2026-11-11', '2026-11-17', 'FINALIZADO', 'lo revivieron'),
+(4, 'incidencia', NULL, 4, NULL, '2026-11-11', NULL, 'ESPERA REQUISICIÓN', 'ssss'),
+(5, 'incidencia', NULL, 5, NULL, '2026-11-11', '2026-11-10', 'FINALIZADO', 'se compró un nuevo foco en tal sucursal con tal dinero y lo puso tal poersona'),
+(6, 'incidencia', NULL, 6, NULL, '2026-11-17', '2026-11-17', 'FINALIZADO', 'se resano el piso con dos horas de antricipacion');
 
 -- --------------------------------------------------------
 
@@ -190,21 +198,35 @@ CREATE TABLE `requisiciones` (
   `id_reporte` bigint(20) NOT NULL COMMENT 'identificador del reporte',
   `id_solicita` bigint(20) NOT NULL COMMENT 'identificador del personal solicitante de la requisición',
   `id_autoriza` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que autoriza la requisición',
-  `justificacion` text NOT NULL COMMENT 'justificación de la solicitud de la requisición',
   `fecha` date NOT NULL COMMENT 'fecha en la que se realiza la requisición',
   `fecha_entrega` date DEFAULT NULL COMMENT 'fecha en la que se entrega la requisición a las oficinas centrales',
   `descripcion_servicio` text NOT NULL COMMENT 'descripción del servicio para el que se necesita la requisición',
   `estado` varchar(20) NOT NULL COMMENT 'estado en el que se encuentra la requisición (pendiente, en curso, aprovada o rechazada)',
-  `tipo_financiamiento` text NOT NULL COMMENT 'tipo de financiamiento que recibe la requisición'
+  `tipo_financiamiento` text NOT NULL COMMENT 'tipo de financiamiento que recibe la requisición',
+  `id_elabora` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `requisiciones`
 --
 
-INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `justificacion`, `fecha`, `fecha_entrega`, `descripcion_servicio`, `estado`, `tipo_financiamiento`) VALUES
-(2, 2, 14, 13, 'hace falta', '2026-11-04', NULL, 'necesito dos panes', 'pendiente', 'est'),
-(3, 2, 14, NULL, 'ssss', '2026-11-04', NULL, 'sss', 'sss', 'sss');
+INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `fecha`, `fecha_entrega`, `descripcion_servicio`, `estado`, `tipo_financiamiento`, `id_elabora`) VALUES
+(2, 2, 14, 13, '2026-11-04', NULL, 'necesito dos panes', 'pendiente', 'est', 0),
+(3, 2, 14, NULL, '2026-11-04', NULL, 'sss', 'sss', 'sss', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `requisiciones_detalle`
+--
+
+CREATE TABLE `requisiciones_detalle` (
+  `id_detalle` bigint(20) NOT NULL,
+  `id_requisicion` bigint(20) NOT NULL,
+  `num_lote` int(3) NOT NULL,
+  `cantidad` int(3) NOT NULL,
+  `descripcion` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -244,10 +266,11 @@ INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`,
 (11, 'MEDICA', 'me rompi la pierna', 'no se 103', '2026-10-28', '11:45:40', '11:46:02', 'FINALIZADO', 16, 15, 0, 0, '13:45:40', NULL, 0, NULL, '0000-00-00'),
 (12, 'PERSONAL', 'jjj', 'ñññ', '2026-11-09', '13:28:22', '13:28:45', 'FINALIZADO', 21, 20, 0, 0, '15:28:22', NULL, NULL, NULL, NULL),
 (14, 'MEDICA', 'ww', 'ww', '2026-11-09', NULL, '13:56:41', 'FINALIZADO', 13, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL),
-(15, 'MEDICA', '444', '444', '2026-11-09', NULL, NULL, 'PENDIENTE', 20, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL),
 (16, 'MEDICA', 'sss', 'casa #403', '2026-11-09', '14:22:53', '14:26:18', 'FINALIZADO', 21, 20, 1, 0, '16:22:53', NULL, NULL, NULL, NULL),
 (17, 'MEDICA', '123', '7777', '2026-11-09', '14:28:46', '19:05:06', 'FINALIZADO', 21, 20, 0, 0, '16:28:46', '02:36:20', NULL, NULL, '2026-11-09'),
-(18, 'PERSONAL', 'qqqq', 'qqq', '2026-11-10', '19:05:53', '19:06:02', 'FINALIZADO', 21, 20, 0, 1, '21:05:53', NULL, 1, NULL, '2026-11-09');
+(18, 'PERSONAL', 'qqqq', 'qqq', '2026-11-10', '19:05:53', '19:06:02', 'FINALIZADO', 21, 20, 0, 1, '21:05:53', NULL, 1, NULL, '2026-11-09'),
+(19, 'CITA', 'sss', 'sss', '2026-11-11', NULL, NULL, 'RECHAZADA', 21, 20, 0, 0, NULL, NULL, NULL, NULL, NULL),
+(20, 'MEDICA', 'Cita con el doctor', 'ISSSTE', '2026-11-11', '20:50:10', '20:56:18', 'FINALIZADO', 20, 14, 0, 0, '22:50:10', NULL, NULL, NULL, '2026-11-10');
 
 -- --------------------------------------------------------
 
@@ -272,7 +295,7 @@ INSERT INTO `servicios` (`id_servicio`, `nombre`, `periodicidad`, `descripcion`,
 (3, 'revision de extintores', 4, 'revision del llenado y funcionalidad de los extintores', 0),
 (4, 'impermeabilización de techos', 42, 'se tiene que impermeabilizar el techo con', 0),
 (5, 'mantenimiento de luminarias', 5, 'prender luminarias', 1),
-(6, 'areas verdes', 4, 'jjj', 1);
+(6, 'areas verdes', 4, 'jjj', 0);
 
 --
 -- Indexes for dumped tables
@@ -335,7 +358,15 @@ ALTER TABLE `requisiciones`
   ADD PRIMARY KEY (`id_requisicion`),
   ADD KEY `id_solicita` (`id_solicita`),
   ADD KEY `id_autoriza` (`id_autoriza`),
-  ADD KEY `id_reporte` (`id_reporte`);
+  ADD KEY `id_reporte` (`id_reporte`),
+  ADD KEY `id_elabora` (`id_elabora`);
+
+--
+-- Indexes for table `requisiciones_detalle`
+--
+ALTER TABLE `requisiciones_detalle`
+  ADD PRIMARY KEY (`id_detalle`),
+  ADD KEY `id_requisicion` (`id_requisicion`);
 
 --
 -- Indexes for table `salidas`
@@ -372,7 +403,7 @@ ALTER TABLE `calendario`
 -- AUTO_INCREMENT for table `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `personal`
@@ -390,7 +421,7 @@ ALTER TABLE `puestos`
 -- AUTO_INCREMENT for table `reportes`
 --
 ALTER TABLE `reportes`
-  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=3;
+  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `requisiciones`
@@ -399,10 +430,16 @@ ALTER TABLE `requisiciones`
   MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de requisición', AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `requisiciones_detalle`
+--
+ALTER TABLE `requisiciones_detalle`
+  MODIFY `id_detalle` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `salidas`
 --
 ALTER TABLE `salidas`
-  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de la salida', AUTO_INCREMENT=19;
+  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de la salida', AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `servicios`
@@ -456,6 +493,12 @@ ALTER TABLE `requisiciones`
   ADD CONSTRAINT `id_autoriza` FOREIGN KEY (`id_autoriza`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `id_solicita` FOREIGN KEY (`id_solicita`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `requisiciones_ibfk_1` FOREIGN KEY (`id_reporte`) REFERENCES `reportes` (`id_reporte`);
+
+--
+-- Constraints for table `requisiciones_detalle`
+--
+ALTER TABLE `requisiciones_detalle`
+  ADD CONSTRAINT `requisiciones_detalle_ibfk_1` FOREIGN KEY (`id_requisicion`) REFERENCES `requisiciones` (`id_requisicion`);
 
 --
 -- Constraints for table `salidas`
