@@ -29,7 +29,7 @@ function ver_reportes_requisicion($pdo) {
             FROM requisiciones q2
             WHERE q2.id_reporte = r.id_reporte
         )
-        WHERE UPPER(r.estado) IN ('ESPERA REQUISICIÓN', 'EN ESPERA DE REQUISICIÓN')
+        WHERE UPPER(TRIM(r.estado)) IN ('ESPERA REQUISICIÓN', 'EN ESPERA DE REQUISICIÓN', 'EN ESPERA DE RECURSOS')
         ORDER BY r.fecha_inicio DESC, r.id_reporte DESC"
     );
 

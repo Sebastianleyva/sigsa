@@ -44,7 +44,7 @@ function aceptar_requisicion($pdo, $input, $id_autoriza) {
         if (!$reporte) {
             throw new OutOfBoundsException('El reporte asociado no existe');
         }
-        if (!in_array(strtoupper($reporte['estado']), ['ESPERA REQUISICIÓN', 'EN ESPERA DE REQUISICIÓN'], true)) {
+        if (!in_array(strtoupper(trim($reporte['estado'])), ['ESPERA REQUISICIÓN', 'EN ESPERA DE REQUISICIÓN', 'EN ESPERA DE RECURSOS'], true)) {
             throw new DomainException('El reporte asociado ya no está en espera de requisición');
         }
 

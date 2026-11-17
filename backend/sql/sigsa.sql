@@ -223,8 +223,8 @@ INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_
 CREATE TABLE `requisiciones_detalle` (
   `id_detalle` bigint(20) NOT NULL,
   `id_requisicion` bigint(20) NOT NULL,
-  `num_lote` int(3) NOT NULL,
-  `cantidad` int(3) NOT NULL,
+  `num_lote` varchar(50) DEFAULT NULL,
+  `cantidad` int(3) DEFAULT NULL,
   `descripcion` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

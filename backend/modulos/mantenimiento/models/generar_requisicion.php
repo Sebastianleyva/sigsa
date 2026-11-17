@@ -1,94 +1,134 @@
 <?php
 
 function generar_requisicion($pdo, $input, $usuario) {
-    $id_reporte = filter_var(
-        $input['id_reporte'] ?? null,
-        FILTER_VALIDATE_INT,
-        ['options' => ['min_range' => 1]]
-    );
-    if ($id_reporte === false) {
-        throw new InvalidArgumentException('El id_reporte debe ser un entero positivo');
+    $id_reporte = validar_entero_positivo($input['id_reporte'] ?? null, 'id_reporte');
+    $id_solicita = validar_entero_positivo($input['id_solicita'] ?? null, 'id_solicita');
+    $id_autoriza = validar_entero_positivo($input['id_autoriza'] ?? null, 'id_autoriza');
+    $id_elabora = validar_entero_positivo($usuario['sub'] ?? null, 'id_elabora');
+    $justificacion = validar_texto_obligatorio($input['justificacion'] ?? null, 'justificacion');
+    $fecha = validar_fecha($input['fecha'] ?? null, 'fecha');
+    $fecha_entrega = validar_fecha_opcional($input['fecha_entrega'] ?? null, 'fecha_entrega');
+    $detalles = $input['detalles'] ?? null;
+
+    if (!is_array($detalles) || count($detalles) === 0) {
+        throw new InvalidArgumentException('Debe existir al menos un renglón de requisición');
     }
 
-    foreach (['justificacion', 'fecha', 'descripcion_servicio', 'tipo_financiamiento'] as $campo) {
-        if (!is_string($input[$campo] ?? null) || trim($input[$campo]) === '') {
-            throw new InvalidArgumentException("El campo {$campo} es obligatorio");
+    $detalles_validos = [];
+    foreach ($detalles as $indice => $detalle) {
+        if (!is_array($detalle)) {
+            throw new InvalidArgumentException("El renglón " . ($indice + 1) . " no es válido");
         }
-    }
-
-    $justificacion = trim($input['justificacion']);
-    $fecha = trim($input['fecha']);
-    $descripcion_servicio = trim($input['descripcion_servicio']);
-    $tipo_financiamiento = trim($input['tipo_financiamiento']);
-    $fecha_validada = DateTime::createFromFormat('!Y-m-d', $fecha);
-    if (!$fecha_validada || $fecha_validada->format('Y-m-d') !== $fecha) {
-        throw new InvalidArgumentException('La fecha debe tener el formato AAAA-MM-DD');
-    }
-
-    $id_solicita = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-    if ($id_solicita === false) {
-        throw new InvalidArgumentException('El usuario solicitante no es válido');
+        $descripcion = validar_texto_obligatorio($detalle['descripcion'] ?? null, "la descripción del renglón " . ($indice + 1));
+        $num_lote = trim((string) ($detalle['num_lote'] ?? ''));
+        if (strlen($num_lote) > 50) {
+            throw new InvalidArgumentException("El Núm. Lote del renglón " . ($indice + 1) . " es demasiado largo");
+        }
+        $cantidad = $detalle['cantidad'] ?? null;
+        if ($cantidad === '' || $cantidad === null) {
+            $cantidad = null;
+        } elseif (filter_var($cantidad, FILTER_VALIDATE_INT) === false || (int) $cantidad < 0) {
+            throw new InvalidArgumentException("La cantidad del renglón " . ($indice + 1) . " debe ser un entero positivo o estar vacía");
+        } else {
+            $cantidad = (int) $cantidad;
+        }
+        $detalles_validos[] = [
+            'num_lote' => $num_lote === '' ? null : $num_lote,
+            'cantidad' => $cantidad,
+            'descripcion' => $descripcion,
+        ];
     }
 
     $pdo->beginTransaction();
     try {
-        $query = $pdo->prepare(
-            "SELECT estado
-            FROM reportes
-            WHERE id_reporte = :id_reporte
-            FOR UPDATE"
-        );
+        $query = $pdo->prepare("SELECT estado FROM reportes WHERE id_reporte = :id_reporte FOR UPDATE");
         $query->execute([':id_reporte' => $id_reporte]);
         $reporte = $query->fetch(PDO::FETCH_ASSOC);
-
-        if (!$reporte) {
-            throw new OutOfBoundsException('Reporte no encontrado');
-        }
-        if (!in_array(strtoupper($reporte['estado']), ['ESPERA REQUISICIÓN', 'EN ESPERA DE REQUISICIÓN'], true)) {
+        if (!$reporte) throw new OutOfBoundsException('Reporte no encontrado');
+        if (!in_array(strtoupper(trim($reporte['estado'])), ['ESPERA REQUISICIÓN', 'EN ESPERA DE REQUISICIÓN'], true)) {
             throw new DomainException('El reporte no está pendiente de requisición');
         }
 
-        $query = $pdo->prepare(
-            "SELECT id_requisicion
-            FROM requisiciones
-            WHERE id_reporte = :id_reporte
-            LIMIT 1"
-        );
+        $query = $pdo->prepare("SELECT id_requisicion FROM requisiciones WHERE id_reporte = :id_reporte LIMIT 1");
         $query->execute([':id_reporte' => $id_reporte]);
-        if ($query->fetchColumn() !== false) {
-            throw new DomainException('Este reporte ya tiene una requisición registrada');
-        }
+        if ($query->fetchColumn() !== false) throw new DomainException('Este reporte ya tiene una requisición registrada');
+
+        validar_personal_requisicion($pdo, $id_solicita, 'solicitante');
+        validar_personal_requisicion($pdo, $id_autoriza, 'autorizador');
+        $descripcion_servicio = implode("\n", array_column($detalles_validos, 'descripcion'));
 
         $query = $pdo->prepare(
             "INSERT INTO requisiciones
-            (id_reporte, id_solicita, justificacion, fecha, descripcion_servicio, estado, tipo_financiamiento)
-            VALUES
-            (:id_reporte, :id_solicita, :justificacion, :fecha, :descripcion_servicio, 'EN ESPERA', :tipo_financiamiento)"
+            (id_reporte, id_solicita, id_autoriza, fecha, fecha_entrega, descripcion_servicio, estado, tipo_financiamiento, id_elabora)
+            VALUES (:id_reporte, :id_solicita, :id_autoriza, :fecha, :fecha_entrega, :descripcion_servicio, 'EN ESPERA', 'FONE', :id_elabora)"
         );
         $query->execute([
             ':id_reporte' => $id_reporte,
             ':id_solicita' => $id_solicita,
-            ':justificacion' => $justificacion,
+            ':id_autoriza' => $id_autoriza,
             ':fecha' => $fecha,
+            ':fecha_entrega' => $fecha_entrega,
             ':descripcion_servicio' => $descripcion_servicio,
-            ':tipo_financiamiento' => $tipo_financiamiento
+            ':id_elabora' => $id_elabora,
         ]);
-        $id_requisicion = $pdo->lastInsertId();
+        $id_requisicion = (int) $pdo->lastInsertId();
 
+        $queryDetalle = $pdo->prepare(
+            "INSERT INTO requisiciones_detalle (id_requisicion, num_lote, cantidad, descripcion)
+            VALUES (:id_requisicion, :num_lote, :cantidad, :descripcion)"
+        );
+        foreach ($detalles_validos as $detalle) {
+            $queryDetalle->bindValue(':id_requisicion', $id_requisicion, PDO::PARAM_INT);
+            $queryDetalle->bindValue(':num_lote', $detalle['num_lote'], $detalle['num_lote'] === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $queryDetalle->bindValue(':cantidad', $detalle['cantidad'], $detalle['cantidad'] === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $queryDetalle->bindValue(':descripcion', $detalle['descripcion'], PDO::PARAM_STR);
+            $queryDetalle->execute();
+        }
+
+        $query = $pdo->prepare("UPDATE reportes SET estado = 'EN ESPERA DE RECURSOS' WHERE id_reporte = :id_reporte");
+        $query->execute([':id_reporte' => $id_reporte]);
         $pdo->commit();
+
         return [
             'id_requisicion' => $id_requisicion,
             'id_reporte' => $id_reporte,
-            'justificacion' => $justificacion,
-            'fecha' => $fecha,
-            'descripcion_servicio' => $descripcion_servicio,
             'estado' => 'EN ESPERA',
-            'tipo_financiamiento' => $tipo_financiamiento
+            'tipo_financiamiento' => 'FONE',
         ];
     } catch (Throwable $error) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
+        if ($pdo->inTransaction()) $pdo->rollBack();
         throw $error;
     }
+}
+
+function validar_entero_positivo($valor, $campo) {
+    $entero = filter_var($valor, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($entero === false) throw new InvalidArgumentException("El campo {$campo} debe ser un entero positivo");
+    return $entero;
+}
+
+function validar_texto_obligatorio($valor, $campo) {
+    if (!is_string($valor) || trim($valor) === '') throw new InvalidArgumentException("El campo {$campo} es obligatorio");
+    return trim($valor);
+}
+
+function validar_fecha($valor, $campo) {
+    if (!is_string($valor)) throw new InvalidArgumentException("El campo {$campo} es obligatorio");
+    $texto = trim($valor);
+    $fecha = DateTime::createFromFormat('!Y-m-d', $texto);
+    if (!$fecha || $fecha->format('Y-m-d') !== $texto) throw new InvalidArgumentException("El campo {$campo} debe tener el formato AAAA-MM-DD");
+    return $fecha->format('Y-m-d');
+}
+
+function validar_fecha_opcional($valor, $campo) {
+    return $valor === null || $valor === '' ? null : validar_fecha($valor, $campo);
+}
+
+function validar_personal_requisicion($pdo, $id_personal, $rol) {
+    $query = $pdo->prepare(
+        "SELECT id_personal FROM personal
+        WHERE id_personal = :id_personal AND activo = '1' AND puesto IN (1, 2, 3)"
+    );
+    $query->execute([':id_personal' => $id_personal]);
+    if (!$query->fetchColumn()) throw new InvalidArgumentException("El {$rol} seleccionado no es válido");
 }

@@ -21,7 +21,7 @@ function ver_reportes_en_curso($pdo, $id_reporte = null) {
         LEFT JOIN personal p ON p.id_personal = i.id_personal
         LEFT JOIN calendario c ON c.id_calendario = r.id_calendario
         LEFT JOIN servicios s ON s.id_servicio = c.id_servicio
-        WHERE UPPER(r.estado) IN ('EN CURSO', 'ESPERA REQUISICIÓN', 'EN ESPERA DE REQUISICIÓN')";
+        WHERE UPPER(TRIM(r.estado)) IN ('EN CURSO', 'ESPERA REQUISICIÓN', 'EN ESPERA DE REQUISICIÓN', 'EN ESPERA DE RECURSOS')";
     $parametros = [];
 
     if ($id_reporte !== null) {
