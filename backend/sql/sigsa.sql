@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 17, 2026 at 07:58 PM
+-- Generation Time: Nov 18, 2026 at 05:10 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -76,6 +76,23 @@ INSERT INTO `calendario` (`id_calendario`, `fecha_destinada`, `estado`, `id_serv
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `comisiones`
+--
+
+CREATE TABLE `comisiones` (
+  `id_comision` bigint(20) NOT NULL COMMENT 'identificador de la comisión',
+  `fecha` date DEFAULT NULL COMMENT 'fecha en la que se registra la solicitud de comisión',
+  `tipo_comision` varchar(30) DEFAULT NULL COMMENT 'tipo de comisión (urbana o fuera de la mancha urbana)',
+  `area_designada` bigint(20) DEFAULT NULL COMMENT 'area encargada de realizar la comisión',
+  `ubicacion` varchar(150) DEFAULT NULL COMMENT 'ubicación de la institución de solicita la comsión',
+  `institucion_solicita` varchar(150) DEFAULT NULL COMMENT 'nombre de la institución que solicita la comisión',
+  `nombre_solicita` varchar(150) DEFAULT NULL COMMENT 'nombre de la persona que solicita la comisión',
+  `id_personal` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que registra la comisión'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `incidencias`
 --
 
@@ -101,7 +118,8 @@ INSERT INTO `incidencias` (`id_incidencia`, `id_personal`, `id_autoriza`, `descr
 (5, 20, 20, 'se fundió un foco y quemo el techo', '2026-11-11', 'BAJA', 'ACEPTADA', 'departamento de sistemas'),
 (6, 20, 13, 'se rompió el suelo', '2026-11-17', 'MEDIA', 'ACEPTADA', 'pasillo de la cocina'),
 (7, 13, 13, 'sse rompio una puerta', '2026-11-17', 'MEDIA', 'ACEPTADA', 'en la cocina'),
-(8, 20, 18, 'exploto el microondas', '2026-11-17', 'MEDIA', 'ACEPTADA', 'cocina');
+(8, 20, 18, 'exploto el microondas', '2026-11-17', 'MEDIA', 'ACEPTADA', 'cocina'),
+(9, 16, 18, 'se cayó un pedazo del techo y se esta pudriendo alrededor de ello', '2026-11-17', 'BAJA', 'ACEPTADA', 'en l,a oficina de carlitos');
 
 -- --------------------------------------------------------
 
@@ -135,8 +153,8 @@ INSERT INTO `personal` (`id_personal`, `rfc`, `curp`, `nombre`, `apellido_p`, `a
 (15, 'son13valores3', 'rils060301hdgytba3', 'Luis', 'Jimenez', 'Delgado', 'delgado@gmail.com', '6181161704', 3, 7, 14, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
 (16, 'son13valores4', 'rils060301hdgytba4', 'Diego', 'Erre', 'So', 'diego@gmail.com', '6181161705', 4, 7, 15, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
 (18, 'son13valores5', 'rils060301hdgytba5', 'Jose', 'Lomas', 'Turbas', 'jose@gmail.com', '6181161706', 2, 1, 13, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
-(20, 'son13valores6', 'rils060301hdgytba6', 'Itzel', 'Ochoa', 'Gandara', 'itzel@gmail.com', '6181161707', 3, 8, 14, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
-(21, 'son13valores7', 'rils060301hdgytba7', 'Mafer', 'luna', 'soto', 'mafer@gmail.com', '6181161708', 4, 8, 20, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu');
+(20, 'son13valores6', 'rils060301hdgytba6', 'Itzel', 'Ochoa', 'Gandara', 'itzel@gmail.com', '6181161707', 3, 3, 18, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
+(21, 'son13valores7', 'rils060301hdgytba7', 'Mafer', 'luna', 'soto', 'mafer@gmail.com', '6181161708', 4, 3, 20, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu');
 
 -- --------------------------------------------------------
 
@@ -189,7 +207,8 @@ INSERT INTO `reportes` (`id_reporte`, `tipo`, `id_calendario`, `id_incidencia`, 
 (5, 'incidencia', NULL, 5, NULL, '2026-11-11', '2026-11-10', 'FINALIZADO', 'se compró un nuevo foco en tal sucursal con tal dinero y lo puso tal poersona'),
 (6, 'incidencia', NULL, 6, NULL, '2026-11-17', '2026-11-17', 'FINALIZADO', 'se resano el piso con dos horas de antricipacion'),
 (7, 'incidencia', NULL, 7, NULL, '2026-11-17', NULL, 'ESPERA REQUISICIÓN', ''),
-(8, 'incidencia', NULL, 8, 18, '2026-11-17', NULL, 'ESPERA REQUISICIÓN', '');
+(8, 'incidencia', NULL, 8, 18, '2026-11-17', NULL, 'EN ESPERA DE RECURSO', ''),
+(9, 'incidencia', NULL, 9, 18, '2026-11-17', NULL, 'EN ESPERA DE RECURSO', '');
 
 -- --------------------------------------------------------
 
@@ -217,7 +236,9 @@ CREATE TABLE `requisiciones` (
 
 INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `fecha`, `fecha_entrega`, `justificacion`, `descripcion_servicio`, `estado`, `tipo_financiamiento`, `id_elabora`) VALUES
 (2, 2, 14, 13, '2026-11-04', NULL, NULL, 'necesito dos panes', 'pendiente', 'est', 0),
-(3, 2, 14, NULL, '2026-11-04', NULL, NULL, 'sss', 'sss', 'sss', 0);
+(3, 2, 14, NULL, '2026-11-04', NULL, NULL, 'sss', 'sss', 'sss', 0),
+(4, 9, 18, 13, '2026-11-17', NULL, NULL, 'reparacion de techo dentro de la dirección\ncuadros de tablaroca para techo acondicionado', 'EN ESPERA', 'FONE', 18),
+(5, 8, 18, 13, '2026-11-17', NULL, NULL, 'mantenimiento de la cocina de la dirección\nun microondas nuevo', 'EN ESPERA', 'FONE', 18);
 
 -- --------------------------------------------------------
 
@@ -232,6 +253,16 @@ CREATE TABLE `requisiciones_detalle` (
   `cantidad` int(3) DEFAULT NULL,
   `descripcion` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `requisiciones_detalle`
+--
+
+INSERT INTO `requisiciones_detalle` (`id_detalle`, `id_requisicion`, `num_lote`, `cantidad`, `descripcion`) VALUES
+(1, 4, NULL, NULL, 'reparacion de techo dentro de la dirección'),
+(2, 4, '1', 4, 'cuadros de tablaroca para techo acondicionado'),
+(3, 5, NULL, NULL, 'mantenimiento de la cocina de la dirección'),
+(4, 5, '1', 1, 'un microondas nuevo');
 
 -- --------------------------------------------------------
 
@@ -275,7 +306,10 @@ INSERT INTO `salidas` (`id_salida`, `tipo_salida`, `motivo`, `destino`, `fecha`,
 (17, 'MEDICA', '123', '7777', '2026-11-09', '14:28:46', '19:05:06', 'FINALIZADO', 21, 20, 0, 0, '16:28:46', '02:36:20', NULL, NULL, '2026-11-09'),
 (18, 'PERSONAL', 'qqqq', 'qqq', '2026-11-10', '19:05:53', '19:06:02', 'FINALIZADO', 21, 20, 0, 1, '21:05:53', NULL, 1, NULL, '2026-11-09'),
 (19, 'CITA', 'sss', 'sss', '2026-11-11', NULL, NULL, 'RECHAZADA', 21, 20, 0, 0, NULL, NULL, NULL, NULL, NULL),
-(20, 'MEDICA', 'Cita con el doctor', 'ISSSTE', '2026-11-11', '20:50:10', '20:56:18', 'FINALIZADO', 20, 14, 0, 0, '22:50:10', NULL, NULL, NULL, '2026-11-10');
+(20, 'MEDICA', 'Cita con el doctor', 'ISSSTE', '2026-11-11', '20:50:10', '20:56:18', 'FINALIZADO', 20, 14, 0, 0, '22:50:10', NULL, NULL, NULL, '2026-11-10'),
+(21, 'PERSONAL', 'voy al recital de mi hijo, va a decir las efemerides', 'primaria Manuel Rosas Santillan', '2026-11-17', '15:03:44', '15:04:15', 'FINALIZADO', 21, 20, 0, 0, '17:03:44', NULL, NULL, NULL, '2026-11-17'),
+(22, 'PERSONAL', 'sss', '1ss', '2026-11-17', NULL, NULL, 'PENDIENTE', 15, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL),
+(23, 'CITA', 'ss', 'sss', '2026-11-17', '15:05:02', '15:05:17', 'FINALIZADO', 20, 18, 0, 1, '17:05:02', NULL, 1, '2026-11-17 15:05:56', '2026-11-17');
 
 -- --------------------------------------------------------
 
@@ -302,6 +336,89 @@ INSERT INTO `servicios` (`id_servicio`, `nombre`, `periodicidad`, `descripcion`,
 (5, 'mantenimiento de luminarias', 5, 'prender luminarias', 1),
 (6, 'areas verdes', 4, 'jjj', 0);
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tabulador_viaticos`
+--
+
+CREATE TABLE `tabulador_viaticos` (
+  `id_tabulador` bigint(20) NOT NULL,
+  `id_puesto` bigint(20) NOT NULL,
+  `id_zona` bigint(20) NOT NULL,
+  `tipo_comprobacion` enum('FACTURA','CONSTANCIA') NOT NULL,
+  `pernocta` tinyint(1) NOT NULL COMMENT '0 = Sin pernoctar, 1 = Pernoctar',
+  `monto_diario` decimal(10,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tabulador_viaticos`
+--
+
+INSERT INTO `tabulador_viaticos` (`id_tabulador`, `id_puesto`, `id_zona`, `tipo_comprobacion`, `pernocta`, `monto_diario`) VALUES
+(1, 1, 1, 'FACTURA', 0, 500.00),
+(2, 1, 1, 'FACTURA', 1, 1250.00),
+(3, 2, 1, 'FACTURA', 0, 400.00),
+(4, 2, 1, 'FACTURA', 1, 1050.00),
+(5, 3, 1, 'FACTURA', 0, 390.00),
+(6, 3, 1, 'FACTURA', 1, 1000.00),
+(7, 4, 1, 'FACTURA', 0, 350.00),
+(8, 4, 1, 'FACTURA', 1, 900.00),
+(9, 1, 1, 'CONSTANCIA', 0, 380.00),
+(10, 1, 1, 'CONSTANCIA', 1, 760.00),
+(11, 2, 1, 'CONSTANCIA', 0, 360.00),
+(12, 2, 1, 'CONSTANCIA', 1, 720.00),
+(13, 3, 1, 'CONSTANCIA', 0, 315.00),
+(14, 3, 1, 'CONSTANCIA', 1, 630.00),
+(15, 4, 1, 'CONSTANCIA', 0, 279.00),
+(16, 4, 1, 'CONSTANCIA', 1, 558.00),
+(17, 1, 2, 'FACTURA', 0, 700.00),
+(18, 1, 2, 'FACTURA', 1, 1600.00),
+(19, 2, 2, 'FACTURA', 0, 500.00),
+(20, 2, 2, 'FACTURA', 1, 1300.00),
+(21, 3, 2, 'FACTURA', 0, 450.00),
+(22, 3, 2, 'FACTURA', 1, 1191.00),
+(23, 4, 2, 'FACTURA', 0, 365.00),
+(24, 4, 2, 'FACTURA', 1, 916.00),
+(25, 1, 3, 'FACTURA', 0, 881.00),
+(26, 1, 3, 'FACTURA', 1, 2221.00),
+(27, 2, 3, 'FACTURA', 0, 549.00),
+(28, 2, 3, 'FACTURA', 1, 1832.00),
+(29, 3, 3, 'FACTURA', 0, 458.00),
+(30, 3, 3, 'FACTURA', 1, 1465.00),
+(31, 4, 3, 'FACTURA', 0, 367.00),
+(32, 4, 3, 'FACTURA', 1, 1191.00),
+(33, 1, 4, 'FACTURA', 0, 1258.00),
+(34, 1, 4, 'FACTURA', 1, 2749.00),
+(35, 2, 4, 'FACTURA', 0, 899.00),
+(36, 2, 4, 'FACTURA', 1, 2108.00),
+(37, 3, 4, 'FACTURA', 0, 719.00),
+(38, 3, 4, 'FACTURA', 1, 1832.00),
+(39, 4, 4, 'FACTURA', 0, 663.00),
+(40, 4, 4, 'FACTURA', 1, 1691.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `zonas_viaticos`
+--
+
+CREATE TABLE `zonas_viaticos` (
+  `id_zona` bigint(20) NOT NULL,
+  `nombre` varchar(120) NOT NULL,
+  `permite_constancia` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `zonas_viaticos`
+--
+
+INSERT INTO `zonas_viaticos` (`id_zona`, `nombre`, `permite_constancia`) VALUES
+(1, 'Dentro del estado más de 150 km', 1),
+(2, 'Cabeceras municipales de Santiago Papasq., Santa María del Oro', 0),
+(3, 'Zona Metropolitana Lagunera (Dgo-Coahuila)', 0),
+(4, 'Otros estados (Mex-Mty-Jal-Etc.)', 0);
+
 --
 -- Indexes for dumped tables
 --
@@ -319,6 +436,14 @@ ALTER TABLE `areas`
 ALTER TABLE `calendario`
   ADD PRIMARY KEY (`id_calendario`),
   ADD KEY `id_servicio` (`id_servicio`);
+
+--
+-- Indexes for table `comisiones`
+--
+ALTER TABLE `comisiones`
+  ADD PRIMARY KEY (`id_comision`),
+  ADD KEY `fk_area_designada` (`area_designada`),
+  ADD KEY `fk_id_personal` (`id_personal`);
 
 --
 -- Indexes for table `incidencias`
@@ -389,6 +514,20 @@ ALTER TABLE `servicios`
   ADD PRIMARY KEY (`id_servicio`);
 
 --
+-- Indexes for table `tabulador_viaticos`
+--
+ALTER TABLE `tabulador_viaticos`
+  ADD PRIMARY KEY (`id_tabulador`),
+  ADD UNIQUE KEY `uk_tarifa_unica` (`id_puesto`,`id_zona`,`tipo_comprobacion`,`pernocta`),
+  ADD KEY `fk_tabulador_zona` (`id_zona`);
+
+--
+-- Indexes for table `zonas_viaticos`
+--
+ALTER TABLE `zonas_viaticos`
+  ADD PRIMARY KEY (`id_zona`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -405,10 +544,16 @@ ALTER TABLE `calendario`
   MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del calendario', AUTO_INCREMENT=21;
 
 --
+-- AUTO_INCREMENT for table `comisiones`
+--
+ALTER TABLE `comisiones`
+  MODIFY `id_comision` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de la comisión';
+
+--
 -- AUTO_INCREMENT for table `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `personal`
@@ -426,31 +571,43 @@ ALTER TABLE `puestos`
 -- AUTO_INCREMENT for table `reportes`
 --
 ALTER TABLE `reportes`
-  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=9;
+  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `requisiciones`
 --
 ALTER TABLE `requisiciones`
-  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de requisición', AUTO_INCREMENT=4;
+  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de requisición', AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `requisiciones_detalle`
 --
 ALTER TABLE `requisiciones_detalle`
-  MODIFY `id_detalle` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_detalle` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `salidas`
 --
 ALTER TABLE `salidas`
-  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de la salida', AUTO_INCREMENT=21;
+  MODIFY `id_salida` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de la salida', AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `servicios`
 --
 ALTER TABLE `servicios`
   MODIFY `id_servicio` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del servicio', AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `tabulador_viaticos`
+--
+ALTER TABLE `tabulador_viaticos`
+  MODIFY `id_tabulador` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+
+--
+-- AUTO_INCREMENT for table `zonas_viaticos`
+--
+ALTER TABLE `zonas_viaticos`
+  MODIFY `id_zona` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
@@ -467,6 +624,13 @@ ALTER TABLE `areas`
 --
 ALTER TABLE `calendario`
   ADD CONSTRAINT `id_servicio` FOREIGN KEY (`id_servicio`) REFERENCES `servicios` (`id_servicio`);
+
+--
+-- Constraints for table `comisiones`
+--
+ALTER TABLE `comisiones`
+  ADD CONSTRAINT `fk_area_designada` FOREIGN KEY (`area_designada`) REFERENCES `areas` (`id_area`),
+  ADD CONSTRAINT `fk_id_personal` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`);
 
 --
 -- Constraints for table `incidencias`
@@ -511,6 +675,13 @@ ALTER TABLE `requisiciones_detalle`
 ALTER TABLE `salidas`
   ADD CONSTRAINT `salidas_ibfk_1` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `salidas_ibfk_2` FOREIGN KEY (`id_autoriza`) REFERENCES `personal` (`id_personal`);
+
+--
+-- Constraints for table `tabulador_viaticos`
+--
+ALTER TABLE `tabulador_viaticos`
+  ADD CONSTRAINT `fk_tabulador_puesto` FOREIGN KEY (`id_puesto`) REFERENCES `puestos` (`id_puesto`),
+  ADD CONSTRAINT `fk_tabulador_zona` FOREIGN KEY (`id_zona`) REFERENCES `zonas_viaticos` (`id_zona`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
