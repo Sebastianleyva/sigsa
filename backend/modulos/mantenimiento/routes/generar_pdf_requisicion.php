@@ -25,12 +25,14 @@ try {
             CONCAT_WS(' ', pa.nombre, pa.apellido_p, pa.apellido_m) AS autorizador,
             CONCAT_WS(' ', pe.nombre, pe.apellido_p, pe.apellido_m) AS elaborador,
             pe.correo AS correo_elaborador,
-            pe.telefono AS telefono_elaborador
+            pe.telefono AS telefono_elaborador,
+            cc.codigo_contable AS codigo_direccion
         FROM requisiciones q
         JOIN reportes r ON r.id_reporte = q.id_reporte
         LEFT JOIN personal ps ON ps.id_personal = q.id_solicita
         LEFT JOIN personal pa ON pa.id_personal = q.id_autoriza
         LEFT JOIN personal pe ON pe.id_personal = q.id_elabora
+        LEFT JOIN codigos_contables cc ON cc.id_codigo = q.id_codigo
         WHERE q.id_requisicion = :id_requisicion"
     );
     $query->execute([':id_requisicion' => $id_requisicion]);
@@ -70,6 +72,16 @@ try {
             ? "{$partesEntrega[2]}/{$partesEntrega[1]}/{$partesEntrega[0]}"
             : (string) $requisicion['fecha_entrega'];
     }
+
+    $codigoCuenta = $requisicion['tipo_codigo'] === 'CC_CENTRAL'
+        ? ($requisicion['cc_central'] ?? '')
+        : ($requisicion['codigo_direccion'] ?? '');
+    $cuentaCargo = $codigoCuenta
+        ? "1-99999-{$codigoCuenta}-25021-1-2110008020010-2501-134020506-5050001-61015-015"
+        : '1-99999-51351001-5101-25021-1-2110008020010-2501-134020506-5050001-61015-015';
+    $tituloRequisicion = strtoupper((string) ($requisicion['tipo_requisicion'] ?? 'SERVICIOS')) === 'MATERIALES'
+        ? 'REQUISICIÓN DE MATERIALES'
+        : 'REQUISICIÓN DE SERVICIOS';
 
     // Opcional: Pega aquí tus logos en Base64 (ej. 'data:image/png;base64,...') para que carguen dentro del Blob
     $logoDurangoBase64 = '';
@@ -297,7 +309,7 @@ try {
           </div>
         <?php endif; ?>
       </div>
-      <div class="titulo-requisicion">REQUISICIÓN DE SERVICIOS</div>
+      <div class="titulo-requisicion"><?= $escape($tituloRequisicion) ?></div>
     </div>
 
     <!-- DATOS GENERALES -->
@@ -330,7 +342,7 @@ try {
       </tr>
       <tr>
         <td class="centro" style="font-size: 8pt;">
-          1-99999-51351001-5101-25021-1-2110008020010-2501-134020506-5050001-61015-015
+          <?= $escape($cuentaCargo) ?>
         </td>
         <td colspan="2" style="padding: 2px 4px; font-size: 7.5pt;">
           <table class="sin-borde">
