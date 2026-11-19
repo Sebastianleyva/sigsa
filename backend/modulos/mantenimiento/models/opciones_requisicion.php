@@ -25,5 +25,17 @@ function obtener_opciones_requisicion($pdo, $id_elabora) {
         }
     }
 
-    return ['personal' => $personal, 'elabora' => $elabora, 'director' => $director];
+    $query = $pdo->query(
+        "SELECT id_codigo, codigo_contable, descripcion
+        FROM codigos_contables
+        ORDER BY descripcion, codigo_contable"
+    );
+    $codigos_contables = $query->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        'personal' => $personal,
+        'elabora' => $elabora,
+        'director' => $director,
+        'codigos_contables' => $codigos_contables,
+    ];
 }

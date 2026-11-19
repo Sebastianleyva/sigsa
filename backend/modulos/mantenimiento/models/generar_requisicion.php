@@ -7,6 +7,21 @@ function generar_requisicion($pdo, $input, $usuario) {
     $fecha = validar_fecha($input['fecha'] ?? null, 'fecha');
     $fecha_entrega = validar_fecha_opcional($input['fecha_entrega'] ?? null, 'fecha_entrega');
     $detalles = $input['detalles'] ?? null;
+    $tipo_requisicion = validar_opcion($input['tipo_requisicion'] ?? null, ['SERVICIOS', 'MATERIALES'], 'tipo_requisicion');
+    $tipo_codigo = validar_opcion($input['tipo_codigo'] ?? null, ['CC_DIRECCION', 'CC_CENTRAL'], 'tipo_codigo');
+    $id_codigo = null;
+    $cc_central = null;
+
+    if ($tipo_codigo === 'CC_DIRECCION') {
+        $id_codigo = validar_entero_positivo($input['id_codigo'] ?? null, 'id_codigo');
+        $query = $pdo->prepare("SELECT id_codigo FROM codigos_contables WHERE id_codigo = :id_codigo");
+        $query->execute([':id_codigo' => $id_codigo]);
+        if (!$query->fetchColumn()) {
+            throw new InvalidArgumentException('El código contable seleccionado no es válido');
+        }
+    } else {
+        $cc_central = validar_codigo_central($input['cc_central'] ?? null);
+    }
 
     if (!is_array($detalles) || count($detalles) === 0) {
         throw new InvalidArgumentException('Debe existir al menos un renglón de requisición');
@@ -78,10 +93,11 @@ function generar_requisicion($pdo, $input, $usuario) {
 
         $query = $pdo->prepare(
             "INSERT INTO requisiciones
-            (id_reporte, id_solicita, id_autoriza, fecha, fecha_entrega, justificacion, descripcion_servicio, estado, tipo_financiamiento, id_elabora)
-            VALUES (:id_reporte, :id_solicita, :id_autoriza, :fecha, :fecha_entrega, :justificacion, :descripcion_servicio, 'EN ESPERA', 'FONE', :id_elabora)"
+            (tipo_requisicion, id_reporte, id_solicita, id_autoriza, fecha, fecha_entrega, justificacion, descripcion_servicio, estado, tipo_financiamiento, id_elabora, tipo_codigo, id_codigo, cc_central)
+            VALUES (:tipo_requisicion, :id_reporte, :id_solicita, :id_autoriza, :fecha, :fecha_entrega, :justificacion, :descripcion_servicio, 'EN ESPERA', 'FONE', :id_elabora, :tipo_codigo, :id_codigo, :cc_central)"
         );
         $query->execute([
+            ':tipo_requisicion' => $tipo_requisicion,
             ':id_reporte' => $id_reporte,
             ':id_solicita' => $id_solicita,
             ':id_autoriza' => $id_autoriza,
@@ -90,6 +106,9 @@ function generar_requisicion($pdo, $input, $usuario) {
             ':justificacion' => $justificacion,
             ':descripcion_servicio' => $descripcion_servicio,
             ':id_elabora' => $id_elabora,
+            ':tipo_codigo' => $tipo_codigo,
+            ':id_codigo' => $id_codigo,
+            ':cc_central' => $cc_central,
         ]);
         $id_requisicion = (int) $pdo->lastInsertId();
 
@@ -142,6 +161,27 @@ function validar_fecha($valor, $campo) {
 
 function validar_fecha_opcional($valor, $campo) {
     return $valor === null || $valor === '' ? null : validar_fecha($valor, $campo);
+}
+
+function validar_opcion($valor, $opciones, $campo) {
+    if (!is_string($valor) || !in_array($valor, $opciones, true)) {
+        throw new InvalidArgumentException("El campo {$campo} no es válido");
+    }
+    return $valor;
+}
+
+function validar_codigo_central($valor) {
+    if (!is_string($valor)) {
+        throw new InvalidArgumentException('El código contable central es obligatorio');
+    }
+    $codigo = trim($valor);
+    if ($codigo === '') {
+        throw new InvalidArgumentException('El código contable central es obligatorio');
+    }
+    if (strlen($codigo) > 14) {
+        throw new InvalidArgumentException('El código contable central es demasiado largo');
+    }
+    return $codigo;
 }
 
 function validar_personal_requisicion($pdo, $id_personal, $rol) {
