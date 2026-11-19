@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 19, 2026 at 05:04 PM
+-- Generation Time: Nov 19, 2026 at 06:31 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -82,27 +82,28 @@ INSERT INTO `calendario` (`id_calendario`, `fecha_destinada`, `estado`, `id_serv
 CREATE TABLE `codigos_contables` (
   `id_codigo` bigint(20) NOT NULL COMMENT 'identificador del numero de cuenta',
   `codigo_contable` varchar(14) NOT NULL COMMENT 'codigo del numero de cuenta',
-  `descripcion` text DEFAULT NULL COMMENT 'descripción del uso del código de cuenta'
+  `descripcion` text DEFAULT NULL COMMENT 'descripción del uso del código de cuenta',
+  `activo` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `codigos_contables`
 --
 
-INSERT INTO `codigos_contables` (`id_codigo`, `codigo_contable`, `descripcion`) VALUES
-(1, '51221001-22101', 'ALIMENTACION'),
-(2, '51246001-24601', 'MATERIAL ELECTRICO'),
-(3, '51261001-26101', 'GASOLINA'),
-(4, '51291001-29101', 'HERRAMIENTAS MENORES'),
-(5, '51294001-29401', 'REFACCIONES DE LAS TICS'),
-(6, '51296001-29601', 'REFACCIONES EQUIPO DE TRANSPORTE'),
-(7, '51327003-32703', 'LICENCIAS (ARRENDAMIENTOS ACTIVOS INTANGIBLES)'),
-(8, '51353001-35301', 'MANTENIMIENTO DE LAS TICS'),
-(9, '51355001-35501', 'MANTENIMIENTO DE EQUIPO DE TRANSPORTE'),
-(10, '51371001-37101', 'PASAJES AEREOS'),
-(11, '51372001-37201', 'PASAJES TERRESTRES'),
-(12, '51372002-37202', 'CUOTAS Y PEAJES'),
-(13, '51375001-37501', 'VIATICOS EN EL PAIS');
+INSERT INTO `codigos_contables` (`id_codigo`, `codigo_contable`, `descripcion`, `activo`) VALUES
+(1, '51221001-22101', 'ALIMENTACION', 1),
+(2, '51246001-24601', 'MATERIAL ELECTRICO', 1),
+(3, '51261001-26101', 'GASOLINA', 1),
+(4, '51291001-29101', 'HERRAMIENTAS MENORES', 1),
+(5, '51294001-29401', 'REFACCIONES DE LAS TICS', 1),
+(6, '51296001-29601', 'REFACCIONES EQUIPO DE TRANSPORTE', 1),
+(7, '51327003-32703', 'LICENCIAS (ARRENDAMIENTOS ACTIVOS INTANGIBLES)', 1),
+(8, '51353001-35301', 'MANTENIMIENTO DE LAS TICS', 1),
+(9, '51355001-35501', 'MANTENIMIENTO DE EQUIPO DE TRANSPORTE', 1),
+(10, '51371001-37101', 'PASAJES AEREOS', 1),
+(11, '51372001-37201', 'PASAJES TERRESTRES', 1),
+(12, '51372002-37202', 'CUOTAS Y PEAJES', 1),
+(13, '51375001-37501', 'VIATICOS EN EL PAIS', 1);
 
 -- --------------------------------------------------------
 
@@ -155,7 +156,11 @@ INSERT INTO `incidencias` (`id_incidencia`, `id_personal`, `id_autoriza`, `descr
 (7, 13, 13, 'sse rompio una puerta', '2026-11-17', 'MEDIA', 'ACEPTADA', 'en la cocina'),
 (8, 20, 18, 'exploto el microondas', '2026-11-17', 'MEDIA', 'ACEPTADA', 'cocina'),
 (9, 16, 18, 'se cayó un pedazo del techo y se esta pudriendo alrededor de ello', '2026-11-17', 'BAJA', 'ACEPTADA', 'en l,a oficina de carlitos'),
-(10, 20, 14, 'kknn', '2026-11-18', 'MEDIA', 'ACEPTADA', 'cocina');
+(10, 20, 14, 'kknn', '2026-11-18', 'MEDIA', 'ACEPTADA', 'cocina'),
+(11, 14, 14, 'sssssss', '2026-11-19', 'BAJA', 'ACEPTADA', 'sssssss'),
+(12, 14, 14, 'ssss', '2026-11-19', 'MEDIA', 'ACEPTADA', 'sss'),
+(13, 14, 14, 'sssss', '2026-11-19', 'BAJA', 'ACEPTADA', 'sss'),
+(14, 14, 14, 'sssss', '2026-11-19', 'ALTA', 'ACEPTADA', 'sss');
 
 -- --------------------------------------------------------
 
@@ -273,14 +278,18 @@ CREATE TABLE `reportes` (
 INSERT INTO `reportes` (`id_reporte`, `tipo`, `id_calendario`, `id_incidencia`, `id_personal`, `fecha_inicio`, `fecha_final`, `estado`, `descripcion`) VALUES
 (2, 'incidencia', NULL, NULL, NULL, '2026-11-04', NULL, 'pendiente', 'si'),
 (3, 'incidencia', NULL, 3, NULL, '2026-11-11', '2026-11-17', 'FINALIZADO', 'lo revivieron'),
-(4, 'incidencia', NULL, 4, NULL, '2026-11-11', NULL, 'ESPERA REQUISICIÓN', 'ssss'),
+(4, 'incidencia', NULL, 4, NULL, '2026-11-11', NULL, 'EN ESPERA DE RECURSO', 'ssss'),
 (5, 'incidencia', NULL, 5, NULL, '2026-11-11', '2026-11-10', 'FINALIZADO', 'se compró un nuevo foco en tal sucursal con tal dinero y lo puso tal poersona'),
 (6, 'incidencia', NULL, 6, NULL, '2026-11-17', '2026-11-17', 'FINALIZADO', 'se resano el piso con dos horas de antricipacion'),
-(7, 'incidencia', NULL, 7, NULL, '2026-11-17', NULL, 'ESPERA REQUISICIÓN', ''),
+(7, 'incidencia', NULL, 7, NULL, '2026-11-17', NULL, 'EN ESPERA DE RECURSO', ''),
 (8, 'incidencia', NULL, 8, 18, '2026-11-17', NULL, 'EN ESPERA DE RECURSO', ''),
 (9, 'incidencia', NULL, 9, 18, '2026-11-17', NULL, 'EN ESPERA DE RECURSO', ''),
 (10, 'incidencia', NULL, 10, 14, '2026-11-18', NULL, 'EN ESPERA DE RECURSO', ''),
-(11, 'servicio programado', 19, NULL, 13, '2026-11-19', NULL, 'EN CURSO', '');
+(11, 'servicio programado', 19, NULL, 13, '2026-11-19', NULL, 'EN CURSO', ''),
+(12, 'incidencia', NULL, 11, 14, '2026-11-19', NULL, 'EN ESPERA DE RECURSO', ''),
+(13, 'incidencia', NULL, 12, 14, '2026-11-19', NULL, 'EN ESPERA DE RECURSO', ''),
+(14, 'incidencia', NULL, 13, 14, '2026-11-19', NULL, 'EN ESPERA DE RECURSO', ''),
+(15, 'incidencia', NULL, 14, 14, '2026-11-19', NULL, 'EN ESPERA DE RECURSO', '');
 
 -- --------------------------------------------------------
 
@@ -315,7 +324,13 @@ INSERT INTO `requisiciones` (`id_requisicion`, `tipo_requisicion`, `id_reporte`,
 (3, '', 2, 14, NULL, '2026-11-04', NULL, NULL, 'sss', 'sss', 'sss', 0, 'CC_DIRECCION', NULL, NULL),
 (4, '', 9, 18, 13, '2026-11-17', NULL, NULL, 'reparacion de techo dentro de la dirección\ncuadros de tablaroca para techo acondicionado', 'EN ESPERA', 'FONE', 18, 'CC_DIRECCION', NULL, NULL),
 (5, '', 8, 18, 13, '2026-11-17', NULL, NULL, 'mantenimiento de la cocina de la dirección\nun microondas nuevo', 'EN ESPERA', 'FONE', 18, 'CC_DIRECCION', NULL, NULL),
-(6, '', 10, 14, 13, '2026-11-18', NULL, 'JJ', 'cocin', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', NULL, NULL);
+(6, '', 10, 14, 13, '2026-11-18', NULL, 'JJ', 'cocin', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', NULL, NULL),
+(7, 'SERVICIOS', 7, 13, 13, '2026-11-19', NULL, 'de nuevo', 'mantenimiento', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', 4, NULL),
+(8, 'SERVICIOS', 4, 20, 13, '2026-11-19', NULL, 'adecuacion de luminarias dentro de la direccion, con el objetivo de mejorar el rendimiento dentro de ella', 'mantenimiento de luminarias en la direccion\nfocos electricos led de 45x15 cm', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', 2, NULL),
+(9, 'MATERIALES', 12, 14, 13, '2026-11-19', NULL, 'sssssss', 'ssss\nssss\nsss', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', 2, NULL),
+(10, 'SERVICIOS', 13, 14, 13, '2026-11-19', NULL, 'sssss', 'sss\nss', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', 5, NULL),
+(11, 'SERVICIOS', 14, 14, 13, '2026-11-19', NULL, 'sssss', 'ssss\nsss', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', 4, NULL),
+(12, 'MATERIALES', 15, 14, 13, '2026-11-11', NULL, 'dadfvcc', 'ssss\nsdedfd\nsss', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', 5, NULL);
 
 -- --------------------------------------------------------
 
@@ -340,7 +355,20 @@ INSERT INTO `requisiciones_detalle` (`id_detalle`, `id_requisicion`, `num_lote`,
 (2, 4, '1', 4, 'cuadros de tablaroca para techo acondicionado'),
 (3, 5, NULL, NULL, 'mantenimiento de la cocina de la dirección'),
 (4, 5, '1', 1, 'un microondas nuevo'),
-(5, 6, '1', 2, 'cocin');
+(5, 6, '1', 2, 'cocin'),
+(6, 7, NULL, NULL, 'mantenimiento'),
+(7, 8, NULL, NULL, 'mantenimiento de luminarias en la direccion'),
+(8, 8, '1', 45, 'focos electricos led de 45x15 cm'),
+(9, 9, NULL, NULL, 'ssss'),
+(10, 9, '1', 12, 'ssss'),
+(11, 9, '2', 22, 'sss'),
+(12, 10, NULL, NULL, 'sss'),
+(13, 10, '1', 2, 'ss'),
+(14, 11, NULL, NULL, 'ssss'),
+(15, 11, '1', 222, 'sss'),
+(16, 12, NULL, NULL, 'ssss'),
+(17, 12, '1', 33, 'sdedfd'),
+(18, 12, '2', 33, 'sss');
 
 -- --------------------------------------------------------
 
@@ -686,7 +714,7 @@ ALTER TABLE `comisiones`
 -- AUTO_INCREMENT for table `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `orden_servicio`
@@ -716,19 +744,19 @@ ALTER TABLE `puestos`
 -- AUTO_INCREMENT for table `reportes`
 --
 ALTER TABLE `reportes`
-  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=12;
+  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `requisiciones`
 --
 ALTER TABLE `requisiciones`
-  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de requisición', AUTO_INCREMENT=7;
+  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de requisición', AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `requisiciones_detalle`
 --
 ALTER TABLE `requisiciones_detalle`
-  MODIFY `id_detalle` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_detalle` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `salidas`
