@@ -7,9 +7,9 @@ require_once '../../../includes/conexion.php';
 require_once '../models/codigos_contables.php';
 
 try {
-    validar_jwt_requerido();
+    $usuario = validar_jwt_requerido();
     validar_csrf_requerido();
-    requerir_rol([1, 2, 3]);
+    requerir_permiso_mantenimiento($pdo, $usuario);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode(['data' => listar_codigos_contables($pdo)]);

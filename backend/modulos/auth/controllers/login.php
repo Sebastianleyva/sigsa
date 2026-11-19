@@ -24,7 +24,12 @@ function login($pdo, $input) {
     }
 
     $correo = $input['correo'];
-    $query = $pdo->prepare("SELECT * FROM personal WHERE correo = :correo");
+    $query = $pdo->prepare(
+        "SELECT p.*, a.nombre AS area_nombre
+        FROM personal p
+        LEFT JOIN areas a ON a.id_area = p.area
+        WHERE p.correo = :correo"
+    );
     $query->execute(['correo' => $correo]);
     $usuario = $query->fetch();
 
@@ -62,6 +67,7 @@ function login($pdo, $input) {
     $_SESSION['id_personal'] = $usuario['id_personal'];
     $_SESSION['id_jefe']     = $usuario['id_jefe'];
     $_SESSION['area']        = $usuario['area'];
+    $_SESSION['area_nombre'] = $usuario['area_nombre'];
     $_SESSION['nombre']      = $usuario['nombre'];
     $_SESSION['correo']      = $usuario['correo'];
     $_SESSION['puesto']      = $usuario['puesto'];
@@ -82,6 +88,7 @@ function login($pdo, $input) {
             "nombre"      => $_SESSION['nombre'],
             "correo"      => $_SESSION['correo'],
             "area"        => $_SESSION['area'],
+            "area_nombre" => $_SESSION['area_nombre'],
             "puesto"      => $_SESSION['puesto']
         ]
     ]);

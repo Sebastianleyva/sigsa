@@ -7,6 +7,7 @@ import {
   crearServicio,
   desactivarServicio,
   actualizarFechaCalendario,
+  puedeGestionarMantenimiento,
   type ServicioMantenimiento,
 } from '../../services/mantenimiento_services'
 import './styles/servicios_mantenimiento.css'
@@ -21,7 +22,7 @@ function fechaLocal(fecha: Date) {
 export default function ServiciosMantenimiento() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
-  const esAdministrador = [1, 2, 3].includes(usuario?.puesto ?? 0)
+  const esAdministrador = puedeGestionarMantenimiento(usuario)
   const fechaMinima = fechaLocal(new Date())
   const fechaMaxima = `${new Date().getFullYear() + 1}-12-31`
   const [servicios, setServicios] = useState<ServicioMantenimiento[]>([])
@@ -143,7 +144,7 @@ export default function ServiciosMantenimiento() {
       <main className="servicios-mantenimiento-page">
         <section className="servicios-mantenimiento-content">
           <h1>Acceso restringido</h1>
-          <p>Solo los puestos administrativos pueden administrar servicios.</p>
+          <p>Solo dirección, subdirección y el Departamento de Operaciones y Logística pueden administrar servicios.</p>
           <button type="button" onClick={() => navigate('/mantenimiento')}>Volver al módulo</button>
         </section>
       </main>

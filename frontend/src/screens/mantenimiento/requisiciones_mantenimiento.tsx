@@ -4,6 +4,7 @@ import { authService } from '../../services/auth_services.js'
 import {
   aceptarRequisicion,
   consultarReportesRequisicion,
+  puedeGestionarMantenimiento,
   type ReporteRequisicion,
 } from '../../services/mantenimiento_services'
 import './styles/requisiciones_mantenimiento.css'
@@ -27,7 +28,7 @@ function mostrarOrigen(reporte: ReporteRequisicion) {
 export default function RequisicionesMantenimiento() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
-  const autorizado = [1, 2, 3].includes(Number(usuario?.puesto))
+  const autorizado = puedeGestionarMantenimiento(usuario)
   const puedeAutorizar = [1, 2].includes(Number(usuario?.puesto))
   const [reportes, setReportes] = useState<ReporteRequisicion[]>([])
   const [cargando, setCargando] = useState(true)

@@ -7,6 +7,7 @@ import {
   consultarCodigosContables,
   crearCodigoContable,
   desactivarCodigoContable,
+  puedeGestionarMantenimiento,
   type CodigoContableMantenimiento,
 } from '../../services/mantenimiento_services'
 import './styles/codigos_contables_mantenimiento.css'
@@ -14,7 +15,7 @@ import './styles/codigos_contables_mantenimiento.css'
 export default function CodigosContablesMantenimiento() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
-  const esAdministrador = [1, 2, 3].includes(usuario?.puesto ?? 0)
+  const esAdministrador = puedeGestionarMantenimiento(usuario)
   const [codigos, setCodigos] = useState<CodigoContableMantenimiento[]>([])
   const [codigo, setCodigo] = useState('')
   const [descripcion, setDescripcion] = useState('')
@@ -127,7 +128,7 @@ export default function CodigosContablesMantenimiento() {
       <main className="codigos-contables-page">
         <section className="codigos-contables-content">
           <h1>Acceso restringido</h1>
-          <p>Solo los puestos administrativos pueden administrar códigos contables.</p>
+          <p>Solo dirección, subdirección y el Departamento de Operaciones y Logística pueden administrar códigos contables.</p>
           <button type="button" onClick={() => navigate('/mantenimiento')}>Volver al módulo</button>
         </section>
       </main>

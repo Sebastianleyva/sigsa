@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 try {
     $usuario = validar_jwt_requerido();
     validar_csrf_requerido();
-    requerir_rol([1, 2, 3]);
+    requerir_permiso_mantenimiento($pdo, $usuario);
     $id_elabora = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
     if ($id_elabora === false) throw new InvalidArgumentException('El usuario en sesión no es válido');
     echo json_encode(obtener_opciones_requisicion($pdo, $id_elabora));

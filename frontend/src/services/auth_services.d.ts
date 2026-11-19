@@ -112,7 +112,8 @@ export type Usuario = {
   apellido_m: string
   correo: string
   puesto: number
-  area: number
+  area: number | null
+  area_nombre?: string | null
   id_jefe: number | null
 }
 

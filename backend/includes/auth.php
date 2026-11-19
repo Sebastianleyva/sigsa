@@ -152,3 +152,33 @@ function requerir_area(array $areas_permitidas) {
         exit;
     }
 }
+
+function requerir_permiso_mantenimiento($pdo, array $usuario) {
+    $id_personal = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id_personal === false) {
+        http_response_code(403);
+        echo json_encode(['ERROR' => 'No tienes permisos para realizar esta acción']);
+        exit;
+    }
+
+    $query = $pdo->prepare(
+        "SELECT p.puesto, UPPER(TRIM(COALESCE(a.nombre, ''))) AS nombre_area
+        FROM personal p
+        LEFT JOIN areas a ON a.id_area = p.area
+        WHERE p.id_personal = :id_personal AND p.activo = '1'"
+    );
+    $query->execute([':id_personal' => $id_personal]);
+    $personal = $query->fetch(PDO::FETCH_ASSOC);
+    $esDireccion = $personal && in_array((int) $personal['puesto'], [1, 2], true);
+    $esOperacionesLogistica = $personal
+        && in_array($personal['nombre_area'], [
+            'DEPARTAMENTO DE OPERACIONES Y LOGISTICA',
+            'DEPARTAMENTO DE OPERACIONES Y LOGÍSTICA',
+        ], true);
+
+    if (!$esDireccion && !$esOperacionesLogistica) {
+        http_response_code(403);
+        echo json_encode(['ERROR' => 'Solo dirección, subdirección y el Departamento de Operaciones y Logística pueden realizar esta acción']);
+        exit;
+    }
+}

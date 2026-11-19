@@ -33,6 +33,21 @@ export type CodigoContableMantenimiento = {
   activo: number
 }
 
+export function puedeGestionarMantenimiento(usuario: {
+  puesto?: number | string
+  area?: number | string | null
+  area_nombre?: string | null
+} | null) {
+  if ([1, 2].includes(Number(usuario?.puesto))) return true
+  const area = usuario?.area_nombre
+    ?.normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLocaleUpperCase('es-MX')
+  return area === 'DEPARTAMENTO DE OPERACIONES Y LOGISTICA'
+    || (!usuario?.area_nombre && Number(usuario?.area) === 6)
+}
+
 export type FechaServicio = {
   id_calendario: number
   fecha_destinada: string

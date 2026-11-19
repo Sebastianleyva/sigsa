@@ -6,6 +6,7 @@ import {
   consultarReportesRequisicion,
   crearRequisicion,
   obtenerPdfRequisicion,
+  puedeGestionarMantenimiento,
   type DetalleRequisicion,
   type OpcionesRequisicion,
   type ReporteRequisicion,
@@ -49,7 +50,7 @@ export default function CrearRequisicionMantenimiento() {
   const navigate = useNavigate()
   const { id_reporte: idReporteParam } = useParams()
   const usuario = authService.getUsuarioActual()
-  const autorizado = [1, 2, 3].includes(Number(usuario?.puesto))
+  const autorizado = puedeGestionarMantenimiento(usuario)
   const idReporte = Number(idReporteParam)
   const parametroValido = Number.isInteger(idReporte) && idReporte > 0
   const [reporte, setReporte] = useState<ReporteRequisicion | null>(null)

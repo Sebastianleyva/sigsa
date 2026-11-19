@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { authService } from '../../services/auth_services.js'
+import { puedeGestionarMantenimiento } from '../../services/mantenimiento_services'
 import './styles/mantenimiento_home.css'
 
 type OpcionMantenimiento = {
@@ -95,7 +96,14 @@ const destinos: Record<string, string> = {
 export default function MantenimientoHome() {
     const navigate = useNavigate()
     const usuario = authService.getUsuarioActual()
-    const puedeVerFuncionesAdministrativas = [1, 2, 3].includes(usuario?.puesto ?? 0)
+    const puedeGestionar = puedeGestionarMantenimiento(usuario)
+    const esPersonalAdministrativo = [1, 2, 3].includes(Number(usuario?.puesto))
+    const puedeVerFuncionesAdministrativas = esPersonalAdministrativo || puedeGestionar
+    const opcionesVisibles = opcionesAdministrativas.filter((opcion) => (
+      ['/mantenimiento/servicios', '/mantenimiento/requisiciones', '/mantenimiento/codigos-contables'].includes(opcion.path)
+        ? puedeGestionar
+        : esPersonalAdministrativo
+    ))
 
     const renderOpciones = (opciones: OpcionMantenimiento[]) => opciones.map((opcion) => (
       <button
@@ -159,7 +167,7 @@ export default function MantenimientoHome() {
                             </div>
                         </div>
                         <div className="mantenimiento-home-grid mantenimiento-home-admin-grid">
-                            {renderOpciones(opcionesAdministrativas)}
+                            {renderOpciones(opcionesVisibles)}
                         </div>
                     </section>
                 )}

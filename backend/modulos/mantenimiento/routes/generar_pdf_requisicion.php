@@ -9,9 +9,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    validar_jwt_requerido();
+    $usuario = validar_jwt_requerido();
     validar_csrf_requerido();
-    requerir_rol([1, 2, 3]);
+    requerir_permiso_mantenimiento($pdo, $usuario);
 
     $id_requisicion = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
     if ($id_requisicion === false || $id_requisicion === null) {
