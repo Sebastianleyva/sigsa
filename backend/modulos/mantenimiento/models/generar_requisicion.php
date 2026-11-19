@@ -14,10 +14,10 @@ function generar_requisicion($pdo, $input, $usuario) {
 
     if ($tipo_codigo === 'CC_DIRECCION') {
         $id_codigo = validar_entero_positivo($input['id_codigo'] ?? null, 'id_codigo');
-        $query = $pdo->prepare("SELECT id_codigo FROM codigos_contables WHERE id_codigo = :id_codigo");
+        $query = $pdo->prepare("SELECT id_codigo FROM codigos_contables WHERE id_codigo = :id_codigo AND activo = 1");
         $query->execute([':id_codigo' => $id_codigo]);
         if (!$query->fetchColumn()) {
-            throw new InvalidArgumentException('El código contable seleccionado no es válido');
+            throw new InvalidArgumentException('El código contable seleccionado no existe o está desactivado');
         }
     } else {
         $cc_central = validar_codigo_central($input['cc_central'] ?? null);

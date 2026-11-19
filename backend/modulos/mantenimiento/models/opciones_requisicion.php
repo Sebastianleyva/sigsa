@@ -28,6 +28,7 @@ function obtener_opciones_requisicion($pdo, $id_elabora) {
     $query = $pdo->query(
         "SELECT id_codigo, codigo_contable, descripcion
         FROM codigos_contables
+        WHERE activo = 1
         ORDER BY descripcion, codigo_contable"
     );
     $codigos_contables = $query->fetchAll(PDO::FETCH_ASSOC);
