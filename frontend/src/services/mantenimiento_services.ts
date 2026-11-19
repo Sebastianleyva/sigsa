@@ -11,6 +11,12 @@ export type CalendarioServicio = {
   periodicidad: number
 }
 
+export type ReporteCalendarioCreado = {
+  id_reporte: number | string
+  id_calendario: number
+  estado: string
+}
+
 export type ServicioMantenimiento = {
   id_servicio: number
   nombre: string
@@ -163,6 +169,35 @@ export async function consultarCalendarioMes(anio: number, mes: number) {
     return response.data.data
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar el calendario.')
+  }
+}
+
+export async function iniciarMantenimientoCalendario(
+  id_calendario: number,
+  fecha_inicio: string,
+  requiere_requisicion: boolean,
+): Promise<ReporteCalendarioCreado> {
+  try {
+    const response = await api.post<{ reporte: ReporteCalendarioCreado }>(
+      'mantenimiento/routes/generar_reporte.php',
+      {
+        tipo: 'servicio programado',
+        id_calendario,
+        fecha_inicio,
+        estado: requiere_requisicion ? 'ESPERA REQUISICIÓN' : 'EN CURSO',
+        descripcion: '',
+      },
+    )
+    if (!response.data?.reporte) {
+      throw new Error('El servidor devolvió una respuesta inválida al iniciar el mantenimiento.')
+    }
+    return {
+      ...response.data.reporte,
+      id_reporte: Number(response.data.reporte.id_reporte),
+      id_calendario: Number(response.data.reporte.id_calendario),
+    }
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible iniciar el mantenimiento.')
   }
 }
 

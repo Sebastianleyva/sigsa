@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { consultarCalendarioMes, type CalendarioServicio } from '../../services/mantenimiento_services'
+import { authService } from '../../services/auth_services.js'
+import ConfirmationDialog from '../../components/ConfirmationDialog'
+import { consultarCalendarioMes, iniciarMantenimientoCalendario, type CalendarioServicio } from '../../services/mantenimiento_services'
 import './styles/calendario_mantenimiento.css'
 
 const nombresMes = [
@@ -70,12 +72,15 @@ function MesCalendario({ anio, mes, servicios, fechaSeleccionada, onSeleccionarF
 
 export default function CalendarioMantenimiento() {
   const navigate = useNavigate()
+  const puedeIniciar = [1, 2].includes(Number(authService.getUsuarioActual()?.puesto))
   const anioActual = new Date().getFullYear()
   const [anio, setAnio] = useState(() => new Date().getFullYear())
   const [calendario, setCalendario] = useState<CalendarioServicio[]>([])
   const [fechaSeleccionada, setFechaSeleccionada] = useState<string | null>(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [confirmacion, setConfirmacion] = useState<CalendarioServicio | null>(null)
+  const [procesandoId, setProcesandoId] = useState<number | null>(null)
 
   useEffect(() => {
     let vigente = true
@@ -117,6 +122,26 @@ export default function CalendarioMantenimiento() {
   const eventosSeleccionados = fechaSeleccionada
     ? calendario.filter((evento) => evento.fecha_destinada === fechaSeleccionada)
     : []
+
+  async function iniciarMantenimiento(requiereRequisicion: boolean) {
+    if (!confirmacion || procesandoId !== null) return
+    const evento = confirmacion
+    setConfirmacion(null)
+    setProcesandoId(evento.id_calendario)
+    setError('')
+    try {
+      const fecha = new Date()
+      const fechaInicio = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`
+      const resultado = await iniciarMantenimientoCalendario(evento.id_calendario, fechaInicio, requiereRequisicion)
+      setCalendario((actual) => actual.map((item) => (
+        item.id_calendario === evento.id_calendario ? { ...item, estado: resultado.estado } : item
+      )))
+    } catch (errorInicio: unknown) {
+      setError(errorInicio instanceof Error ? errorInicio.message : 'No fue posible iniciar el mantenimiento.')
+    } finally {
+      setProcesandoId(null)
+    }
+  }
 
   return (
     <main className="calendario-mantenimiento-page">
@@ -173,17 +198,46 @@ export default function CalendarioMantenimiento() {
               {fechaSeleccionada && eventosSeleccionados.length === 0 && <p>No hay mantenimientos programados para esta fecha.</p>}
               {eventosSeleccionados.map((evento) => (
                 <article className="calendario-evento" key={evento.id_calendario}>
-                  <div>
+                  <div className="calendario-evento-info">
+                    <span className="calendario-evento-kicker">SERVICIO #{evento.id_servicio}</span>
                     <h3>{evento.servicio}</h3>
                     <p>{evento.descripcion_servicio}</p>
+                    <dl className="calendario-evento-datos">
+                      <div><dt>Fecha programada</dt><dd>{evento.fecha_destinada}</dd></div>
+                      <div><dt>Periodicidad</dt><dd>Cada {evento.periodicidad} semanas</dd></div>
+                    </dl>
                   </div>
-                  <span>{evento.estado}</span>
+                  <div className="calendario-evento-acciones">
+                    <span>{evento.estado}</span>
+                    {puedeIniciar && evento.estado.toLocaleUpperCase('es-MX') === 'PENDIENTE' && (
+                      <button
+                        type="button"
+                        className="calendario-evento-iniciar"
+                        disabled={procesandoId !== null}
+                        onClick={() => setConfirmacion(evento)}
+                      >
+                        {procesandoId === evento.id_calendario ? 'Iniciando…' : 'Iniciar mantenimiento'}
+                      </button>
+                    )}
+                  </div>
                 </article>
               ))}
             </section>
           </>
         )}
       </section>
+      {confirmacion && (
+        <ConfirmationDialog
+          open
+          title="¿El mantenimiento requiere requisición?"
+          message="Si la requiere, el mantenimiento quedará en espera de requisición. Si no, iniciará en curso."
+          onCancel={() => setConfirmacion(null)}
+          actions={[
+            { label: 'No, iniciar en curso', variant: 'primary', onClick: () => void iniciarMantenimiento(false) },
+            { label: 'Sí, requiere requisición', variant: 'secondary', onClick: () => void iniciarMantenimiento(true) },
+          ]}
+        />
+      )}
     </main>
   )
 }

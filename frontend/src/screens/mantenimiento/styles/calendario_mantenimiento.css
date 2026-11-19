@@ -271,6 +271,42 @@
   border-top: 1px solid var(--calendario-line);
 }
 
+.calendario-evento-info { min-width: 0; }
+
+.calendario-evento-kicker {
+  color: var(--calendario-green);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.calendario-evento-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 10px 0 0;
+}
+
+.calendario-evento-datos div { display: grid; gap: 2px; }
+.calendario-evento-datos dt { color: var(--calendario-muted); font-size: 9px; }
+.calendario-evento-datos dd { margin: 0; font-size: 11px; font-weight: 700; }
+
+.calendario-evento-acciones { display: grid; flex: 0 0 auto; justify-items: end; gap: 9px; }
+
+.calendario-evento-iniciar {
+  padding: 8px 11px;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  background: var(--calendario-green);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.calendario-evento-iniciar:disabled { opacity: .55; cursor: wait; }
+
 .calendario-evento h3 {
   margin: 0 0 4px;
   font-size: 13px;
@@ -339,6 +375,8 @@
   .calendario-evento {
     align-items: flex-start;
   }
+
+  .calendario-evento-acciones { justify-items: start; }
 }
 
 @media (prefers-reduced-motion: reduce) {
