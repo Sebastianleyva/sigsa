@@ -291,7 +291,23 @@
 .calendario-evento-datos dt { color: var(--calendario-muted); font-size: 9px; }
 .calendario-evento-datos dd { margin: 0; font-size: 11px; font-weight: 700; }
 
-.calendario-evento-acciones { display: grid; flex: 0 0 auto; justify-items: end; gap: 9px; }
+.calendario-evento-acciones {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.calendario-evento-estado {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 20px;
+  color: var(--calendario-green);
+  background: #e8f2eb;
+  font-size: 10px;
+  font-weight: 700;
+}
 
 .calendario-evento-iniciar {
   padding: 8px 11px;
@@ -317,16 +333,6 @@
   color: var(--calendario-muted);
   font-size: 11px;
   line-height: 1.5;
-}
-
-.calendario-evento > span {
-  flex: 0 0 auto;
-  padding: 5px 8px;
-  border-radius: 20px;
-  color: var(--calendario-green);
-  background: #e8f2eb;
-  font-size: 10px;
-  font-weight: 700;
 }
 
 .calendario-mensaje,
@@ -376,7 +382,7 @@
     align-items: flex-start;
   }
 
-  .calendario-evento-acciones { justify-items: start; }
+  .calendario-evento-acciones { align-items: flex-start; }
 }
 
 @media (prefers-reduced-motion: reduce) {

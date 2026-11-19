@@ -208,7 +208,7 @@ export default function CalendarioMantenimiento() {
                     </dl>
                   </div>
                   <div className="calendario-evento-acciones">
-                    <span>{evento.estado}</span>
+                    <span className="calendario-evento-estado">{evento.estado}</span>
                     {puedeIniciar && evento.estado.toLocaleUpperCase('es-MX') === 'PENDIENTE' && (
                       <button
                         type="button"
