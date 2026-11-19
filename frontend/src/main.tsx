@@ -15,6 +15,7 @@ import CambiarContrasenaScreen from './screens/auth/cambiar_contrasena.tsx'
 import MantenimientoHome, { MantenimientoDestino } from './screens/mantenimiento/mantenimiento_home.tsx'
 import CalendarioMantenimiento from './screens/mantenimiento/calendario_mantenimiento.tsx'
 import ServiciosMantenimiento from './screens/mantenimiento/servicios_mantenimiento.tsx'
+import CodigosContablesMantenimiento from './screens/mantenimiento/codigos_contables_mantenimiento.tsx'
 import MantenimientosEnCurso from './screens/mantenimiento/mantenimientos_en_curso.tsx'
 import ConcluirMantenimiento from './screens/mantenimiento/concluir_mantenimiento.tsx'
 import HistorialReportesMantenimiento from './screens/mantenimiento/historial_reportes.tsx'
@@ -34,6 +35,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/mantenimiento" element={<MantenimientoHome />} />
         <Route path="/mantenimiento/calendario" element={<CalendarioMantenimiento />} />
         <Route path="/mantenimiento/servicios" element={<ServiciosMantenimiento />} />
+        <Route path="/mantenimiento/codigos-contables" element={<CodigosContablesMantenimiento />} />
         <Route path="/mantenimiento/reportes/en-curso" element={<MantenimientosEnCurso />} />
         <Route path="/mantenimiento/reportes/historial" element={<HistorialReportesMantenimiento />} />
         <Route path="/mantenimiento/reportes/:id_reporte/concluir" element={<ConcluirMantenimiento />} />

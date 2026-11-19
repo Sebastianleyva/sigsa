@@ -71,6 +71,14 @@ const opcionesAdministrativas: OpcionMantenimiento[] = [
         action: 'Ver requisiciones',
         path: '/mantenimiento/requisiciones',
     },
+    {
+        index: '08',
+        category: 'CATÁLOGO',
+        title: 'Códigos contables',
+        description: 'Agrega, modifica o desactiva códigos contables para las requisiciones.',
+        action: 'Administrar códigos',
+        path: '/mantenimiento/codigos-contables',
+    },
 ]
 
 const destinos: Record<string, string> = {
@@ -81,6 +89,7 @@ const destinos: Record<string, string> = {
     '/mantenimiento/reportes/en-curso': 'Mantenimientos en curso',
     '/mantenimiento/servicios': 'Servicios',
     '/mantenimiento/requisiciones': 'Requisiciones',
+    '/mantenimiento/codigos-contables': 'Códigos contables',
 }
 
 export default function MantenimientoHome() {

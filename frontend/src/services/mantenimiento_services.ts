@@ -26,6 +26,13 @@ export type ServicioMantenimiento = {
   fechas_destinadas: FechaServicio[]
 }
 
+export type CodigoContableMantenimiento = {
+  id_codigo: number
+  codigo_contable: string
+  descripcion: string | null
+  activo: number
+}
+
 export type FechaServicio = {
   id_calendario: number
   fecha_destinada: string
@@ -372,7 +379,13 @@ export async function consultarOpcionesRequisicion(): Promise<OpcionesRequisicio
     if (!Array.isArray(response.data?.personal) || !Array.isArray(response.data?.codigos_contables) || !response.data?.elabora || !response.data?.director) {
       throw new Error('El servidor devolvió opciones inválidas para la requisición.')
     }
-    return response.data
+    return {
+      ...response.data,
+      codigos_contables: response.data.codigos_contables.map((codigo) => ({
+        ...codigo,
+        id_codigo: Number(codigo.id_codigo),
+      })),
+    }
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar el personal para la requisición.')
   }
@@ -497,5 +510,69 @@ export async function desactivarServicio(id_servicio: number) {
     })
   } catch (error) {
     throw obtenerError(error, 'No fue posible eliminar el servicio.')
+  }
+}
+
+export async function consultarCodigosContables(): Promise<CodigoContableMantenimiento[]> {
+  try {
+    const response = await api.get<{ data: CodigoContableMantenimiento[] }>(
+      'mantenimiento/routes/codigos_contables.php',
+    )
+    if (!Array.isArray(response.data?.data)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar códigos contables.')
+    }
+    return response.data.data.map((codigo) => ({
+      ...codigo,
+      id_codigo: Number(codigo.id_codigo),
+      activo: Number(codigo.activo),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar los códigos contables.')
+  }
+}
+
+export async function crearCodigoContable(datos: Pick<CodigoContableMantenimiento, 'codigo_contable' | 'descripcion'>) {
+  try {
+    const response = await api.post<{ codigo_contable: CodigoContableMantenimiento }>(
+      'mantenimiento/routes/codigos_contables.php',
+      datos,
+    )
+    if (!response.data?.codigo_contable) {
+      throw new Error('El servidor devolvió una respuesta inválida al crear el código contable.')
+    }
+    return {
+      ...response.data.codigo_contable,
+      id_codigo: Number(response.data.codigo_contable.id_codigo),
+      activo: Number(response.data.codigo_contable.activo),
+    }
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible crear el código contable.')
+  }
+}
+
+export async function actualizarCodigoContable(
+  datos: Pick<CodigoContableMantenimiento, 'id_codigo' | 'codigo_contable' | 'descripcion'>,
+) {
+  try {
+    const response = await api.patch<{ codigo_contable: Omit<CodigoContableMantenimiento, 'activo'> }>(
+      'mantenimiento/routes/codigos_contables.php',
+      datos,
+    )
+    if (!response.data?.codigo_contable) {
+      throw new Error('El servidor devolvió una respuesta inválida al actualizar el código contable.')
+    }
+    return response.data.codigo_contable
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible actualizar el código contable.')
+  }
+}
+
+export async function desactivarCodigoContable(id_codigo: number) {
+  try {
+    await api.delete('mantenimiento/routes/codigos_contables.php', {
+      data: { id_codigo },
+    })
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible desactivar el código contable.')
   }
 }
