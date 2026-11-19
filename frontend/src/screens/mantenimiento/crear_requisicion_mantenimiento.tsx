@@ -13,7 +13,9 @@ import {
 import './styles/requisiciones_mantenimiento.css'
 
 const AREA_SOLICITANTE = 'DIRECCIÓN DE SISTEMAS Y TECNOLOGÍAS'
-const CUENTA_CARGO = '1-99999-51351001-5101-25021-1-2110008020010-2501-134020506-5050001-61015-015'
+const CUENTA_BASE = '1-99999'
+const CUENTA_RESTO = '-25021-1-2110008020010-2501-134020506-5050001-61015-015'
+const CUENTA_POR_DEFECTO = `${CUENTA_BASE}-51351001-5101${CUENTA_RESTO}`
 
 function fechaActual() {
   return new Date().toISOString().slice(0, 10)
@@ -56,6 +58,10 @@ export default function CrearRequisicionMantenimiento() {
   const [fechaEntrega, setFechaEntrega] = useState('')
   const [justificacion, setJustificacion] = useState('')
   const [detalles, setDetalles] = useState<DetalleRequisicion[]>([detalleVacio()])
+  const [tipoRequisicion, setTipoRequisicion] = useState<'SERVICIOS' | 'MATERIALES'>('SERVICIOS')
+  const [tipoCodigo, setTipoCodigo] = useState<'CC_DIRECCION' | 'CC_CENTRAL'>('CC_DIRECCION')
+  const [idCodigo, setIdCodigo] = useState<number | null>(null)
+  const [ccCentral, setCcCentral] = useState('')
   const [cargando, setCargando] = useState(true)
   const [guardando, setGuardando] = useState(false)
   const [errorCarga, setErrorCarga] = useState('')
@@ -110,6 +116,14 @@ export default function CrearRequisicionMantenimiento() {
   async function enviarFormulario(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!reporte || !opciones || guardando) return
+    if (tipoCodigo === 'CC_DIRECCION' && idCodigo === null) {
+      setError('Selecciona un código contable de dirección.')
+      return
+    }
+    if (tipoCodigo === 'CC_CENTRAL' && ccCentral.trim() === '') {
+      setError('Captura el código contable central.')
+      return
+    }
     if (!detalles.some((detalle) => detalle.descripcion.trim() !== '')) {
       setError('Agrega al menos un renglón con descripción.')
       return
@@ -123,6 +137,10 @@ export default function CrearRequisicionMantenimiento() {
         fecha_entrega: fechaEntrega || null,
         justificacion: justificacion.trim(),
         detalles: detalles.filter((detalle) => detalle.descripcion.trim() !== ''),
+        tipo_requisicion: tipoRequisicion,
+        tipo_codigo: tipoCodigo,
+        id_codigo: tipoCodigo === 'CC_DIRECCION' ? idCodigo : null,
+        cc_central: tipoCodigo === 'CC_CENTRAL' ? ccCentral.trim() : null,
       })
       setIdRequisicion(Number(resultado.id_requisicion))
     } catch (errorCreacion: unknown) {
@@ -133,6 +151,15 @@ export default function CrearRequisicionMantenimiento() {
   }
 
   const elabora = opciones?.elabora
+  const codigoDireccion = opciones?.codigos_contables.find((codigo) => codigo.id_codigo === idCodigo)?.codigo_contable
+  const codigoCuenta = tipoCodigo === 'CC_DIRECCION'
+    ? codigoDireccion
+    : tipoCodigo === 'CC_CENTRAL'
+      ? ccCentral.trim()
+      : null
+  const cuentaCargo = codigoCuenta
+    ? `${CUENTA_BASE}-${codigoCuenta}${CUENTA_RESTO}`
+    : CUENTA_POR_DEFECTO
 
   return (
     <main className="requisiciones-mantenimiento-page">
@@ -161,9 +188,72 @@ export default function CrearRequisicionMantenimiento() {
         {!cargando && errorCarga && <p className="requisiciones-mantenimiento-error" role="alert">{errorCarga}</p>}
         {!cargando && !errorCarga && reporte && opciones && (
           <form className="requisiciones-mantenimiento-official-form" onSubmit={(event) => void enviarFormulario(event)}>
+            <section className="requisiciones-mantenimiento-form-panel" aria-label="Tipo de requisición">
+              <div className="requisiciones-mantenimiento-form-grid">
+                <label htmlFor="requisicion-tipo">Tipo de requisición <span>*</span></label>
+                <select
+                  id="requisicion-tipo"
+                  value={tipoRequisicion}
+                  onChange={(event) => setTipoRequisicion(event.target.value as 'SERVICIOS' | 'MATERIALES')}
+                  required
+                >
+                  <option value="SERVICIOS">Requisición de servicios</option>
+                  <option value="MATERIALES">Requisición de materiales</option>
+                </select>
+              </div>
+            </section>
+
             <section className="requisiciones-mantenimiento-official-header" aria-label="Datos institucionales">
               <div><span>Área solicitante</span><strong>{AREA_SOLICITANTE}</strong></div>
-              <div><span>Cuenta(s) cargo</span><strong>{CUENTA_CARGO}</strong></div>
+              <div className="requisiciones-mantenimiento-account-charge">
+                <span>Cuenta(s) cargo</span>
+                <div className="requisiciones-mantenimiento-form-grid">
+                  <label htmlFor="requisicion-tipo-codigo">Tipo de código contable <span>*</span></label>
+                  <select
+                    id="requisicion-tipo-codigo"
+                    value={tipoCodigo}
+                    onChange={(event) => {
+                      setTipoCodigo(event.target.value as 'CC_DIRECCION' | 'CC_CENTRAL')
+                      setError('')
+                    }}
+                    required
+                  >
+                    <option value="CC_DIRECCION">Código contable dirección</option>
+                    <option value="CC_CENTRAL">Código contable central</option>
+                  </select>
+                  {tipoCodigo === 'CC_DIRECCION' ? (
+                    <>
+                      <label htmlFor="requisicion-codigo-direccion">Código y descripción <span>*</span></label>
+                      <select
+                        id="requisicion-codigo-direccion"
+                        value={idCodigo ?? ''}
+                        onChange={(event) => setIdCodigo(event.target.value === '' ? null : Number(event.target.value))}
+                        required
+                      >
+                        <option value="">Selecciona un código contable</option>
+                        {opciones.codigos_contables.map((codigo) => (
+                          <option key={codigo.id_codigo} value={codigo.id_codigo}>
+                            {codigo.codigo_contable} — {codigo.descripcion ?? 'Sin descripción'}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  ) : (
+                    <>
+                      <label htmlFor="requisicion-codigo-central">Código contable central <span>*</span></label>
+                      <input
+                        id="requisicion-codigo-central"
+                        value={ccCentral}
+                        onChange={(event) => setCcCentral(event.target.value)}
+                        maxLength={14}
+                        placeholder="Ej. 51221001-22101"
+                        required
+                      />
+                    </>
+                  )}
+                </div>
+                <strong>{cuentaCargo}</strong>
+              </div>
               <div><span>Financiamiento</span><strong>FONE</strong></div>
               <div><span>Programas federales</span><strong>N/A</strong></div>
               <div><span>Folio</span><strong>Se asigna en oficinas centrales</strong></div>

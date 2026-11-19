@@ -75,6 +75,10 @@ export type RequisicionMantenimiento = {
   descripcion_servicio: string
   estado: string
   tipo_financiamiento: string
+  tipo_requisicion?: string
+  tipo_codigo?: 'CC_DIRECCION' | 'CC_CENTRAL'
+  id_codigo?: number | null
+  cc_central?: string | null
 }
 export type DetalleRequisicion = {
   num_lote: string
@@ -94,6 +98,12 @@ export type OpcionesRequisicion = {
   personal: PersonaRequisicion[]
   elabora: PersonaRequisicion | null
   director: PersonaRequisicion | null
+  codigos_contables: CodigoContable[]
+}
+export type CodigoContable = {
+  id_codigo: number
+  codigo_contable: string
+  descripcion: string | null
 }
 export type RequisicionReporte = {
   id_requisicion: number
@@ -336,6 +346,10 @@ export async function crearRequisicion(
     fecha_entrega: string | null
     justificacion: string
     detalles: DetalleRequisicion[]
+    tipo_requisicion: 'SERVICIOS' | 'MATERIALES'
+    tipo_codigo: 'CC_DIRECCION' | 'CC_CENTRAL'
+    id_codigo: number | null
+    cc_central: string | null
   },
 ): Promise<RequisicionMantenimiento> {
   try {
@@ -355,7 +369,7 @@ export async function crearRequisicion(
 export async function consultarOpcionesRequisicion(): Promise<OpcionesRequisicion> {
   try {
     const response = await api.get<OpcionesRequisicion>('mantenimiento/routes/opciones_requisicion.php')
-    if (!Array.isArray(response.data?.personal) || !response.data?.elabora || !response.data?.director) {
+    if (!Array.isArray(response.data?.personal) || !Array.isArray(response.data?.codigos_contables) || !response.data?.elabora || !response.data?.director) {
       throw new Error('El servidor devolvió opciones inválidas para la requisición.')
     }
     return response.data
