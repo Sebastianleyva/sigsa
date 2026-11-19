@@ -34,7 +34,7 @@ function aceptar_requisicion($pdo, $input, $id_autoriza) {
         }
 
         $query = $pdo->prepare(
-            "SELECT estado
+            "SELECT estado, id_calendario
             FROM reportes
             WHERE id_reporte = :id_reporte
             FOR UPDATE"
@@ -64,6 +64,11 @@ function aceptar_requisicion($pdo, $input, $id_autoriza) {
             WHERE id_reporte = :id_reporte"
         );
         $query->execute([':id_reporte' => $requisicion['id_reporte']]);
+
+        if ($reporte['id_calendario'] !== null) {
+            $query = $pdo->prepare("UPDATE calendario SET estado = 'EN CURSO' WHERE id_calendario = :id_calendario");
+            $query->execute([':id_calendario' => $reporte['id_calendario']]);
+        }
 
         $pdo->commit();
         return [

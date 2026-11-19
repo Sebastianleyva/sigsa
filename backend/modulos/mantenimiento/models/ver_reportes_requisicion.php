@@ -13,7 +13,7 @@ function ver_reportes_requisicion($pdo) {
             r.descripcion,
             i.lugar,
             i.descripcion AS descripcion_incidencia,
-            i.id_autoriza AS id_solicita,
+            COALESCE(i.id_autoriza, r.id_personal) AS id_solicita,
             i.urgencia,
             c.fecha_destinada,
             s.nombre AS servicio,
@@ -24,7 +24,7 @@ function ver_reportes_requisicion($pdo) {
         FROM reportes r
         LEFT JOIN incidencias i ON i.id_incidencia = r.id_incidencia
         LEFT JOIN personal p ON p.id_personal = i.id_personal
-        LEFT JOIN personal pa ON pa.id_personal = i.id_autoriza
+        LEFT JOIN personal pa ON pa.id_personal = COALESCE(i.id_autoriza, r.id_personal)
         LEFT JOIN calendario c ON c.id_calendario = r.id_calendario
         LEFT JOIN servicios s ON s.id_servicio = c.id_servicio
         LEFT JOIN requisiciones q ON q.id_requisicion = (

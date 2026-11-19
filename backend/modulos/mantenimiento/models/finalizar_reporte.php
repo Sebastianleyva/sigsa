@@ -26,7 +26,7 @@ function finalizar_reporte($pdo, $input) {
     $pdo->beginTransaction();
     try {
         $query = $pdo->prepare(
-            "SELECT estado
+            "SELECT estado, id_calendario
             FROM reportes
             WHERE id_reporte = :id_reporte
             FOR UPDATE"
@@ -53,6 +53,11 @@ function finalizar_reporte($pdo, $input) {
         ]);
         if ($query->rowCount() !== 1) {
             throw new DomainException('El reporte ya fue concluido por otro usuario');
+        }
+
+        if ($reporte['id_calendario'] !== null) {
+            $query = $pdo->prepare("UPDATE calendario SET estado = 'FINALIZADO' WHERE id_calendario = :id_calendario");
+            $query->execute([':id_calendario' => $reporte['id_calendario']]);
         }
 
         $query = $pdo->prepare(

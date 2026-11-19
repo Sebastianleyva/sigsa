@@ -30,10 +30,14 @@ function generar_reporte($pdo, $input, $id_personal){
             throw new InvalidArgumentException('El id_calendario debe ser un entero positivo');
         }
 
-        $query = $pdo->prepare('SELECT id_calendario FROM calendario WHERE id_calendario = :id_calendario');
+        $query = $pdo->prepare("SELECT id_calendario, estado FROM calendario WHERE id_calendario = :id_calendario");
         $query->execute([':id_calendario' => $id_calendario]);
-        if ($query->fetchColumn() === false) {
+        $calendario = $query->fetch(PDO::FETCH_ASSOC);
+        if (!$calendario) {
             throw new OutOfBoundsException('Calendario no encontrado');
+        }
+        if (strtoupper(trim($calendario['estado'])) !== 'PENDIENTE') {
+            throw new DomainException('El mantenimiento del calendario ya fue iniciado');
         }
     } else {
         $id_incidencia = filter_var($id_incidencia, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -75,6 +79,11 @@ function generar_reporte($pdo, $input, $id_personal){
         'estado' => $estado,
         'descripcion' => $descripcion
     ]);
+
+    if ($tiene_calendario) {
+        $query = $pdo->prepare('UPDATE calendario SET estado = :estado WHERE id_calendario = :id_calendario');
+        $query->execute([':estado' => $estado, ':id_calendario' => $id_calendario]);
+    }
 
     return [
         'id_reporte' => $pdo->lastInsertId(),

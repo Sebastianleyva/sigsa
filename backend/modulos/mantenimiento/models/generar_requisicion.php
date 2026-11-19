@@ -39,7 +39,7 @@ function generar_requisicion($pdo, $input, $usuario) {
 
     $pdo->beginTransaction();
     try {
-        $query = $pdo->prepare("SELECT estado, id_incidencia FROM reportes WHERE id_reporte = :id_reporte FOR UPDATE");
+        $query = $pdo->prepare("SELECT estado, id_incidencia, id_calendario, id_personal FROM reportes WHERE id_reporte = :id_reporte FOR UPDATE");
         $query->execute([':id_reporte' => $id_reporte]);
         $reporte = $query->fetch(PDO::FETCH_ASSOC);
         if (!$reporte) throw new OutOfBoundsException('Reporte no encontrado');
@@ -47,14 +47,17 @@ function generar_requisicion($pdo, $input, $usuario) {
             throw new DomainException('El reporte no está pendiente de requisición');
         }
 
-        if (!$reporte['id_incidencia']) {
-            throw new DomainException('El reporte no tiene una incidencia autorizada asociada');
+        if ($reporte['id_incidencia']) {
+            $query = $pdo->prepare("SELECT id_autoriza FROM incidencias WHERE id_incidencia = :id_incidencia");
+            $query->execute([':id_incidencia' => $reporte['id_incidencia']]);
+            $id_solicita = $query->fetchColumn();
+        } elseif ($reporte['id_calendario']) {
+            $id_solicita = $reporte['id_personal'];
+        } else {
+            throw new DomainException('El reporte no tiene un origen válido');
         }
-        $query = $pdo->prepare("SELECT id_autoriza FROM incidencias WHERE id_incidencia = :id_incidencia");
-        $query->execute([':id_incidencia' => $reporte['id_incidencia']]);
-        $id_solicita = $query->fetchColumn();
         if (!$id_solicita) {
-            throw new DomainException('La incidencia no tiene una persona autorizadora registrada');
+            throw new DomainException('El reporte no tiene una persona solicitante registrada');
         }
 
         $query = $pdo->query(
