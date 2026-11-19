@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 19, 2026 at 04:47 PM
+-- Generation Time: Nov 19, 2026 at 04:54 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -290,6 +290,7 @@ INSERT INTO `reportes` (`id_reporte`, `tipo`, `id_calendario`, `id_incidencia`, 
 
 CREATE TABLE `requisiciones` (
   `id_requisicion` bigint(20) NOT NULL COMMENT 'identificador de requisición',
+  `tipo_requisicion` varchar(30) NOT NULL,
   `id_reporte` bigint(20) NOT NULL COMMENT 'identificador del reporte',
   `id_solicita` bigint(20) NOT NULL COMMENT 'identificador del personal solicitante de la requisición',
   `id_autoriza` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que autoriza la requisición',
@@ -308,12 +309,12 @@ CREATE TABLE `requisiciones` (
 -- Dumping data for table `requisiciones`
 --
 
-INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `fecha`, `fecha_entrega`, `justificacion`, `descripcion_servicio`, `estado`, `tipo_financiamiento`, `id_elabora`, `tipo_codigo`, `id_codigo`) VALUES
-(2, 2, 14, 13, '2026-11-04', NULL, NULL, 'necesito dos panes', 'pendiente', 'est', 0, 'CC_DIRECCION', NULL),
-(3, 2, 14, NULL, '2026-11-04', NULL, NULL, 'sss', 'sss', 'sss', 0, 'CC_DIRECCION', NULL),
-(4, 9, 18, 13, '2026-11-17', NULL, NULL, 'reparacion de techo dentro de la dirección\ncuadros de tablaroca para techo acondicionado', 'EN ESPERA', 'FONE', 18, 'CC_DIRECCION', NULL),
-(5, 8, 18, 13, '2026-11-17', NULL, NULL, 'mantenimiento de la cocina de la dirección\nun microondas nuevo', 'EN ESPERA', 'FONE', 18, 'CC_DIRECCION', NULL),
-(6, 10, 14, 13, '2026-11-18', NULL, 'JJ', 'cocin', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', NULL);
+INSERT INTO `requisiciones` (`id_requisicion`, `tipo_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `fecha`, `fecha_entrega`, `justificacion`, `descripcion_servicio`, `estado`, `tipo_financiamiento`, `id_elabora`, `tipo_codigo`, `id_codigo`) VALUES
+(2, '', 2, 14, 13, '2026-11-04', NULL, NULL, 'necesito dos panes', 'pendiente', 'est', 0, 'CC_DIRECCION', NULL),
+(3, '', 2, 14, NULL, '2026-11-04', NULL, NULL, 'sss', 'sss', 'sss', 0, 'CC_DIRECCION', NULL),
+(4, '', 9, 18, 13, '2026-11-17', NULL, NULL, 'reparacion de techo dentro de la dirección\ncuadros de tablaroca para techo acondicionado', 'EN ESPERA', 'FONE', 18, 'CC_DIRECCION', NULL),
+(5, '', 8, 18, 13, '2026-11-17', NULL, NULL, 'mantenimiento de la cocina de la dirección\nun microondas nuevo', 'EN ESPERA', 'FONE', 18, 'CC_DIRECCION', NULL),
+(6, '', 10, 14, 13, '2026-11-18', NULL, 'JJ', 'cocin', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', NULL);
 
 -- --------------------------------------------------------
 
