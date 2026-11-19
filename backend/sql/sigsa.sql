@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 18, 2026 at 05:10 PM
+-- Generation Time: Nov 19, 2026 at 04:47 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -70,8 +70,39 @@ INSERT INTO `calendario` (`id_calendario`, `fecha_destinada`, `estado`, `id_serv
 (16, '2026-12-15', 'PENDIENTE', 5),
 (17, '2027-01-19', 'PENDIENTE', 5),
 (18, '2026-11-16', 'PENDIENTE', 6),
-(19, '2026-12-14', 'PENDIENTE', 6),
+(19, '2026-12-14', 'EN CURSO', 6),
 (20, '2027-01-11', 'PENDIENTE', 6);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `codigos_contables`
+--
+
+CREATE TABLE `codigos_contables` (
+  `id_codigo` bigint(20) NOT NULL COMMENT 'identificador del numero de cuenta',
+  `codigo_contable` varchar(14) NOT NULL COMMENT 'codigo del numero de cuenta',
+  `descripcion` text DEFAULT NULL COMMENT 'descripción del uso del código de cuenta'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `codigos_contables`
+--
+
+INSERT INTO `codigos_contables` (`id_codigo`, `codigo_contable`, `descripcion`) VALUES
+(1, '51221001-22101', 'ALIMENTACION'),
+(2, '51246001-24601', 'MATERIAL ELECTRICO'),
+(3, '51261001-26101', 'GASOLINA'),
+(4, '51291001-29101', 'HERRAMIENTAS MENORES'),
+(5, '51294001-29401', 'REFACCIONES DE LAS TICS'),
+(6, '51296001-29601', 'REFACCIONES EQUIPO DE TRANSPORTE'),
+(7, '51327003-32703', 'LICENCIAS (ARRENDAMIENTOS ACTIVOS INTANGIBLES)'),
+(8, '51353001-35301', 'MANTENIMIENTO DE LAS TICS'),
+(9, '51355001-35501', 'MANTENIMIENTO DE EQUIPO DE TRANSPORTE'),
+(10, '51371001-37101', 'PASAJES AEREOS'),
+(11, '51372001-37201', 'PASAJES TERRESTRES'),
+(12, '51372002-37202', 'CUOTAS Y PEAJES'),
+(13, '51375001-37501', 'VIATICOS EN EL PAIS');
 
 -- --------------------------------------------------------
 
@@ -81,13 +112,17 @@ INSERT INTO `calendario` (`id_calendario`, `fecha_destinada`, `estado`, `id_serv
 
 CREATE TABLE `comisiones` (
   `id_comision` bigint(20) NOT NULL COMMENT 'identificador de la comisión',
-  `fecha` date DEFAULT NULL COMMENT 'fecha en la que se registra la solicitud de comisión',
-  `tipo_comision` varchar(30) DEFAULT NULL COMMENT 'tipo de comisión (urbana o fuera de la mancha urbana)',
-  `area_designada` bigint(20) DEFAULT NULL COMMENT 'area encargada de realizar la comisión',
-  `ubicacion` varchar(150) DEFAULT NULL COMMENT 'ubicación de la institución de solicita la comsión',
+  `fecha` date NOT NULL COMMENT 'fecha en la que se registra la solicitud de comisión',
+  `tipo_comision` varchar(30) NOT NULL COMMENT 'tipo de comisión (urbana o fuera de la mancha urbana)',
+  `tipo_destino` varchar(50) NOT NULL,
+  `area_designada` bigint(20) NOT NULL COMMENT 'area encargada de realizar la comisión',
+  `ubicacion` varchar(150) NOT NULL COMMENT 'ubicación de la institución de solicita la comsión',
   `institucion_solicita` varchar(150) DEFAULT NULL COMMENT 'nombre de la institución que solicita la comisión',
   `nombre_solicita` varchar(150) DEFAULT NULL COMMENT 'nombre de la persona que solicita la comisión',
-  `id_personal` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que registra la comisión'
+  `id_personal` bigint(20) NOT NULL COMMENT 'identificador del personal que registra la comisión',
+  `estado` varchar(30) NOT NULL,
+  `fecha_inicio` date NOT NULL,
+  `fecha_final` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -119,7 +154,29 @@ INSERT INTO `incidencias` (`id_incidencia`, `id_personal`, `id_autoriza`, `descr
 (6, 20, 13, 'se rompió el suelo', '2026-11-17', 'MEDIA', 'ACEPTADA', 'pasillo de la cocina'),
 (7, 13, 13, 'sse rompio una puerta', '2026-11-17', 'MEDIA', 'ACEPTADA', 'en la cocina'),
 (8, 20, 18, 'exploto el microondas', '2026-11-17', 'MEDIA', 'ACEPTADA', 'cocina'),
-(9, 16, 18, 'se cayó un pedazo del techo y se esta pudriendo alrededor de ello', '2026-11-17', 'BAJA', 'ACEPTADA', 'en l,a oficina de carlitos');
+(9, 16, 18, 'se cayó un pedazo del techo y se esta pudriendo alrededor de ello', '2026-11-17', 'BAJA', 'ACEPTADA', 'en l,a oficina de carlitos'),
+(10, 20, 14, 'kknn', '2026-11-18', 'MEDIA', 'ACEPTADA', 'cocina');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orden_servicio`
+--
+
+CREATE TABLE `orden_servicio` (
+  `id_orden` bigint(20) NOT NULL,
+  `fecha` date NOT NULL,
+  `n_reporte` int(20) NOT NULL,
+  `responsable_institucion` varchar(150) NOT NULL,
+  `nombre_institucion` varchar(150) NOT NULL,
+  `clave_institucion` varchar(10) NOT NULL,
+  `domicilio_institucion` varchar(150) NOT NULL,
+  `localidad_institucion` varchar(50) NOT NULL,
+  `tel_institucion` varchar(10) NOT NULL,
+  `falla_reportada` text NOT NULL,
+  `actividad_realizada` text NOT NULL,
+  `observaciones` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -155,6 +212,19 @@ INSERT INTO `personal` (`id_personal`, `rfc`, `curp`, `nombre`, `apellido_p`, `a
 (18, 'son13valores5', 'rils060301hdgytba5', 'Jose', 'Lomas', 'Turbas', 'jose@gmail.com', '6181161706', 2, 1, 13, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
 (20, 'son13valores6', 'rils060301hdgytba6', 'Itzel', 'Ochoa', 'Gandara', 'itzel@gmail.com', '6181161707', 3, 3, 18, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu'),
 (21, 'son13valores7', 'rils060301hdgytba7', 'Mafer', 'luna', 'soto', 'mafer@gmail.com', '6181161708', 4, 3, 20, '1', '$2y$10$abcdefghijklmnopqrstuuq3FgY9h6pgSXk4AFFgiWBGrnbPlzyyu');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `personal_comisionado`
+--
+
+CREATE TABLE `personal_comisionado` (
+  `id_personalcomisionado` bigint(20) NOT NULL COMMENT 'identificador de la tabla',
+  `id_comision` bigint(20) DEFAULT NULL COMMENT 'identificador de la comisión en tramite',
+  `id_personal` bigint(20) DEFAULT NULL COMMENT 'identificador del personal comisionado',
+  `viaticos` decimal(10,2) DEFAULT NULL COMMENT 'viaticos destinados al personal comisionado'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -208,7 +278,9 @@ INSERT INTO `reportes` (`id_reporte`, `tipo`, `id_calendario`, `id_incidencia`, 
 (6, 'incidencia', NULL, 6, NULL, '2026-11-17', '2026-11-17', 'FINALIZADO', 'se resano el piso con dos horas de antricipacion'),
 (7, 'incidencia', NULL, 7, NULL, '2026-11-17', NULL, 'ESPERA REQUISICIÓN', ''),
 (8, 'incidencia', NULL, 8, 18, '2026-11-17', NULL, 'EN ESPERA DE RECURSO', ''),
-(9, 'incidencia', NULL, 9, 18, '2026-11-17', NULL, 'EN ESPERA DE RECURSO', '');
+(9, 'incidencia', NULL, 9, 18, '2026-11-17', NULL, 'EN ESPERA DE RECURSO', ''),
+(10, 'incidencia', NULL, 10, 14, '2026-11-18', NULL, 'EN ESPERA DE RECURSO', ''),
+(11, 'servicio programado', 19, NULL, 13, '2026-11-19', NULL, 'EN CURSO', '');
 
 -- --------------------------------------------------------
 
@@ -227,18 +299,21 @@ CREATE TABLE `requisiciones` (
   `descripcion_servicio` text NOT NULL COMMENT 'descripción del servicio para el que se necesita la requisición',
   `estado` varchar(20) NOT NULL COMMENT 'estado en el que se encuentra la requisición (pendiente, en curso, aprovada o rechazada)',
   `tipo_financiamiento` text NOT NULL COMMENT 'tipo de financiamiento que recibe la requisición',
-  `id_elabora` bigint(20) NOT NULL
+  `id_elabora` bigint(20) NOT NULL COMMENT 'identificador del personal que realiza el tramite de la requisición',
+  `tipo_codigo` enum('CC_DIRECCION','CC_CENTRAL') NOT NULL COMMENT 'Tipo de codigo contable al que se cargara la requisición',
+  `id_codigo` bigint(20) DEFAULT NULL COMMENT 'identificador del codigo contable'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `requisiciones`
 --
 
-INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `fecha`, `fecha_entrega`, `justificacion`, `descripcion_servicio`, `estado`, `tipo_financiamiento`, `id_elabora`) VALUES
-(2, 2, 14, 13, '2026-11-04', NULL, NULL, 'necesito dos panes', 'pendiente', 'est', 0),
-(3, 2, 14, NULL, '2026-11-04', NULL, NULL, 'sss', 'sss', 'sss', 0),
-(4, 9, 18, 13, '2026-11-17', NULL, NULL, 'reparacion de techo dentro de la dirección\ncuadros de tablaroca para techo acondicionado', 'EN ESPERA', 'FONE', 18),
-(5, 8, 18, 13, '2026-11-17', NULL, NULL, 'mantenimiento de la cocina de la dirección\nun microondas nuevo', 'EN ESPERA', 'FONE', 18);
+INSERT INTO `requisiciones` (`id_requisicion`, `id_reporte`, `id_solicita`, `id_autoriza`, `fecha`, `fecha_entrega`, `justificacion`, `descripcion_servicio`, `estado`, `tipo_financiamiento`, `id_elabora`, `tipo_codigo`, `id_codigo`) VALUES
+(2, 2, 14, 13, '2026-11-04', NULL, NULL, 'necesito dos panes', 'pendiente', 'est', 0, 'CC_DIRECCION', NULL),
+(3, 2, 14, NULL, '2026-11-04', NULL, NULL, 'sss', 'sss', 'sss', 0, 'CC_DIRECCION', NULL),
+(4, 9, 18, 13, '2026-11-17', NULL, NULL, 'reparacion de techo dentro de la dirección\ncuadros de tablaroca para techo acondicionado', 'EN ESPERA', 'FONE', 18, 'CC_DIRECCION', NULL),
+(5, 8, 18, 13, '2026-11-17', NULL, NULL, 'mantenimiento de la cocina de la dirección\nun microondas nuevo', 'EN ESPERA', 'FONE', 18, 'CC_DIRECCION', NULL),
+(6, 10, 14, 13, '2026-11-18', NULL, 'JJ', 'cocin', 'EN ESPERA', 'FONE', 14, 'CC_DIRECCION', NULL);
 
 -- --------------------------------------------------------
 
@@ -262,7 +337,8 @@ INSERT INTO `requisiciones_detalle` (`id_detalle`, `id_requisicion`, `num_lote`,
 (1, 4, NULL, NULL, 'reparacion de techo dentro de la dirección'),
 (2, 4, '1', 4, 'cuadros de tablaroca para techo acondicionado'),
 (3, 5, NULL, NULL, 'mantenimiento de la cocina de la dirección'),
-(4, 5, '1', 1, 'un microondas nuevo');
+(4, 5, '1', 1, 'un microondas nuevo'),
+(5, 6, '1', 2, 'cocin');
 
 -- --------------------------------------------------------
 
@@ -335,6 +411,27 @@ INSERT INTO `servicios` (`id_servicio`, `nombre`, `periodicidad`, `descripcion`,
 (4, 'impermeabilización de techos', 42, 'se tiene que impermeabilizar el techo con', 0),
 (5, 'mantenimiento de luminarias', 5, 'prender luminarias', 1),
 (6, 'areas verdes', 4, 'jjj', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `solicitud_soporte`
+--
+
+CREATE TABLE `solicitud_soporte` (
+  `id_solicitud` bigint(20) NOT NULL,
+  `direccion` varchar(150) NOT NULL,
+  `departamento` varchar(100) NOT NULL,
+  `nombre_reporta` varchar(150) NOT NULL,
+  `cisco` varchar(5) NOT NULL,
+  `fecha` date NOT NULL,
+  `hora` time NOT NULL,
+  `tecnico_asignado` bigint(20) NOT NULL,
+  `solicitud_falla` text NOT NULL,
+  `equipos_atendidos` int(4) NOT NULL,
+  `usuarios_beneficiados` int(4) NOT NULL,
+  `estado` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -438,6 +535,13 @@ ALTER TABLE `calendario`
   ADD KEY `id_servicio` (`id_servicio`);
 
 --
+-- Indexes for table `codigos_contables`
+--
+ALTER TABLE `codigos_contables`
+  ADD PRIMARY KEY (`id_codigo`),
+  ADD UNIQUE KEY `cuenta_cargo` (`codigo_contable`);
+
+--
 -- Indexes for table `comisiones`
 --
 ALTER TABLE `comisiones`
@@ -454,6 +558,12 @@ ALTER TABLE `incidencias`
   ADD KEY `id_autoriza` (`id_autoriza`);
 
 --
+-- Indexes for table `orden_servicio`
+--
+ALTER TABLE `orden_servicio`
+  ADD PRIMARY KEY (`id_orden`);
+
+--
 -- Indexes for table `personal`
 --
 ALTER TABLE `personal`
@@ -465,6 +575,14 @@ ALTER TABLE `personal`
   ADD KEY `puesto` (`puesto`),
   ADD KEY `area` (`area`),
   ADD KEY `id_jefe` (`id_jefe`);
+
+--
+-- Indexes for table `personal_comisionado`
+--
+ALTER TABLE `personal_comisionado`
+  ADD PRIMARY KEY (`id_personalcomisionado`),
+  ADD KEY `fk_id_comision_en_personalcomisionado` (`id_comision`),
+  ADD KEY `fk_id_personal_en_personalcomisionado` (`id_personal`);
 
 --
 -- Indexes for table `puestos`
@@ -489,7 +607,8 @@ ALTER TABLE `requisiciones`
   ADD KEY `id_solicita` (`id_solicita`),
   ADD KEY `id_autoriza` (`id_autoriza`),
   ADD KEY `id_reporte` (`id_reporte`),
-  ADD KEY `id_elabora` (`id_elabora`);
+  ADD KEY `id_elabora` (`id_elabora`),
+  ADD KEY `fk_id_codigo` (`id_codigo`);
 
 --
 -- Indexes for table `requisiciones_detalle`
@@ -512,6 +631,12 @@ ALTER TABLE `salidas`
 --
 ALTER TABLE `servicios`
   ADD PRIMARY KEY (`id_servicio`);
+
+--
+-- Indexes for table `solicitud_soporte`
+--
+ALTER TABLE `solicitud_soporte`
+  ADD KEY `tecnico_asignado` (`tecnico_asignado`);
 
 --
 -- Indexes for table `tabulador_viaticos`
@@ -544,6 +669,12 @@ ALTER TABLE `calendario`
   MODIFY `id_calendario` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del calendario', AUTO_INCREMENT=21;
 
 --
+-- AUTO_INCREMENT for table `codigos_contables`
+--
+ALTER TABLE `codigos_contables`
+  MODIFY `id_codigo` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del numero de cuenta', AUTO_INCREMENT=14;
+
+--
 -- AUTO_INCREMENT for table `comisiones`
 --
 ALTER TABLE `comisiones`
@@ -553,13 +684,25 @@ ALTER TABLE `comisiones`
 -- AUTO_INCREMENT for table `incidencias`
 --
 ALTER TABLE `incidencias`
-  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `orden_servicio`
+--
+ALTER TABLE `orden_servicio`
+  MODIFY `id_orden` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `personal`
 --
 ALTER TABLE `personal`
   MODIFY `id_personal` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del personal', AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `personal_comisionado`
+--
+ALTER TABLE `personal_comisionado`
+  MODIFY `id_personalcomisionado` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de la tabla';
 
 --
 -- AUTO_INCREMENT for table `puestos`
@@ -571,19 +714,19 @@ ALTER TABLE `puestos`
 -- AUTO_INCREMENT for table `reportes`
 --
 ALTER TABLE `reportes`
-  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=10;
+  MODIFY `id_reporte` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del reporte', AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `requisiciones`
 --
 ALTER TABLE `requisiciones`
-  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de requisición', AUTO_INCREMENT=6;
+  MODIFY `id_requisicion` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador de requisición', AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `requisiciones_detalle`
 --
 ALTER TABLE `requisiciones_detalle`
-  MODIFY `id_detalle` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_detalle` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `salidas`
@@ -648,6 +791,13 @@ ALTER TABLE `personal`
   ADD CONSTRAINT `personal_ibfk_3` FOREIGN KEY (`id_jefe`) REFERENCES `personal` (`id_personal`);
 
 --
+-- Constraints for table `personal_comisionado`
+--
+ALTER TABLE `personal_comisionado`
+  ADD CONSTRAINT `fk_id_comision_en_personalcomisionado` FOREIGN KEY (`id_comision`) REFERENCES `comisiones` (`id_comision`),
+  ADD CONSTRAINT `fk_id_personal_en_personalcomisionado` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`);
+
+--
 -- Constraints for table `reportes`
 --
 ALTER TABLE `reportes`
@@ -659,6 +809,7 @@ ALTER TABLE `reportes`
 -- Constraints for table `requisiciones`
 --
 ALTER TABLE `requisiciones`
+  ADD CONSTRAINT `fk_id_codigo` FOREIGN KEY (`id_codigo`) REFERENCES `codigos_contables` (`id_codigo`),
   ADD CONSTRAINT `id_autoriza` FOREIGN KEY (`id_autoriza`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `id_solicita` FOREIGN KEY (`id_solicita`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `requisiciones_ibfk_1` FOREIGN KEY (`id_reporte`) REFERENCES `reportes` (`id_reporte`);
