@@ -35,6 +35,7 @@ function ver_personal_comision($pdo, int $id_comision, int $puesto, ?int $area):
         "SELECT id_personal, nombre, apellido_p, apellido_m, puesto
          FROM personal
          WHERE area = :area AND activo = '1' AND puesto IN (3, 4)
+           AND COALESCE(comisionado, 0) = 0
          ORDER BY puesto, apellido_p, apellido_m, nombre"
     );
     $consulta_personal->execute(['area' => (int) $comision['id_area']]);

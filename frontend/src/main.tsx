@@ -27,6 +27,9 @@ import ComisionesHome from './screens/comisiones/comisiones_home.tsx'
 import CrearSolicitudComision from './screens/comisiones/crear_solicitud_comision.tsx'
 import SolicitudesSinComision from './screens/comisiones/solicitudes_sin_comision.tsx'
 import CrearComision from './screens/comisiones/crear_comision.tsx'
+import ComisionesPendientes from './screens/comisiones/comisiones_pendientes.tsx'
+import AsignarComision from './screens/comisiones/asignar_comision.tsx'
+import ComisionesEnCurso from './screens/comisiones/comisiones_en_curso.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -40,6 +43,9 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/comisiones/solicitudes/crear" element={<CrearSolicitudComision />} />
         <Route path="/comisiones/crear" element={<SolicitudesSinComision />} />
         <Route path="/comisiones/crear/:id_solicitud" element={<CrearComision />} />
+        <Route path="/comisiones/pendientes" element={<ComisionesPendientes />} />
+        <Route path="/comisiones/pendientes/:id_comision/asignar" element={<AsignarComision />} />
+        <Route path="/comisiones/en-curso" element={<ComisionesEnCurso />} />
         <Route path="/mantenimiento" element={<MantenimientoHome />} />
         <Route path="/mantenimiento/calendario" element={<CalendarioMantenimiento />} />
         <Route path="/mantenimiento/servicios" element={<ServiciosMantenimiento />} />

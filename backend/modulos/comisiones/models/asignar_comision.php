@@ -20,6 +20,7 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
         $ids_personal[] = $id_personal;
     }
     $ids_personal = array_values(array_unique($ids_personal));
+    sort($ids_personal, SORT_NUMERIC);
 
     if (!in_array($puesto, [2, 3], true) || $area === null) {
         throw new InvalidArgumentException('El usuario no puede asignar esta comisión');
@@ -52,13 +53,16 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
             $parametros_personal[$placeholder] = $id_personal;
         }
         $consulta_personal = $pdo->prepare(
-            "SELECT id_personal
+            "SELECT id_personal, comisionado
              FROM personal
              WHERE area = :area AND activo = '1' AND puesto IN (3, 4)
-               AND id_personal IN (" . implode(', ', $placeholders) . ')'
+               AND id_personal IN (" . implode(', ', $placeholders) . ')
+             ORDER BY id_personal
+             FOR UPDATE'
         );
         $consulta_personal->execute($parametros_personal);
-        $ids_validos = array_map('intval', $consulta_personal->fetchAll(PDO::FETCH_COLUMN));
+        $personal_valido = $consulta_personal->fetchAll(PDO::FETCH_ASSOC);
+        $ids_validos = array_map('intval', array_column($personal_valido, 'id_personal'));
         if (count($ids_validos) !== count($ids_personal)) {
             throw new InvalidArgumentException('Solo puedes asignar personal activo del área de la comisión');
         }
@@ -68,7 +72,21 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
         );
         $consulta_asignados->execute(['id_comision' => $id_comision]);
         $ids_existentes = array_map('intval', $consulta_asignados->fetchAll(PDO::FETCH_COLUMN));
+        $ids_existentes_lookup = array_fill_keys($ids_existentes, true);
+        foreach ($personal_valido as $persona) {
+            $id_personal = (int) $persona['id_personal'];
+            if ((int) $persona['comisionado'] === 1 && !isset($ids_existentes_lookup[$id_personal])) {
+                throw new InvalidArgumentException('Una o más personas seleccionadas ya participan en otra comisión');
+            }
+        }
+
         $ids_nuevos = array_values(array_diff($ids_personal, $ids_existentes));
+        $marcar_comisionado = $pdo->prepare(
+            'UPDATE personal SET comisionado = 1 WHERE id_personal = :id_personal'
+        );
+        foreach ($ids_personal as $id_personal) {
+            $marcar_comisionado->execute(['id_personal' => $id_personal]);
+        }
 
         $insertar_personal = $pdo->prepare(
             'INSERT INTO personal_comisionado (id_comision, id_personal)

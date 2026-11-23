@@ -136,7 +136,7 @@ CREATE TABLE `personal` (
   `id_jefe` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que está a cargo del personal registrado',
   `activo` char(1) NOT NULL COMMENT 'estado en el que se encuentra el personal (1=activo, 0=inactivo)',
   `contrasena` varchar(255) NOT NULL COMMENT 'contraseña del personal para ingresar al sistema',
-  `comisionado` tinyint(1) DEFAULT NULL
+  `comisionado` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
