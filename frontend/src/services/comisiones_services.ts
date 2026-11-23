@@ -4,7 +4,6 @@ import api from '../api/axios.js'
 export type SolicitudComisionData = {
   institucion_solicita: string
   ubicacion: string
-  tipo_destino: string
   nombre_solicita: string
 }
 
@@ -35,6 +34,38 @@ export type AreaComision = {
 export type OpcionesComision = {
   solicitudes: SolicitudComision[]
   areas: AreaComision[]
+}
+
+export type PersonalComision = {
+  id_personal: number
+  nombre: string
+  apellido_p: string
+  apellido_m: string
+  puesto: number
+}
+
+export type ComisionPendiente = {
+  id_comision: number
+  id_solicitud: number
+  fecha: string
+  tipo_comision: string
+  tipo_destino: string
+  id_area: number
+  estado: string
+  lugar: string
+  institucion_solicita: string
+  nombre_solicita: string
+}
+
+export type OpcionesAsignacionComision = {
+  comision: ComisionPendiente & { area_nombre: string }
+  personal: PersonalComision[]
+}
+
+export type ComisionEnCurso = ComisionPendiente & {
+  fecha_inicio: string | null
+  area_nombre: string
+  comisionados: PersonalComision[]
 }
 
 function obtenerError(error: unknown, mensaje: string): Error {
@@ -94,5 +125,94 @@ export async function consultarOpcionesComision(): Promise<OpcionesComision> {
     }
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar las solicitudes pendientes de comisión.')
+  }
+}
+
+export async function consultarComisionesPendientes(): Promise<ComisionPendiente[]> {
+  try {
+    const response = await api.get<{ comisiones: ComisionPendiente[] }>(
+      'comisiones/routes/ver_comisiones_pendientes.php',
+    )
+    if (!Array.isArray(response.data?.comisiones)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar las comisiones pendientes.')
+    }
+    return response.data.comisiones.map((comision) => ({
+      ...comision,
+      id_comision: Number(comision.id_comision),
+      id_solicitud: Number(comision.id_solicitud),
+      id_area: Number(comision.id_area),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar las comisiones pendientes.')
+  }
+}
+
+export async function consultarOpcionesAsignacionComision(
+  id_comision: number,
+): Promise<OpcionesAsignacionComision> {
+  try {
+    const response = await api.get<OpcionesAsignacionComision>(
+      'comisiones/routes/ver_personal_comision.php',
+      { params: { id_comision } },
+    )
+    if (!response.data?.comision || !Array.isArray(response.data?.personal)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar el personal asignable.')
+    }
+    return {
+      comision: {
+        ...response.data.comision,
+        id_comision: Number(response.data.comision.id_comision),
+        id_solicitud: Number(response.data.comision.id_solicitud),
+        id_area: Number(response.data.comision.id_area),
+      },
+      personal: response.data.personal.map((persona) => ({
+        ...persona,
+        id_personal: Number(persona.id_personal),
+        puesto: Number(persona.puesto),
+      })),
+    }
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar el personal para esta comisión.')
+  }
+}
+
+export async function asignarComisionados(id_comision: number, ids_personal: number[]) {
+  try {
+    const response = await api.post<{
+      comision: { id_comision: number; estado: string; fecha_inicio: string; ids_personal: number[] }
+    }>(
+      'comisiones/routes/asignar_comision.php',
+      { id_comision, ids_personal },
+    )
+    if (!response.data?.comision) {
+      throw new Error('El servidor devolvió una respuesta inválida al iniciar la comisión.')
+    }
+    return response.data.comision
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible asignar al personal e iniciar la comisión.')
+  }
+}
+
+export async function consultarComisionesEnCurso(): Promise<ComisionEnCurso[]> {
+  try {
+    const response = await api.get<{ comisiones: ComisionEnCurso[] }>(
+      'comisiones/routes/ver_comisiones_en_curso.php',
+    )
+    if (!Array.isArray(response.data?.comisiones)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar las comisiones en curso.')
+    }
+    return response.data.comisiones.map((comision) => ({
+      ...comision,
+      id_comision: Number(comision.id_comision),
+      id_solicitud: Number(comision.id_solicitud),
+      id_area: Number(comision.id_area),
+      comisionados: (comision.comisionados ?? []).map((persona) => ({
+        ...persona,
+        id_personal: Number(persona.id_personal),
+        puesto: Number(persona.puesto),
+      })),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar las comisiones en curso.')
   }
 }
