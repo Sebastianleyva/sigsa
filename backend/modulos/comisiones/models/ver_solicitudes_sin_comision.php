@@ -2,7 +2,7 @@
 
 function ver_solicitudes_sin_comision($pdo): array {
     $consulta = $pdo->query(
-        'SELECT id_solicitud, fecha, institucion_solicita, ubicacion, tipo_destino, nombre_solicita
+        'SELECT id_solicitud, fecha, institucion_solicita, ubicacion, nombre_solicita
          FROM solicitudes
          WHERE comisionada = 0
          ORDER BY fecha DESC, id_solicitud DESC'
