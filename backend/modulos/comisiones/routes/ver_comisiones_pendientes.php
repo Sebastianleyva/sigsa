@@ -36,9 +36,9 @@ try {
     }
 
     $puesto = (int) $personal['puesto'];
-    if (!in_array($puesto, [1, 2, 3], true)) {
+    if (!in_array($puesto, [2, 3], true)) {
         http_response_code(403);
-        echo json_encode(["ERROR" => "No tienes permisos para consultar comisiones"]);
+        echo json_encode(["ERROR" => "Solo subdirectores y jefes de departamento pueden consultar comisiones pendientes"]);
         exit;
     }
 
