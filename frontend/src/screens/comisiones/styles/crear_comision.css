@@ -1,0 +1,293 @@
+.crear-comision-page {
+  --crear-comision-ink: #203431;
+  --crear-comision-muted: #687973;
+  --crear-comision-green: #176c58;
+  --crear-comision-line: #d9e3dc;
+  min-height: 100svh;
+  color: var(--crear-comision-ink);
+  background: #f2f6f3;
+}
+
+.crear-comision-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 76px;
+  padding: 0 clamp(22px, 6vw, 88px);
+  border-bottom: 1px solid #e1e9e3;
+  background: rgb(255 255 255 / 72%);
+}
+
+.crear-comision-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--crear-comision-ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.crear-comision-brand-mark {
+  display: grid;
+  grid-template: repeat(2, 8px) / repeat(2, 8px);
+  gap: 3px;
+  transform: rotate(-8deg);
+}
+
+.crear-comision-brand-mark i {
+  border-radius: 2px;
+  background: #d9734d;
+}
+
+.crear-comision-brand-mark i:nth-child(2),
+.crear-comision-brand-mark i:nth-child(3) {
+  background: #78b98d;
+}
+
+.crear-comision-topbar-label,
+.crear-comision-eyebrow,
+.crear-comision-solicitud-label {
+  color: var(--crear-comision-green);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+}
+
+.crear-comision-content {
+  width: min(960px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 30px 0 60px;
+  animation: crear-comision-arrive 380ms ease-out both;
+}
+
+.crear-comision-back {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--crear-comision-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.crear-comision-back:hover {
+  color: var(--crear-comision-green);
+}
+
+.crear-comision-heading {
+  max-width: 660px;
+  margin: 38px 0 34px;
+}
+
+.crear-comision-heading h1 {
+  margin: 12px 0 8px;
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(32px, 5vw, 40px);
+  line-height: 1.15;
+}
+
+.crear-comision-heading p {
+  margin: 0;
+  color: var(--crear-comision-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.crear-comision-form {
+  padding: 34px 40px 30px;
+  border: 1px solid var(--crear-comision-line);
+  background: #fff;
+}
+
+.crear-comision-solicitud {
+  margin-bottom: 25px;
+  padding: 18px 20px;
+  border-left: 3px solid var(--crear-comision-green);
+  background: #f6f9f6;
+}
+
+.crear-comision-solicitud h2 {
+  margin: 9px 0 6px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+}
+
+.crear-comision-solicitud p {
+  margin: 4px 0 0;
+  color: var(--crear-comision-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.crear-comision-form-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--crear-comision-line);
+}
+
+.crear-comision-form-heading h2 {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+}
+
+.crear-comision-form-heading span,
+.crear-comision-actions > span {
+  color: var(--crear-comision-muted);
+  font-size: 11px;
+}
+
+.crear-comision-form-heading b,
+.crear-comision-fields b {
+  color: #b94d35;
+}
+
+.crear-comision-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  padding: 26px 0;
+}
+
+.crear-comision-fields label {
+  display: grid;
+  gap: 8px;
+  color: var(--crear-comision-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.crear-comision-fields input,
+.crear-comision-fields select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #cbd8cf;
+  border-radius: 2px;
+  background: #fff;
+  color: var(--crear-comision-ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.crear-comision-fields input:focus,
+.crear-comision-fields select:focus {
+  border-color: var(--crear-comision-green);
+  outline: 2px solid rgb(23 108 88 / 15%);
+}
+
+.crear-comision-fields input::placeholder {
+  color: #9aa8a0;
+}
+
+.crear-comision-state {
+  padding: 18px 20px;
+  border: 1px solid var(--crear-comision-line);
+  background: #fff;
+  color: var(--crear-comision-muted);
+  font-size: 13px;
+}
+
+.crear-comision-state.error {
+  border-color: #e8c2b9;
+  background: #fff8f6;
+  color: #8f3e2d;
+}
+
+.crear-comision-state.success {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-color: #b9d8c3;
+  background: #f3faf5;
+  color: #205943;
+}
+
+.crear-comision-state button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.crear-comision-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 20px;
+  border-top: 1px solid var(--crear-comision-line);
+}
+
+.crear-comision-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--crear-comision-green);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.crear-comision-actions button:hover:not(:disabled) {
+  background: #125643;
+}
+
+.crear-comision-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes crear-comision-arrive {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .crear-comision-topbar {
+    min-height: 66px;
+  }
+
+  .crear-comision-topbar-label {
+    font-size: 9px;
+  }
+
+  .crear-comision-content {
+    width: calc(100% - 36px);
+  }
+
+  .crear-comision-form {
+    padding: 26px 20px 22px;
+  }
+
+  .crear-comision-fields {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .crear-comision-form-heading,
+  .crear-comision-actions,
+  .crear-comision-state.success {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

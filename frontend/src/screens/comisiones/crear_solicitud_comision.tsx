@@ -117,7 +117,7 @@ export default function CrearSolicitudComision() {
               <p>Solicitud #{solicitudCreada} creada correctamente.</p>
               <button
                 type="button"
-                onClick={() => navigate(`/comisiones/crear?id_solicitud=${solicitudCreada}`)}
+                onClick={() => navigate(`/comisiones/crear/${solicitudCreada}`)}
               >
                 Crear comisión con esta solicitud <span aria-hidden="true">→</span>
               </button>

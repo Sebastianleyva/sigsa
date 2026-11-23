@@ -1,0 +1,233 @@
+.solicitudes-comision-page {
+  --solicitudes-comision-ink: #203431;
+  --solicitudes-comision-muted: #687973;
+  --solicitudes-comision-green: #176c58;
+  --solicitudes-comision-line: #d9e3dc;
+  min-height: 100svh;
+  color: var(--solicitudes-comision-ink);
+  background: #f2f6f3;
+}
+
+.solicitudes-comision-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 76px;
+  padding: 0 clamp(22px, 6vw, 88px);
+  border-bottom: 1px solid #e1e9e3;
+  background: rgb(255 255 255 / 72%);
+}
+
+.solicitudes-comision-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--solicitudes-comision-ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.solicitudes-comision-brand-mark {
+  display: grid;
+  grid-template: repeat(2, 8px) / repeat(2, 8px);
+  gap: 3px;
+  transform: rotate(-8deg);
+}
+
+.solicitudes-comision-brand-mark i {
+  border-radius: 2px;
+  background: #d9734d;
+}
+
+.solicitudes-comision-brand-mark i:nth-child(2),
+.solicitudes-comision-brand-mark i:nth-child(3) {
+  background: #78b98d;
+}
+
+.solicitudes-comision-topbar-label,
+.solicitudes-comision-eyebrow {
+  color: var(--solicitudes-comision-green);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+}
+
+.solicitudes-comision-content {
+  width: min(1000px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 30px 0 60px;
+  animation: solicitudes-comision-arrive 380ms ease-out both;
+}
+
+.solicitudes-comision-back {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--solicitudes-comision-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.solicitudes-comision-back:hover {
+  color: var(--solicitudes-comision-green);
+}
+
+.solicitudes-comision-heading {
+  margin: 38px 0 32px;
+}
+
+.solicitudes-comision-heading h1 {
+  margin: 12px 0 8px;
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(32px, 5vw, 40px);
+  line-height: 1.15;
+}
+
+.solicitudes-comision-heading p {
+  margin: 0;
+  color: var(--solicitudes-comision-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.solicitudes-comision-state {
+  padding: 20px;
+  border: 1px solid var(--solicitudes-comision-line);
+  background: #fff;
+  color: var(--solicitudes-comision-muted);
+  font-size: 13px;
+}
+
+.solicitudes-comision-state.error {
+  border-color: #e8c2b9;
+  background: #fff8f6;
+  color: #8f3e2d;
+}
+
+.solicitudes-comision-list {
+  display: grid;
+  gap: 14px;
+}
+
+.solicitudes-comision-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px 28px;
+  padding: 22px 24px;
+  border: 1px solid var(--solicitudes-comision-line);
+  background: #fff;
+}
+
+.solicitudes-comision-card-heading {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #edf1ed;
+}
+
+.solicitudes-comision-card-id {
+  color: var(--solicitudes-comision-green);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.solicitudes-comision-card-heading time {
+  color: var(--solicitudes-comision-muted);
+  font-size: 11px;
+}
+
+.solicitudes-comision-card h2 {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 17px;
+}
+
+.solicitudes-comision-card dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.solicitudes-comision-card dl div {
+  min-width: 0;
+}
+
+.solicitudes-comision-card dt {
+  margin-bottom: 5px;
+  color: var(--solicitudes-comision-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.solicitudes-comision-card dd {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.solicitudes-comision-card > button {
+  align-self: end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 42px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--solicitudes-comision-green);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.solicitudes-comision-card > button:hover {
+  background: #125643;
+}
+
+@keyframes solicitudes-comision-arrive {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 700px) {
+  .solicitudes-comision-topbar {
+    min-height: 66px;
+  }
+
+  .solicitudes-comision-topbar-label {
+    font-size: 9px;
+  }
+
+  .solicitudes-comision-content {
+    width: calc(100% - 36px);
+  }
+
+  .solicitudes-comision-card {
+    grid-template-columns: 1fr;
+  }
+
+  .solicitudes-comision-card dl {
+    grid-template-columns: 1fr;
+  }
+
+  .solicitudes-comision-card > button {
+    justify-self: start;
+  }
+}

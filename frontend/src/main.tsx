@@ -23,6 +23,10 @@ import RequisicionesMantenimiento from './screens/mantenimiento/requisiciones_ma
 import CrearRequisicionMantenimiento from './screens/mantenimiento/crear_requisicion_mantenimiento.tsx'
 import ReportarIncidencia from './screens/mantenimiento/reportar_incidencia.tsx'
 import VerIncidenciasMantenimiento from './screens/mantenimiento/ver_incidencias.tsx'
+import ComisionesHome from './screens/comisiones/comisiones_home.tsx'
+import CrearSolicitudComision from './screens/comisiones/crear_solicitud_comision.tsx'
+import SolicitudesSinComision from './screens/comisiones/solicitudes_sin_comision.tsx'
+import CrearComision from './screens/comisiones/crear_comision.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -32,6 +36,10 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/home" element={<App />} />
+        <Route path="/comisiones" element={<ComisionesHome />} />
+        <Route path="/comisiones/solicitudes/crear" element={<CrearSolicitudComision />} />
+        <Route path="/comisiones/crear" element={<SolicitudesSinComision />} />
+        <Route path="/comisiones/crear/:id_solicitud" element={<CrearComision />} />
         <Route path="/mantenimiento" element={<MantenimientoHome />} />
         <Route path="/mantenimiento/calendario" element={<CalendarioMantenimiento />} />
         <Route path="/mantenimiento/servicios" element={<ServiciosMantenimiento />} />
