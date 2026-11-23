@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2026 at 05:05 PM
+-- Generation Time: Nov 23, 2026 at 06:54 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -74,8 +74,8 @@ CREATE TABLE `comisiones` (
   `tipo_destino` varchar(50) NOT NULL,
   `id_area` bigint(20) NOT NULL,
   `estado` varchar(30) NOT NULL,
-  `fecha_inicio` date NOT NULL,
-  `fecha_final` date NOT NULL
+  `fecha_inicio` date DEFAULT NULL,
+  `fecha_final` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -146,8 +146,8 @@ CREATE TABLE `personal` (
 
 CREATE TABLE `personal_comisionado` (
   `id_personalcomisionado` bigint(20) NOT NULL COMMENT 'identificador de la tabla',
-  `id_comision` bigint(20) DEFAULT NULL COMMENT 'identificador de la comisión en tramite',
-  `id_personal` bigint(20) DEFAULT NULL COMMENT 'identificador del personal comisionado',
+  `id_comision` bigint(20) NOT NULL COMMENT 'identificador de la comisión en tramite',
+  `id_personal` bigint(20) NOT NULL COMMENT 'identificador del personal comisionado',
   `viaticos` decimal(10,2) DEFAULT NULL COMMENT 'viaticos destinados al personal comisionado'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -272,7 +272,8 @@ CREATE TABLE `solicitudes` (
   `ubicacion` varchar(150) NOT NULL,
   `tipo_destino` varchar(150) NOT NULL,
   `nombre_solicita` varchar(150) NOT NULL,
-  `id_personal` bigint(20) NOT NULL
+  `id_personal` bigint(20) NOT NULL,
+  `comisionada` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

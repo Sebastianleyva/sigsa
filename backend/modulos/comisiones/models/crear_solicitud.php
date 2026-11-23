@@ -11,9 +11,9 @@ function crear_solicitud($pdo,$input, $id_personal){
 
     $query = $pdo -> prepare(
         'INSERT INTO solicitudes
-        (fecha, institucion_solicita, ubicacion, tipo_destino, nombre_solicita, id_personal)
+        (fecha, institucion_solicita, ubicacion, tipo_destino, nombre_solicita, id_personal, comisionada)
         VALUES 
-        (:fecha, :institucion_solicita, :ubicacion, :tipo_destino, :nombre_solicita, :id_personal)'
+        (:fecha, :institucion_solicita, :ubicacion, :tipo_destino, :nombre_solicita, :id_personal, 0)'
     );
     $query -> execute([
         'fecha' => $fecha,

@@ -14,26 +14,21 @@ function crear_comision($pdo,$input){
         throw new InvalidArgumentException('El id_area debe ser un entero positivo');
     }
 
+    $opciones = [
+        'tipo_comision' => ['URBANA', 'FORANEA'],
+        'tipo_destino' => ['CENTRO ESCOLAR', 'CENTRO ADMINISTRATIVO']
+    ];
     $textos = [];
-    foreach (['tipo_comision' => 30, 'tipo_destino' => 50] as $campo => $limite) {
+    foreach ($opciones as $campo => $valores_permitidos) {
         if (!isset($input[$campo]) || !is_string($input[$campo])) {
             throw new InvalidArgumentException("El campo {$campo} es obligatorio y debe ser texto");
         }
 
-        $valor = trim($input[$campo]);
-        $longitud = preg_match_all('/./us', $valor, $coincidencias);
-        if ($longitud === false || $longitud === 0 || $longitud > $limite) {
-            throw new InvalidArgumentException("El campo {$campo} no puede estar vacío ni exceder {$limite} caracteres");
+        $valor = strtoupper(trim($input[$campo]));
+        if (!in_array($valor, $valores_permitidos, true)) {
+            throw new InvalidArgumentException("El campo {$campo} contiene una opción no válida");
         }
         $textos[$campo] = $valor;
-    }
-
-    $solicitud = $pdo->prepare(
-        'SELECT id_solicitud FROM solicitudes WHERE id_solicitud = :id_solicitud'
-        );
-    $solicitud->execute(['id_solicitud' => $id_solicitud]);
-    if (!$solicitud->fetchColumn()) {
-        throw new InvalidArgumentException('La solicitud indicada no existe');
     }
 
     $consulta_area = $pdo->prepare(
@@ -49,23 +44,43 @@ function crear_comision($pdo,$input){
     $tipo_destino = $textos['tipo_destino'];
     $estado = 'PENDIENTE';
 
-    $query = $pdo -> prepare(
-        'INSERT INTO comisiones
-        (id_solicitud, fecha, tipo_comision, tipo_destino, id_area, estado)
-        VALUES 
-        (:id_solicitud, :fecha, :tipo_comision, :tipo_destino, :id_area, :estado)'
-    );
-    $query -> execute([
-        'id_solicitud' => $id_solicitud,
-        'fecha' => $fecha,
-        'tipo_comision' => $tipo_comision,
-        'tipo_destino' => $tipo_destino,
-        'id_area' => $id_area,
-        'estado' => $estado
-    ]);
+    $pdo->beginTransaction();
+    try {
+        $marcar_solicitud = $pdo->prepare(
+            'UPDATE solicitudes
+             SET comisionada = 1
+             WHERE id_solicitud = :id_solicitud AND comisionada = 0'
+        );
+        $marcar_solicitud->execute(['id_solicitud' => $id_solicitud]);
+        if ($marcar_solicitud->rowCount() !== 1) {
+            throw new InvalidArgumentException('La solicitud no existe o ya fue comisionada');
+        }
+
+        $query = $pdo->prepare(
+            'INSERT INTO comisiones
+             (id_solicitud, fecha, tipo_comision, tipo_destino, id_area, estado)
+             VALUES
+             (:id_solicitud, :fecha, :tipo_comision, :tipo_destino, :id_area, :estado)'
+        );
+        $query->execute([
+            'id_solicitud' => $id_solicitud,
+            'fecha' => $fecha,
+            'tipo_comision' => $tipo_comision,
+            'tipo_destino' => $tipo_destino,
+            'id_area' => $id_area,
+            'estado' => $estado
+        ]);
+        $id_comision = $pdo->lastInsertId();
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $e;
+    }
 
     return[
-        'id_comision' => $pdo->lastInsertId(),
+        'id_comision' => $id_comision,
         'id_solicitud' => $id_solicitud,
         'fecha' => $fecha,
         'tipo_comision' => $tipo_comision,
