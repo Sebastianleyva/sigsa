@@ -19,6 +19,22 @@ const opciones = [
     action: 'Crear comisión',
     path: '/comisiones/crear',
   },
+  {
+    index: '03',
+    category: 'ASIGNACIÓN',
+    title: 'Comisiones pendientes',
+    description: 'Asigna al personal de tu departamento para iniciar sus comisiones.',
+    action: 'Asignar comisionados',
+    path: '/comisiones/pendientes',
+  },
+  {
+    index: '04',
+    category: 'SEGUIMIENTO',
+    title: 'Comisiones en curso',
+    description: 'Consulta el lugar, la fecha de inicio y el personal comisionado.',
+    action: 'Ver comisiones',
+    path: '/comisiones/en-curso',
+  },
 ]
 
 export default function ComisionesHome() {
@@ -26,8 +42,11 @@ export default function ComisionesHome() {
   const usuario = authService.getUsuarioActual()
   const puedeCrearComision = [1, 2].includes(Number(usuario?.puesto))
     || Number(usuario?.area) === 6
+  const puedeGestionarComisiones = [2, 3].includes(Number(usuario?.puesto))
   const opcionesVisibles = opciones.filter((opcion) => (
-    opcion.path !== '/comisiones/crear' || puedeCrearComision
+    (opcion.path !== '/comisiones/crear' || puedeCrearComision)
+    && (!['/comisiones/pendientes', '/comisiones/en-curso'].includes(opcion.path)
+      || puedeGestionarComisiones)
   ))
 
   return (

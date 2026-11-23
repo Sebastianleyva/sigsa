@@ -70,7 +70,6 @@ export default function SolicitudesSinComision() {
                 <dl>
                   <div><dt>Solicita</dt><dd>{solicitud.nombre_solicita}</dd></div>
                   <div><dt>Ubicación</dt><dd>{solicitud.ubicacion}</dd></div>
-                  <div><dt>Tipo de destino</dt><dd>{solicitud.tipo_destino}</dd></div>
                 </dl>
                 <button
                   type="button"

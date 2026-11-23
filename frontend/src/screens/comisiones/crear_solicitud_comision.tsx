@@ -8,7 +8,6 @@ import './styles/crear_solicitud_comision.css'
 const initialForm: SolicitudComisionData = {
   institucion_solicita: '',
   ubicacion: '',
-  tipo_destino: '',
   nombre_solicita: '',
 }
 
@@ -31,7 +30,6 @@ export default function CrearSolicitudComision() {
       const solicitud = await crearSolicitudComision({
         institucion_solicita: form.institucion_solicita.trim(),
         ubicacion: form.ubicacion.trim(),
-        tipo_destino: form.tipo_destino.trim(),
         nombre_solicita: form.nombre_solicita.trim(),
       })
       setSolicitudCreada(solicitud.id_solicitud)
@@ -87,16 +85,6 @@ export default function CrearSolicitudComision() {
                 value={form.ubicacion}
                 onChange={(event) => updateField('ubicacion', event.target.value)}
                 placeholder="Ciudad o dirección"
-              />
-            </label>
-            <label>
-              Tipo de destino <b>*</b>
-              <input
-                maxLength={150}
-                required
-                value={form.tipo_destino}
-                onChange={(event) => updateField('tipo_destino', event.target.value)}
-                placeholder="Indica el tipo de destino"
               />
             </label>
             <label>
