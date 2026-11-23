@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2026 at 06:54 PM
+-- Generation Time: Nov 23, 2026 at 08:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -135,7 +135,8 @@ CREATE TABLE `personal` (
   `area` bigint(20) DEFAULT NULL COMMENT 'identificador del departamento o subdirección a la que pertenece el personal',
   `id_jefe` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que está a cargo del personal registrado',
   `activo` char(1) NOT NULL COMMENT 'estado en el que se encuentra el personal (1=activo, 0=inactivo)',
-  `contrasena` varchar(255) NOT NULL COMMENT 'contraseña del personal para ingresar al sistema'
+  `contrasena` varchar(255) NOT NULL COMMENT 'contraseña del personal para ingresar al sistema',
+  `comisionado` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -270,7 +271,6 @@ CREATE TABLE `solicitudes` (
   `fecha` date NOT NULL,
   `institucion_solicita` varchar(150) NOT NULL,
   `ubicacion` varchar(150) NOT NULL,
-  `tipo_destino` varchar(150) NOT NULL,
   `nombre_solicita` varchar(150) NOT NULL,
   `id_personal` bigint(20) NOT NULL,
   `comisionada` tinyint(1) NOT NULL
