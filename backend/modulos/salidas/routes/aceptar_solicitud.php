@@ -50,6 +50,17 @@ function aceptar_solicitud(PDO $pdo, array $input, array $usuario): void
         return;
     }
 
+    $bloquear_personal = $pdo->prepare(
+        'SELECT comisionado FROM personal WHERE id_personal = :id_personal FOR UPDATE'
+    );
+    $bloquear_personal->execute(['id_personal' => $salida['id_solicitante']]);
+    if ((int) $bloquear_personal->fetchColumn() === 1) {
+        $pdo->rollBack();
+        http_response_code(409);
+        echo json_encode(["ERROR" => "No puedes iniciar una salida mientras participas en una comisión"]);
+        return;
+    }
+
     date_default_timezone_set('America/Mexico_City');
     $hora_salida = date('H:i:s');
     $hora_estimada = date('H:i:s', strtotime('+2 hour'));

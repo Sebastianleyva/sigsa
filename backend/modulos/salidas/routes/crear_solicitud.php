@@ -155,9 +155,15 @@ function crear_solicitud($pdo, $input, $usuario) {
     try {
         $pdo->beginTransaction();
         $bloquear_personal = $pdo->prepare(
-            'SELECT id_personal FROM personal WHERE id_personal = :id_personal FOR UPDATE'
+            'SELECT comisionado FROM personal WHERE id_personal = :id_personal FOR UPDATE'
         );
         $bloquear_personal->execute(['id_personal' => $id_personal]);
+        if ((int) $bloquear_personal->fetchColumn() === 1) {
+            $pdo->rollBack();
+            http_response_code(409);
+            echo json_encode(['ERROR' => 'No puedes solicitar una salida mientras participas en una comisión']);
+            exit;
+        }
 
         $validacion_estado = $pdo->prepare(
             'SELECT id_salida FROM salidas
