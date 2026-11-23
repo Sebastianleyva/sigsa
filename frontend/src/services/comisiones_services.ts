@@ -1,6 +1,5 @@
 import axios from 'axios'
 import api from '../api/axios.js'
-import { authService } from './auth_services.js'
 
 export type SolicitudComisionData = {
   institucion_solicita: string
@@ -12,7 +11,7 @@ export type SolicitudComisionData = {
 export type SolicitudComision = SolicitudComisionData & {
   id_solicitud: number | string
   fecha: string
-  id_personal: number | string
+  id_personal?: number | string
 }
 
 export type ComisionData = {
@@ -20,8 +19,6 @@ export type ComisionData = {
   id_area: number
   tipo_comision: string
   tipo_destino: string
-  fecha_inicio: string
-  fecha_final: string
 }
 
 export type Comision = ComisionData & {
@@ -33,7 +30,11 @@ export type Comision = ComisionData & {
 export type AreaComision = {
   id_area: number
   nombre: string
-  id_subdireccion: number | null
+}
+
+export type OpcionesComision = {
+  solicitudes: SolicitudComision[]
+  areas: AreaComision[]
 }
 
 function obtenerError(error: unknown, mensaje: string): Error {
@@ -73,18 +74,25 @@ export async function crearComision(datos: ComisionData): Promise<Comision> {
   }
 }
 
-export async function consultarAreasComision(): Promise<AreaComision[]> {
+export async function consultarOpcionesComision(): Promise<OpcionesComision> {
   try {
-    const response = await authService.ObtenerOpcionesRegistro()
-    if (!Array.isArray(response?.areas)) {
-      throw new Error('El servidor devolvió una respuesta inválida al consultar las áreas.')
+    const response = await api.get<OpcionesComision>(
+      'comisiones/routes/ver_solicitudes_sin_comision.php',
+    )
+    if (!Array.isArray(response.data?.solicitudes) || !Array.isArray(response.data?.areas)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar las opciones de comisión.')
     }
-    return response.areas.map((area) => ({
-      ...area,
-      id_area: Number(area.id_area),
-      id_subdireccion: area.id_subdireccion === null ? null : Number(area.id_subdireccion),
-    }))
+    return {
+      solicitudes: response.data.solicitudes.map((solicitud) => ({
+        ...solicitud,
+        id_solicitud: Number(solicitud.id_solicitud),
+      })),
+      areas: response.data.areas.map((area) => ({
+        ...area,
+        id_area: Number(area.id_area),
+      })),
+    }
   } catch (error) {
-    throw obtenerError(error, 'No fue posible consultar las áreas.')
+    throw obtenerError(error, 'No fue posible consultar las solicitudes pendientes de comisión.')
   }
 }
