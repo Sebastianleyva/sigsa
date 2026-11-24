@@ -6,7 +6,7 @@ function crear_solicitud_soporte($pdo, $input, int $id_personal): array {
         throw new InvalidArgumentException('El id_comision debe ser un entero positivo');
     }
 
-    $campos_texto = ['direccion', 'departamento', 'nombre_reporta', 'cisco', 'fecha', 'hora', 'solicitud_falla', 'estado'];
+    $campos_texto = ['direccion', 'departamento', 'nombre_reporta', 'cisco', 'fecha', 'hora', 'solicitud_falla'];
     foreach ($campos_texto as $campo) {
         if (!isset($input[$campo]) || !is_string($input[$campo]) || trim($input[$campo]) === '') {
             throw new InvalidArgumentException('Todos los datos de la solicitud de soporte son obligatorios');
@@ -111,9 +111,17 @@ function crear_solicitud_soporte($pdo, $input, int $id_personal): array {
             'solicitud_falla' => $input['solicitud_falla'],
             'equipos_atendidos' => $equipos,
             'usuarios_beneficiados' => $usuarios,
-            'estado' => $input['estado'],
+            'estado' => 'FINALIZADO',
             'id_comision' => $id_comision,
         ]);
+
+        $actualizar_comision = $pdo->prepare(
+            "UPDATE comisiones SET estado = 'FINALIZADA' WHERE id_comision = :id_comision"
+        );
+        $actualizar_comision->execute(['id_comision' => $id_comision]);
+        if ($actualizar_comision->rowCount() !== 1) {
+            throw new RuntimeException('No fue posible finalizar la comisión');
+        }
 
         $resultado = $pdo->prepare(
             'SELECT * FROM solicitud_soporte WHERE id_comision = :id_comision'

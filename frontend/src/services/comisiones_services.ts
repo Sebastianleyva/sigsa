@@ -232,7 +232,6 @@ export type SolicitudSoporteData = {
   solicitud_falla: string
   equipos_atendidos: number
   usuarios_beneficiados: number
-  estado: string
 }
 
 export async function crearSolicitudSoporte(datos: SolicitudSoporteData) {

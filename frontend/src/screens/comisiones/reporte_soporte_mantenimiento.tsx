@@ -35,7 +35,6 @@ export default function ReporteSoporteMantenimiento() {
     solicitud_falla: '',
     equipos_atendidos: '',
     usuarios_beneficiados: '',
-    estado: 'PENDIENTE',
   })
 
   useEffect(() => {
@@ -99,7 +98,6 @@ export default function ReporteSoporteMantenimiento() {
         solicitud_falla: form.solicitud_falla.trim(),
         equipos_atendidos: Number(form.equipos_atendidos),
         usuarios_beneficiados: Number(form.usuarios_beneficiados),
-        estado: form.estado,
       })
       setCompletado(true)
     } catch (submitError) {
@@ -229,19 +227,6 @@ export default function ReporteSoporteMantenimiento() {
                   value={form.usuarios_beneficiados}
                   onChange={(event) => updateField('usuarios_beneficiados', event.target.value)}
                 />
-              </label>
-              <label>
-                Estado
-                <select
-                  required
-                  value={form.estado}
-                  onChange={(event) => updateField('estado', event.target.value)}
-                >
-                  <option value="PENDIENTE">Pendiente</option>
-                  <option value="ACEPTADA">Aceptada</option>
-                  <option value="FINALIZADA">Finalizada</option>
-                  <option value="RECHAZADA">Rechazada</option>
-                </select>
               </label>
               <label className="comisiones-orden-full">
                 Falla reportada
