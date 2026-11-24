@@ -220,3 +220,33 @@ export async function consultarComisionesEnCurso(): Promise<ComisionEnCurso[]> {
   }
 }
 
+export type SolicitudSoporteData = {
+  id_comision: number
+  direccion: string
+  departamento: string
+  nombre_reporta: string
+  cisco: string
+  fecha: string
+  hora: string
+  tecnico_asignado: number
+  solicitud_falla: string
+  equipos_atendidos: number
+  usuarios_beneficiados: number
+  estado: string
+}
+
+export async function crearSolicitudSoporte(datos: SolicitudSoporteData) {
+  try {
+    const response = await api.post<{ solicitud: Record<string, unknown> }>(
+      'comisiones/routes/crear_solicitud_soporte.php',
+      datos,
+    )
+    if (!response.data?.solicitud) {
+      throw new Error('El servidor devolvió una respuesta inválida al registrar la solicitud de soporte.')
+    }
+    return response.data.solicitud
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible registrar la solicitud de soporte.')
+  }
+}
+

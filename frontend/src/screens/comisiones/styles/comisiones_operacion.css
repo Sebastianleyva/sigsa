@@ -307,6 +307,60 @@
   cursor: not-allowed;
 }
 
+.comisiones-orden-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 20px;
+}
+
+.comisiones-orden-grid label {
+  display: grid;
+  gap: 8px;
+  color: var(--comisiones-op-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.comisiones-orden-grid input,
+.comisiones-orden-grid select,
+.comisiones-orden-grid textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #cbd8cf;
+  border-radius: 2px;
+  background: #fff;
+  color: var(--comisiones-op-ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.comisiones-orden-grid textarea {
+  min-height: 116px;
+  resize: vertical;
+}
+
+.comisiones-orden-grid input:focus,
+.comisiones-orden-grid select:focus,
+.comisiones-orden-grid textarea:focus {
+  border-color: var(--comisiones-op-green);
+  outline: 2px solid rgb(23 108 88 / 15%);
+}
+
+.comisiones-orden-full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .comisiones-orden-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .comisiones-orden-full {
+    grid-column: auto;
+  }
+}
+
 .comisiones-operacion-assignees {
   grid-column: 1 / -1;
   padding-top: 13px;

@@ -22,6 +22,9 @@ export default function OrdenServicio() {
           <h1>Orden de servicio</h1>
           <p>Comisión #{id_comision}</p>
         </div>
+        <p className="comisiones-operacion-state">
+          Los campos de la orden de servicio se configurarán según el documento correspondiente.
+        </p>
       </section>
     </main>
   )
