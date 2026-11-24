@@ -16,7 +16,7 @@ function ver_comisiones_en_curso($pdo, int $puesto, ?int $area): array {
         "SELECT c.id_comision, c.id_solicitud, c.fecha, c.fecha_inicio,
                 c.tipo_comision, c.tipo_destino, c.id_area, c.estado,
                 a.nombre AS area_nombre, s.ubicacion AS lugar,
-                s.institucion_solicita, s.nombre_solicita
+                s.institucion_solicita, s.nombre_solicita, s.falla_reportada
          FROM comisiones c
          INNER JOIN areas a ON a.id_area = c.id_area
          INNER JOIN solicitudes s ON s.id_solicitud = c.id_solicitud

@@ -17,7 +17,7 @@ function ver_personal_comision($pdo, int $id_comision, int $puesto, ?int $area):
     $consulta_comision = $pdo->prepare(
         "SELECT c.id_comision, c.id_solicitud, c.fecha, c.tipo_comision,
                 c.tipo_destino, c.id_area, c.estado, s.ubicacion AS lugar,
-                s.institucion_solicita, s.nombre_solicita, a.nombre AS area_nombre
+                s.institucion_solicita, s.nombre_solicita, s.falla_reportada, a.nombre AS area_nombre
          FROM comisiones c
          INNER JOIN areas a ON a.id_area = c.id_area
          INNER JOIN solicitudes s ON s.id_solicitud = c.id_solicitud

@@ -6,7 +6,7 @@ function ver_comisiones($pdo, int $puesto, ?int $area) {
     if ($puesto === 2 && $area !== null) {
         $sql = 'SELECT c.id_comision, c.id_solicitud, c.fecha, c.tipo_comision,
                        c.tipo_destino, c.id_area, c.estado, s.ubicacion AS lugar,
-                       s.institucion_solicita, s.nombre_solicita
+                       s.institucion_solicita, s.nombre_solicita, s.falla_reportada
                 FROM comisiones c
                 INNER JOIN areas a ON a.id_area = c.id_area
                 INNER JOIN solicitudes s ON s.id_solicitud = c.id_solicitud
@@ -15,7 +15,7 @@ function ver_comisiones($pdo, int $puesto, ?int $area) {
     } elseif ($puesto === 3 && $area !== null) {
         $sql = 'SELECT c.id_comision, c.id_solicitud, c.fecha, c.tipo_comision,
                        c.tipo_destino, c.id_area, c.estado, s.ubicacion AS lugar,
-                       s.institucion_solicita, s.nombre_solicita
+                       s.institucion_solicita, s.nombre_solicita, s.falla_reportada
                 FROM comisiones c
                 INNER JOIN solicitudes s ON s.id_solicitud = c.id_solicitud
                 WHERE c.estado = :estado AND c.id_area = :area';
