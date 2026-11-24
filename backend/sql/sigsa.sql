@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 23, 2026 at 08:22 PM
+-- Generation Time: Nov 24, 2026 at 03:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -110,6 +110,7 @@ CREATE TABLE `orden_servicio` (
   `clave_institucion` varchar(10) NOT NULL,
   `domicilio_institucion` varchar(150) NOT NULL,
   `localidad_institucion` varchar(50) NOT NULL,
+  `municipio_institucion` varchar(50) NOT NULL,
   `tel_institucion` varchar(10) NOT NULL,
   `falla_reportada` text NOT NULL,
   `actividad_realizada` text NOT NULL,
@@ -136,7 +137,7 @@ CREATE TABLE `personal` (
   `id_jefe` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que está a cargo del personal registrado',
   `activo` char(1) NOT NULL COMMENT 'estado en el que se encuentra el personal (1=activo, 0=inactivo)',
   `contrasena` varchar(255) NOT NULL COMMENT 'contraseña del personal para ingresar al sistema',
-  `comisionado` tinyint(1) NOT NULL DEFAULT 0
+  `comisionado` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -272,6 +273,7 @@ CREATE TABLE `solicitudes` (
   `institucion_solicita` varchar(150) NOT NULL,
   `ubicacion` varchar(150) NOT NULL,
   `nombre_solicita` varchar(150) NOT NULL,
+  `falla_reportada` text NOT NULL,
   `id_personal` bigint(20) NOT NULL,
   `comisionada` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
