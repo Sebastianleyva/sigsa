@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 24, 2026 at 03:37 PM
+-- Generation Time: Nov 24, 2026 at 04:37 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -114,7 +114,13 @@ CREATE TABLE `orden_servicio` (
   `tel_institucion` varchar(10) NOT NULL,
   `falla_reportada` text NOT NULL,
   `actividad_realizada` text NOT NULL,
-  `observaciones` text NOT NULL
+  `observaciones` text NOT NULL,
+  `id_comision` bigint(20) NOT NULL,
+  `cpu` int(3) DEFAULT NULL,
+  `proyectores` int(3) DEFAULT NULL,
+  `impresoras` int(3) DEFAULT NULL,
+  `alumnos_benefi` int(4) DEFAULT NULL,
+  `donacion` int(5) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -296,7 +302,8 @@ CREATE TABLE `solicitud_soporte` (
   `solicitud_falla` text NOT NULL,
   `equipos_atendidos` int(4) NOT NULL,
   `usuarios_beneficiados` int(4) NOT NULL,
-  `estado` varchar(20) NOT NULL
+  `estado` varchar(20) NOT NULL,
+  `id_comision` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -371,7 +378,8 @@ ALTER TABLE `incidencias`
 -- Indexes for table `orden_servicio`
 --
 ALTER TABLE `orden_servicio`
-  ADD PRIMARY KEY (`id_orden`);
+  ADD PRIMARY KEY (`id_orden`),
+  ADD KEY `id_comision` (`id_comision`);
 
 --
 -- Indexes for table `personal`
@@ -453,7 +461,8 @@ ALTER TABLE `solicitudes`
 -- Indexes for table `solicitud_soporte`
 --
 ALTER TABLE `solicitud_soporte`
-  ADD KEY `tecnico_asignado` (`tecnico_asignado`);
+  ADD KEY `tecnico_asignado` (`tecnico_asignado`),
+  ADD KEY `id_comision` (`id_comision`);
 
 --
 -- Indexes for table `tabulador_viaticos`
@@ -605,6 +614,12 @@ ALTER TABLE `incidencias`
   ADD CONSTRAINT `incidencias_ibfk_2` FOREIGN KEY (`id_autoriza`) REFERENCES `personal` (`id_personal`);
 
 --
+-- Constraints for table `orden_servicio`
+--
+ALTER TABLE `orden_servicio`
+  ADD CONSTRAINT `orden_servicio_ibfk_1` FOREIGN KEY (`id_comision`) REFERENCES `comisiones` (`id_comision`);
+
+--
 -- Constraints for table `personal`
 --
 ALTER TABLE `personal`
@@ -648,6 +663,12 @@ ALTER TABLE `requisiciones_detalle`
 ALTER TABLE `salidas`
   ADD CONSTRAINT `salidas_ibfk_1` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `salidas_ibfk_2` FOREIGN KEY (`id_autoriza`) REFERENCES `personal` (`id_personal`);
+
+--
+-- Constraints for table `solicitud_soporte`
+--
+ALTER TABLE `solicitud_soporte`
+  ADD CONSTRAINT `solicitud_soporte_ibfk_1` FOREIGN KEY (`id_comision`) REFERENCES `comisiones` (`id_comision`);
 
 --
 -- Constraints for table `tabulador_viaticos`
