@@ -30,6 +30,8 @@ import CrearComision from './screens/comisiones/crear_comision.tsx'
 import ComisionesPendientes from './screens/comisiones/comisiones_pendientes.tsx'
 import AsignarComision from './screens/comisiones/asignar_comision.tsx'
 import ComisionesEnCurso from './screens/comisiones/comisiones_en_curso.tsx'
+import ReporteSoporteMantenimiento from './screens/comisiones/reporte_soporte_mantenimiento.tsx'
+import OrdenServicio from './screens/comisiones/orden_servicio.tsx'
 
 
 createRoot(document.getElementById('root')!).render(
@@ -46,6 +48,8 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/comisiones/pendientes" element={<ComisionesPendientes />} />
         <Route path="/comisiones/pendientes/:id_comision/asignar" element={<AsignarComision />} />
         <Route path="/comisiones/en-curso" element={<ComisionesEnCurso />} />
+        <Route path="/comisiones/en-curso/:id_comision/reporte-soporte" element={<ReporteSoporteMantenimiento />} />
+        <Route path="/comisiones/en-curso/:id_comision/orden-servicio" element={<OrdenServicio />} />
         <Route path="/mantenimiento" element={<MantenimientoHome />} />
         <Route path="/mantenimiento/calendario" element={<CalendarioMantenimiento />} />
         <Route path="/mantenimiento/servicios" element={<ServiciosMantenimiento />} />

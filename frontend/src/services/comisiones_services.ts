@@ -220,19 +220,3 @@ export async function consultarComisionesEnCurso(): Promise<ComisionEnCurso[]> {
   }
 }
 
-export async function terminarComision(id_comision: number) {
-  try {
-    const response = await api.post<{
-      comision: { id_comision: number; estado: string; fecha_inicio: string | null; fecha_final: string | null }
-    }>(
-      'comisiones/routes/terminar_comision.php',
-      { id_comision },
-    )
-    if (!response.data?.comision) {
-      throw new Error('El servidor devolvió una respuesta inválida al terminar la comisión.')
-    }
-    return response.data.comision
-  } catch (error) {
-    throw obtenerError(error, 'No fue posible terminar la comisión.')
-  }
-}

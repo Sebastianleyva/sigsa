@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ConfirmationDialog from '../../components/ConfirmationDialog'
-import { consultarComisionesEnCurso, terminarComision } from '../../services/comisiones_services'
+import { consultarComisionesEnCurso } from '../../services/comisiones_services'
 import type { ComisionEnCurso } from '../../services/comisiones_services'
 import './styles/comisiones_operacion.css'
 
@@ -11,7 +11,6 @@ export default function ComisionesEnCurso() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [comisionATerminar, setComisionATerminar] = useState<ComisionEnCurso | null>(null)
-  const [terminando, setTerminando] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -35,23 +34,18 @@ export default function ComisionesEnCurso() {
     }
   }, [])
 
-  async function handleTerminarComision() {
+  function handleTerminarComision() {
     if (!comisionATerminar) return
-    setTerminando(true)
-    setError(null)
-    try {
-      await terminarComision(comisionATerminar.id_comision)
-      setComisiones((actuales) =>
-        actuales.filter((comision) => comision.id_comision !== comisionATerminar.id_comision),
-      )
-      setComisionATerminar(null)
-    } catch (terminateError) {
-      setError(terminateError instanceof Error
-        ? terminateError.message
-        : 'No fue posible terminar la comisión.')
-      setComisionATerminar(null)
-    } finally {
-      setTerminando(false)
+    const destino = comisionATerminar.tipo_destino.trim().toUpperCase()
+    const comisionId = comisionATerminar.id_comision
+    setComisionATerminar(null)
+
+    if (destino === 'CENTRO ADMINISTRATIVO') {
+      navigate(`/comisiones/en-curso/${comisionId}/reporte-soporte`)
+    } else if (destino === 'CENTRO ESCOLAR') {
+      navigate(`/comisiones/en-curso/${comisionId}/orden-servicio`)
+    } else {
+      setError('El tipo de destino de la comisión no tiene un formulario asignado.')
     }
   }
 
@@ -117,7 +111,6 @@ export default function ComisionesEnCurso() {
                 {comision.puede_terminar && (
                   <button
                     type="button"
-                    disabled={terminando}
                     onClick={() => setComisionATerminar(comision)}
                   >
                     Terminar comisión
@@ -141,7 +134,7 @@ export default function ComisionesEnCurso() {
         onCancel={() => setComisionATerminar(null)}
         actions={[
           {
-            label: terminando ? 'Terminando...' : 'Terminar comisión',
+            label: 'Terminar comisión',
             variant: 'danger',
             onClick: handleTerminarComision,
           },
