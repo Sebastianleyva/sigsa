@@ -249,3 +249,39 @@ export async function crearSolicitudSoporte(datos: SolicitudSoporteData) {
   }
 }
 
+export type OrdenServicioData = {
+  id_comision: number
+  fecha: string
+  n_reporte: number
+  responsable_institucion: string
+  nombre_institucion: string
+  clave_institucion: string
+  domicilio_institucion: string
+  localidad_institucion: string
+  municipio_institucion: string
+  tel_institucion: string
+  falla_reportada: string
+  actividad_realizada: string
+  observaciones: string
+  cpu: number | null
+  proyectores: number | null
+  impresoras: number | null
+  alumnos_benefi: number | null
+  donacion: number | null
+}
+
+export async function crearOrdenServicio(datos: OrdenServicioData) {
+  try {
+    const response = await api.post<{ orden: Record<string, unknown> }>(
+      'comisiones/routes/crear_orden_servicio.php',
+      datos,
+    )
+    if (!response.data?.orden) {
+      throw new Error('El servidor devolvió una respuesta inválida al registrar la orden de servicio.')
+    }
+    return response.data.orden
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible registrar la orden de servicio.')
+  }
+}
+
