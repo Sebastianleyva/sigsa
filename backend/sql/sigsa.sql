@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 24, 2026 at 04:37 PM
+-- Generation Time: Nov 24, 2026 at 09:20 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -291,7 +291,7 @@ CREATE TABLE `solicitudes` (
 --
 
 CREATE TABLE `solicitud_soporte` (
-  `id_solicitud` bigint(20) NOT NULL,
+  `id_solicitud_soporte` bigint(20) NOT NULL,
   `direccion` varchar(150) NOT NULL,
   `departamento` varchar(100) NOT NULL,
   `nombre_reporta` varchar(150) NOT NULL,
@@ -461,6 +461,7 @@ ALTER TABLE `solicitudes`
 -- Indexes for table `solicitud_soporte`
 --
 ALTER TABLE `solicitud_soporte`
+  ADD PRIMARY KEY (`id_solicitud_soporte`),
   ADD KEY `tecnico_asignado` (`tecnico_asignado`),
   ADD KEY `id_comision` (`id_comision`);
 
@@ -571,6 +572,12 @@ ALTER TABLE `servicios`
 --
 ALTER TABLE `solicitudes`
   MODIFY `id_solicitud` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `solicitud_soporte`
+--
+ALTER TABLE `solicitud_soporte`
+  MODIFY `id_solicitud_soporte` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tabulador_viaticos`

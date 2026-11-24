@@ -130,6 +130,14 @@ function crear_orden_servicio($pdo, $input, int $id_personal): array {
             'donacion' => $input['donacion'],
         ]);
 
+        $actualizar_comision = $pdo->prepare(
+            "UPDATE comisiones SET estado = 'FINALIZADA' WHERE id_comision = :id_comision"
+        );
+        $actualizar_comision->execute(['id_comision' => $id_comision]);
+        if ($actualizar_comision->rowCount() !== 1) {
+            throw new RuntimeException('No fue posible finalizar la comisión');
+        }
+
         $resultado = $pdo->prepare('SELECT * FROM orden_servicio WHERE id_comision = :id_comision');
         $resultado->execute(['id_comision' => $id_comision]);
         $orden = $resultado->fetch(PDO::FETCH_ASSOC);

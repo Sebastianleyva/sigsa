@@ -93,14 +93,13 @@ function crear_solicitud_soporte($pdo, $input, int $id_personal): array {
 
         $insertar = $pdo->prepare(
             'INSERT INTO solicitud_soporte
-             (id_solicitud, direccion, departamento, nombre_reporta, cisco, fecha, hora,
+             (direccion, departamento, nombre_reporta, cisco, fecha, hora,
               tecnico_asignado, solicitud_falla, equipos_atendidos, usuarios_beneficiados, estado, id_comision)
              VALUES
-             (:id_solicitud, :direccion, :departamento, :nombre_reporta, :cisco, :fecha, :hora,
+             (:direccion, :departamento, :nombre_reporta, :cisco, :fecha, :hora,
               :tecnico_asignado, :solicitud_falla, :equipos_atendidos, :usuarios_beneficiados, :estado, :id_comision)'
         );
         $insertar->execute([
-            'id_solicitud' => (int) $comision['id_solicitud'],
             'direccion' => $input['direccion'],
             'departamento' => $input['departamento'],
             'nombre_reporta' => $input['nombre_reporta'],
