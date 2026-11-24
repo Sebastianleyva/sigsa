@@ -1,16 +1,8 @@
 <?php
 
-function ver_comisiones_en_curso($pdo, int $puesto, ?int $area): array {
+function ver_comisiones_en_curso($pdo, int $puesto, ?int $area, int $id_personal): array {
     $parametros = ['estado' => 'EN CURSO'];
-    if ($puesto === 2 && $area !== null) {
-        $condicion_area = 'a.id_subdireccion = :area';
-        $parametros['area'] = $area;
-    } elseif ($puesto === 3 && $area !== null) {
-        $condicion_area = 'c.id_area = :area';
-        $parametros['area'] = $area;
-    } else {
-        throw new InvalidArgumentException('Solo subdirectores y jefes de departamento pueden consultar comisiones en curso');
-    }
+    $condicion_area = '1 = 1';
 
     $consulta_comisiones = $pdo->prepare(
         "SELECT c.id_comision, c.id_solicitud, c.fecha, c.fecha_inicio,
@@ -58,6 +50,15 @@ function ver_comisiones_en_curso($pdo, int $puesto, ?int $area): array {
 
     foreach ($comisiones as &$comision) {
         $comision['comisionados'] = $personal_por_comision[$comision['id_comision']] ?? [];
+        $es_participante = false;
+        foreach ($comision['comisionados'] as $persona) {
+            if ((int) $persona['id_personal'] === $id_personal) {
+                $es_participante = true;
+                break;
+            }
+        }
+        $es_jefe_departamento = $puesto === 3 && (int) $comision['id_area'] === (int) $area;
+        $comision['puede_terminar'] = $es_participante || $es_jefe_departamento;
     }
     unset($comision);
 

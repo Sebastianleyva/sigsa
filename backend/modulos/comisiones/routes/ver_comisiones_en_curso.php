@@ -36,20 +36,10 @@ try {
     }
 
     $puesto = (int) $usuario_actual['puesto'];
-    if (!in_array($puesto, [2, 3], true)) {
-        http_response_code(403);
-        echo json_encode(['ERROR' => 'Solo subdirectores y jefes de departamento pueden consultar comisiones en curso']);
-        exit;
-    }
+    $area_raw = filter_var($usuario_actual['area'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    $area = $area_raw === false ? null : $area_raw;
 
-    $area = filter_var($usuario_actual['area'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
-    if ($area === false) {
-        http_response_code(403);
-        echo json_encode(['ERROR' => 'No tienes un área asignada']);
-        exit;
-    }
-
-    $comisiones = ver_comisiones_en_curso($pdo, $puesto, $area);
+    $comisiones = ver_comisiones_en_curso($pdo, $puesto, $area, $id_personal);
     http_response_code(200);
     echo json_encode(['comisiones' => $comisiones]);
 } catch (InvalidArgumentException $e) {

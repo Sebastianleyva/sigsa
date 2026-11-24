@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { consultarComisionesEnCurso } from '../../services/comisiones_services'
+import ConfirmationDialog from '../../components/ConfirmationDialog'
+import { consultarComisionesEnCurso, terminarComision } from '../../services/comisiones_services'
 import type { ComisionEnCurso } from '../../services/comisiones_services'
 import './styles/comisiones_operacion.css'
 
@@ -9,6 +10,8 @@ export default function ComisionesEnCurso() {
   const [comisiones, setComisiones] = useState<ComisionEnCurso[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [comisionATerminar, setComisionATerminar] = useState<ComisionEnCurso | null>(null)
+  const [terminando, setTerminando] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -31,6 +34,26 @@ export default function ComisionesEnCurso() {
       active = false
     }
   }, [])
+
+  async function handleTerminarComision() {
+    if (!comisionATerminar) return
+    setTerminando(true)
+    setError(null)
+    try {
+      await terminarComision(comisionATerminar.id_comision)
+      setComisiones((actuales) =>
+        actuales.filter((comision) => comision.id_comision !== comisionATerminar.id_comision),
+      )
+      setComisionATerminar(null)
+    } catch (terminateError) {
+      setError(terminateError instanceof Error
+        ? terminateError.message
+        : 'No fue posible terminar la comisión.')
+      setComisionATerminar(null)
+    } finally {
+      setTerminando(false)
+    }
+  }
 
   return (
     <main className="comisiones-operacion-page">
@@ -55,7 +78,7 @@ export default function ComisionesEnCurso() {
         {loading && <p className="comisiones-operacion-state" role="status">Cargando comisiones...</p>}
         {error && <p className="comisiones-operacion-state error" role="alert">{error}</p>}
         {!loading && !error && comisiones.length === 0 && (
-          <p className="comisiones-operacion-state">No hay comisiones en curso para tu área.</p>
+          <p className="comisiones-operacion-state">No hay comisiones en curso.</p>
         )}
 
         {!loading && !error && comisiones.length > 0 && (
@@ -91,11 +114,39 @@ export default function ComisionesEnCurso() {
                     </ul>
                   )}
                 </div>
+                {comision.puede_terminar && (
+                  <button
+                    type="button"
+                    disabled={terminando}
+                    onClick={() => setComisionATerminar(comision)}
+                  >
+                    Terminar comisión
+                  </button>
+                )}
               </article>
             ))}
           </section>
         )}
       </section>
+
+      <ConfirmationDialog
+        open={comisionATerminar !== null}
+        title="Terminar comisión"
+        message={
+          comisionATerminar
+            ? `¿Confirmas que deseas terminar la comisión #${comisionATerminar.id_comision}?`
+            : ''
+        }
+        cancelLabel="Cancelar"
+        onCancel={() => setComisionATerminar(null)}
+        actions={[
+          {
+            label: terminando ? 'Terminando...' : 'Terminar comisión',
+            variant: 'danger',
+            onClick: handleTerminarComision,
+          },
+        ]}
+      />
     </main>
   )
 }

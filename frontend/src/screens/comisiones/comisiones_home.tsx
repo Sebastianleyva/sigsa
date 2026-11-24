@@ -45,8 +45,7 @@ export default function ComisionesHome() {
   const puedeGestionarComisiones = [2, 3].includes(Number(usuario?.puesto))
   const opcionesVisibles = opciones.filter((opcion) => (
     (opcion.path !== '/comisiones/crear' || puedeCrearComision)
-    && (!['/comisiones/pendientes', '/comisiones/en-curso'].includes(opcion.path)
-      || puedeGestionarComisiones)
+    && (opcion.path !== '/comisiones/pendientes' || puedeGestionarComisiones)
   ))
 
   return (
