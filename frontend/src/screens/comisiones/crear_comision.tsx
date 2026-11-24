@@ -126,6 +126,7 @@ export default function CrearComision() {
               <span className="crear-comision-solicitud-label">SOLICITUD #{solicitud.id_solicitud}</span>
               <h2>{solicitud.institucion_solicita}</h2>
               <p>{solicitud.nombre_solicita} · {solicitud.ubicacion}</p>
+              <p><strong>Falla reportada:</strong> {solicitud.falla_reportada}</p>
             </section>
 
             <div className="crear-comision-form-heading">

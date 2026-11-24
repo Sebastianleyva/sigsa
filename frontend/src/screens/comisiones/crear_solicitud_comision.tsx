@@ -9,6 +9,7 @@ const initialForm: SolicitudComisionData = {
   institucion_solicita: '',
   ubicacion: '',
   nombre_solicita: '',
+  falla_reportada: '',
 }
 
 export default function CrearSolicitudComision() {
@@ -31,6 +32,7 @@ export default function CrearSolicitudComision() {
         institucion_solicita: form.institucion_solicita.trim(),
         ubicacion: form.ubicacion.trim(),
         nombre_solicita: form.nombre_solicita.trim(),
+        falla_reportada: form.falla_reportada.trim(),
       })
       setSolicitudCreada(solicitud.id_solicitud)
     } catch (submitError) {
@@ -95,6 +97,17 @@ export default function CrearSolicitudComision() {
                 value={form.nombre_solicita}
                 onChange={(event) => updateField('nombre_solicita', event.target.value)}
                 placeholder="Nombre completo"
+              />
+            </label>
+            <label className="crear-solicitud-comision-full-width">
+              Falla reportada <b>*</b>
+              <textarea
+                maxLength={2000}
+                required
+                value={form.falla_reportada}
+                onChange={(event) => updateField('falla_reportada', event.target.value)}
+                placeholder="Describe la falla reportada"
+                rows={5}
               />
             </label>
           </div>

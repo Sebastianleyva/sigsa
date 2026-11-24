@@ -70,6 +70,7 @@ export default function ComisionesPendientes() {
                 <dl>
                   <div><dt>Solicita</dt><dd>{comision.nombre_solicita}</dd></div>
                   <div><dt>Lugar</dt><dd>{comision.lugar}</dd></div>
+                  <div><dt>Falla reportada</dt><dd>{comision.falla_reportada}</dd></div>
                   <div><dt>Tipo de comisión</dt><dd>{comision.tipo_comision}</dd></div>
                   <div><dt>Tipo de destino</dt><dd>{comision.tipo_destino}</dd></div>
                 </dl>

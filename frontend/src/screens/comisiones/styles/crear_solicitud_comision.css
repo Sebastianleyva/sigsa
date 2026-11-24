@@ -156,12 +156,31 @@
   font-size: 13px;
 }
 
-.crear-solicitud-comision-fields input:focus {
+.crear-solicitud-comision-fields textarea {
+  width: 100%;
+  min-height: 116px;
+  padding: 10px 12px;
+  border: 1px solid #cbd8cf;
+  border-radius: 2px;
+  background: #fff;
+  color: var(--crear-solicitud-ink);
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.crear-solicitud-comision-full-width {
+  grid-column: 1 / -1;
+}
+
+.crear-solicitud-comision-fields input:focus,
+.crear-solicitud-comision-fields textarea:focus {
   border-color: var(--crear-solicitud-green);
   outline: 2px solid rgb(23 108 88 / 15%);
 }
 
-.crear-solicitud-comision-fields input::placeholder {
+.crear-solicitud-comision-fields input::placeholder,
+.crear-solicitud-comision-fields textarea::placeholder {
   color: #9aa8a0;
 }
 

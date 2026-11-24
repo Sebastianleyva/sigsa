@@ -105,6 +105,7 @@ export default function AsignarComision() {
               <h2>{opciones.comision.institucion_solicita}</h2>
               <p>{opciones.comision.lugar} · {opciones.comision.area_nombre}</p>
               <p>{opciones.comision.tipo_comision} · {opciones.comision.tipo_destino}</p>
+              <p><strong>Falla reportada:</strong> {opciones.comision.falla_reportada}</p>
             </section>
 
             <label className="comisiones-operacion-select-label" htmlFor="personal-comisionado">

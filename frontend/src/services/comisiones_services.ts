@@ -5,6 +5,7 @@ export type SolicitudComisionData = {
   institucion_solicita: string
   ubicacion: string
   nombre_solicita: string
+  falla_reportada: string
 }
 
 export type SolicitudComision = SolicitudComisionData & {
@@ -55,6 +56,7 @@ export type ComisionPendiente = {
   lugar: string
   institucion_solicita: string
   nombre_solicita: string
+  falla_reportada: string
 }
 
 export type OpcionesAsignacionComision = {
