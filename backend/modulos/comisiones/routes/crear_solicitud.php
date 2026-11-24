@@ -16,6 +16,33 @@ try{
     $usuario = validar_jwt_requerido();
     validar_csrf_requerido();
 
+    $id_personal = filter_var($usuario['sub'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if ($id_personal === false) {
+        http_response_code(401);
+        echo json_encode(["ERROR" => "Los datos de identidad no son válidos"]);
+        exit;
+    }
+
+    $consulta_personal = $pdo->prepare(
+        "SELECT puesto, area FROM personal
+         WHERE id_personal = :id_personal AND activo = '1'"
+    );
+    $consulta_personal->execute(['id_personal' => $id_personal]);
+    $personal = $consulta_personal->fetch(PDO::FETCH_ASSOC);
+    if (!$personal) {
+        http_response_code(403);
+        echo json_encode(["ERROR" => "El usuario no está activo"]);
+        exit;
+    }
+
+    $puesto = (int) $personal['puesto'];
+    $area = filter_var($personal['area'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if (!in_array($puesto, [1, 2], true) && (int) $area !== 6) {
+        http_response_code(403);
+        echo json_encode(["ERROR" => "No tienes permisos para crear solicitudes"]);
+        exit;
+    }
+
     $input = json_decode(file_get_contents('php://input'), true);
     if (!is_array($input)) {
         http_response_code(400);

@@ -40,11 +40,14 @@ const opciones = [
 export default function ComisionesHome() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
+  const puedeCrearSolicitud = [1, 2].includes(Number(usuario?.puesto))
+    || Number(usuario?.area) === 6
   const puedeCrearComision = [1, 2].includes(Number(usuario?.puesto))
     || Number(usuario?.area) === 6
   const puedeGestionarComisiones = [2, 3].includes(Number(usuario?.puesto))
   const opcionesVisibles = opciones.filter((opcion) => (
-    (opcion.path !== '/comisiones/crear' || puedeCrearComision)
+    (opcion.path !== '/comisiones/solicitudes/crear' || puedeCrearSolicitud)
+    && (opcion.path !== '/comisiones/crear' || puedeCrearComision)
     && (opcion.path !== '/comisiones/pendientes' || puedeGestionarComisiones)
   ))
 
