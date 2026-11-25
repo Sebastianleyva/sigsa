@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2026 at 03:57 AM
+-- Generation Time: Nov 25, 2026 at 07:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -98,6 +98,23 @@ CREATE TABLE `incidencias` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `informe_comision`
+--
+
+CREATE TABLE `informe_comision` (
+  `id_informe_comision` bigint(20) NOT NULL,
+  `id_comision` bigint(20) NOT NULL,
+  `id_personal` bigint(20) NOT NULL,
+  `objetivo_comision` text NOT NULL,
+  `actividad_desarrollada` text NOT NULL,
+  `resultados` text NOT NULL,
+  `contribucion` text NOT NULL,
+  `conclusion` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `orden_servicio`
 --
 
@@ -138,6 +155,7 @@ CREATE TABLE `personal` (
   `apellido_m` varchar(25) NOT NULL COMMENT 'apellido materno del personal',
   `correo` varchar(150) NOT NULL COMMENT 'correo asignado del personal. con este correo ingresará al sistema',
   `telefono` varchar(12) NOT NULL COMMENT 'número de telefono del personal',
+  `cisco` varchar(5) DEFAULT NULL,
   `puesto` bigint(20) NOT NULL COMMENT 'identificador del puesto del personal',
   `area` bigint(20) DEFAULT NULL COMMENT 'identificador del departamento o subdirección a la que pertenece el personal',
   `id_jefe` bigint(20) DEFAULT NULL COMMENT 'identificador del personal que está a cargo del personal registrado',
@@ -156,7 +174,12 @@ CREATE TABLE `personal_comisionado` (
   `id_personalcomisionado` bigint(20) NOT NULL COMMENT 'identificador de la tabla',
   `id_comision` bigint(20) NOT NULL COMMENT 'identificador de la comisión en tramite',
   `id_personal` bigint(20) NOT NULL COMMENT 'identificador del personal comisionado',
-  `viaticos` decimal(10,2) DEFAULT NULL COMMENT 'viaticos destinados al personal comisionado'
+  `tipo_comprobación` enum('FACTURA','CONSTANCIA') DEFAULT NULL COMMENT 'tipo de comprobación de viaticos',
+  `dias_pernocta` int(3) NOT NULL DEFAULT 0 COMMENT 'dias que pernocta el personal durante la comision',
+  `dias_sin_pernocta` int(3) NOT NULL DEFAULT 0 COMMENT 'dia sin pernoctar durante la comision',
+  `tarifa_pernocta` decimal(10,2) DEFAULT NULL COMMENT 'tarifa del tabulador',
+  `tarifa_sin_pernocta` decimal(10,2) DEFAULT NULL COMMENT 'tarifa del tabulador',
+  `monto_designado` decimal(10,2) DEFAULT NULL COMMENT 'dias_pernocta*tarifa_pernocta + dias_sin_pernocta*tarifa_sin_pernocta'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -289,6 +312,26 @@ CREATE TABLE `solicitudes` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `solicitudes_de_viaticos`
+--
+
+CREATE TABLE `solicitudes_de_viaticos` (
+  `id_solicitud_viaticos` bigint(20) NOT NULL,
+  `fecha` date NOT NULL,
+  `puesto` varchar(50) NOT NULL,
+  `contacto_emergencia_nombre` varchar(150) DEFAULT NULL,
+  `contacto_emergencia_numero` varchar(10) DEFAULT NULL,
+  `id_personal_comisionado` bigint(20) NOT NULL,
+  `id_personal_registra` bigint(20) NOT NULL,
+  `financiamiento` varchar(10) NOT NULL,
+  `id_codigo_contable` bigint(20) NOT NULL,
+  `id_comision` bigint(20) NOT NULL,
+  `observaciones` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `solicitud_soporte`
 --
 
@@ -377,6 +420,14 @@ ALTER TABLE `incidencias`
   ADD KEY `id_autoriza` (`id_autoriza`);
 
 --
+-- Indexes for table `informe_comision`
+--
+ALTER TABLE `informe_comision`
+  ADD PRIMARY KEY (`id_informe_comision`),
+  ADD KEY `fk_id_comision` (`id_comision`),
+  ADD KEY `fk_id_personal_comisionado` (`id_personal`);
+
+--
 -- Indexes for table `orden_servicio`
 --
 ALTER TABLE `orden_servicio`
@@ -460,6 +511,16 @@ ALTER TABLE `solicitudes`
   ADD KEY `id_personal` (`id_personal`);
 
 --
+-- Indexes for table `solicitudes_de_viaticos`
+--
+ALTER TABLE `solicitudes_de_viaticos`
+  ADD PRIMARY KEY (`id_solicitud_viaticos`),
+  ADD KEY `fk_id_personal_comisionado` (`id_personal_comisionado`),
+  ADD KEY `fk_id_personal_registra` (`id_personal_registra`),
+  ADD KEY `fk_id_codigo_contable` (`id_codigo_contable`),
+  ADD KEY `fk_id_comision` (`id_comision`);
+
+--
 -- Indexes for table `solicitud_soporte`
 --
 ALTER TABLE `solicitud_soporte`
@@ -514,6 +575,12 @@ ALTER TABLE `comisiones`
 --
 ALTER TABLE `incidencias`
   MODIFY `id_incidencia` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `informe_comision`
+--
+ALTER TABLE `informe_comision`
+  MODIFY `id_informe_comision` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `orden_servicio`
@@ -576,6 +643,12 @@ ALTER TABLE `solicitudes`
   MODIFY `id_solicitud` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `solicitudes_de_viaticos`
+--
+ALTER TABLE `solicitudes_de_viaticos`
+  MODIFY `id_solicitud_viaticos` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `solicitud_soporte`
 --
 ALTER TABLE `solicitud_soporte`
@@ -621,6 +694,13 @@ ALTER TABLE `comisiones`
 ALTER TABLE `incidencias`
   ADD CONSTRAINT `incidencias_ibfk_1` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `incidencias_ibfk_2` FOREIGN KEY (`id_autoriza`) REFERENCES `personal` (`id_personal`);
+
+--
+-- Constraints for table `informe_comision`
+--
+ALTER TABLE `informe_comision`
+  ADD CONSTRAINT `informe_comision_ibfk_1` FOREIGN KEY (`id_comision`) REFERENCES `comisiones` (`id_comision`),
+  ADD CONSTRAINT `informe_comision_ibfk_2` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`);
 
 --
 -- Constraints for table `orden_servicio`
@@ -672,6 +752,15 @@ ALTER TABLE `requisiciones_detalle`
 ALTER TABLE `salidas`
   ADD CONSTRAINT `salidas_ibfk_1` FOREIGN KEY (`id_personal`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `salidas_ibfk_2` FOREIGN KEY (`id_autoriza`) REFERENCES `personal` (`id_personal`);
+
+--
+-- Constraints for table `solicitudes_de_viaticos`
+--
+ALTER TABLE `solicitudes_de_viaticos`
+  ADD CONSTRAINT `solicitudes_de_viaticos_ibfk_1` FOREIGN KEY (`id_personal_comisionado`) REFERENCES `personal` (`id_personal`),
+  ADD CONSTRAINT `solicitudes_de_viaticos_ibfk_2` FOREIGN KEY (`id_personal_registra`) REFERENCES `personal` (`id_personal`),
+  ADD CONSTRAINT `solicitudes_de_viaticos_ibfk_3` FOREIGN KEY (`id_comision`) REFERENCES `comisiones` (`id_comision`),
+  ADD CONSTRAINT `solicitudes_de_viaticos_ibfk_4` FOREIGN KEY (`id_codigo_contable`) REFERENCES `codigos_contables` (`id_codigo`);
 
 --
 -- Constraints for table `solicitud_soporte`
