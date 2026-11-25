@@ -253,6 +253,18 @@ export async function crearSolicitudSoporte(datos: SolicitudSoporteData) {
   }
 }
 
+export async function obtenerPdfSolicitudSoporte(id_comision: number) {
+  try {
+    const response = await api.get<Blob>(
+      `comisiones/routes/generar_pdf_solicitud_soporte.php?id=${id_comision}`,
+      { responseType: 'blob' },
+    )
+    return URL.createObjectURL(response.data)
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible generar el documento de soporte.')
+  }
+}
+
 export type OrdenServicioData = {
   id_comision: number
   fecha: string

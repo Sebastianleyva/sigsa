@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
   consultarComisionesEnCurso,
   crearSolicitudSoporte,
+  obtenerPdfSolicitudSoporte,
 } from '../../services/comisiones_services'
 import type { ComisionEnCurso } from '../../services/comisiones_services'
 import './styles/comisiones_operacion.css'
@@ -109,6 +110,25 @@ export default function ReporteSoporteMantenimiento() {
     }
   }
 
+  async function abrirPdf() {
+    const ventana = window.open('', '_blank')
+    if (!ventana) {
+      setError('Permite las ventanas emergentes para abrir el documento.')
+      return
+    }
+
+    ventana.opener = null
+    setError('')
+    try {
+      ventana.location.href = await obtenerPdfSolicitudSoporte(idComision)
+    } catch (pdfError) {
+      ventana.close()
+      setError(pdfError instanceof Error
+        ? pdfError.message
+        : 'No fue posible generar el documento de soporte.')
+    }
+  }
+
   return (
     <main className="comisiones-operacion-page">
       <header className="comisiones-operacion-topbar">
@@ -123,16 +143,19 @@ export default function ReporteSoporteMantenimiento() {
         </button>
         <div className="comisiones-operacion-heading">
           <span className="comisiones-operacion-eyebrow">COMISIONES · SIGSA</span>
-          <h1>Solicitud de soporte y mantenimiento correctivo</h1>
+          <h1>Reporte de soporte y mantenimiento correctivo</h1>
           <p>Comisión #{id_comision}</p>
         </div>
 
         {loading && <p className="comisiones-operacion-state" role="status">Cargando datos...</p>}
         {error && <p className="comisiones-operacion-state error" role="alert">{error}</p>}
         {completado && (
-          <p className="comisiones-operacion-state success" role="status">
-            Solicitud de soporte registrada correctamente.
-          </p>
+          <div className="comisiones-operacion-state success" role="status">
+            Reporte de soporte registrado correctamente.
+            <button type="button" onClick={() => void abrirPdf()}>
+              Imprimir / Guardar como PDF
+            </button>
+          </div>
         )}
 
         {!loading && comision && !completado && (
@@ -240,9 +263,9 @@ export default function ReporteSoporteMantenimiento() {
               </label>
             </div>
             <div className="comisiones-operacion-actions">
-              <span>Los datos iniciales provienen de la solicitud y la comisión.</span>
+              <span>Los datos iniciales provienen del reporte y la comisión.</span>
               <button type="submit" disabled={saving}>
-                {saving ? 'Guardando...' : 'Guardar solicitud de soporte'}
+                {saving ? 'Guardando...' : 'Guardar reporte de soporte'}
               </button>
             </div>
           </form>
