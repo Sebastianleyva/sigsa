@@ -110,38 +110,42 @@ export default function AsignarComision() {
               <p><strong>Falla reportada:</strong> {opciones.comision.falla_reportada}</p>
             </section>
 
-            <label className="comisiones-operacion-select-label" htmlFor="personal-comisionado">
-              Personal del área <b>*</b>
-            </label>
             {opciones.personal.length === 0 ? (
               <p className="comisiones-operacion-state error">
                 No hay personal activo disponible en el área de esta comisión.
               </p>
             ) : (
-              <>
-                <select
-                  id="personal-comisionado"
-                  className="comisiones-operacion-multiselect"
-                  multiple
-                  required
-                  value={seleccionados.map(String)}
-                  onChange={(event) => {
-                    setSeleccionados(
-                      Array.from(event.currentTarget.selectedOptions, (option) => Number(option.value)),
-                    )
-                  }}
-                >
+              <fieldset
+                className="comisiones-operacion-personal"
+                aria-describedby="personal-comisionado-hint"
+              >
+                <legend>
+                  Personal del área <b aria-hidden="true">*</b>
+                </legend>
+                <div className="comisiones-operacion-personal-list">
                   {opciones.personal.map((persona) => (
-                    <option key={persona.id_personal} value={persona.id_personal}>
-                      {persona.nombre} {persona.apellido_p} {persona.apellido_m}
-                      {persona.puesto === 3 ? ' · Jefe de departamento' : ''}
-                    </option>
+                    <label key={persona.id_personal} htmlFor={`personal-${persona.id_personal}`}>
+                      <input
+                        id={`personal-${persona.id_personal}`}
+                        type="checkbox"
+                        checked={seleccionados.includes(persona.id_personal)}
+                        onChange={(event) => {
+                          setSeleccionados((actuales) => event.target.checked
+                            ? [...actuales, persona.id_personal]
+                            : actuales.filter((id) => id !== persona.id_personal))
+                        }}
+                      />
+                      <span>
+                        {persona.nombre} {persona.apellido_p} {persona.apellido_m}
+                        {persona.puesto === 3 ? ' · Jefe de departamento' : ''}
+                      </span>
+                    </label>
                   ))}
-                </select>
-                <p className="comisiones-operacion-hint">
-                  Puedes seleccionar varias personas usando Ctrl (Windows) o Cmd (Mac).
+                </div>
+                <p className="comisiones-operacion-hint" id="personal-comisionado-hint">
+                  Marca una o más personas para asignarlas a la comisión.
                 </p>
-              </>
+              </fieldset>
             )}
 
             {error && <p className="comisiones-operacion-state error" role="alert">{error}</p>}
