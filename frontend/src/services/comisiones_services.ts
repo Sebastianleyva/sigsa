@@ -6,11 +6,13 @@ export type SolicitudComisionData = {
   ubicacion: string
   nombre_solicita: string
   falla_reportada: string
+  num_contacto: string
+  fecha_comision: string | null
 }
 
 export type SolicitudComision = SolicitudComisionData & {
   id_solicitud: number | string
-  fecha: string
+  fecha_registro: string
   id_personal?: number | string
 }
 
@@ -57,6 +59,8 @@ export type ComisionPendiente = {
   institucion_solicita: string
   nombre_solicita: string
   falla_reportada: string
+  num_contacto: string
+  fecha_comision: string | null
 }
 
 export type OpcionesAsignacionComision = {

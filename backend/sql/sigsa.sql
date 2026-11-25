@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 24, 2026 at 09:20 PM
+-- Generation Time: Nov 25, 2026 at 03:57 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -275,13 +275,15 @@ CREATE TABLE `servicios` (
 
 CREATE TABLE `solicitudes` (
   `id_solicitud` bigint(20) NOT NULL,
-  `fecha` date NOT NULL,
+  `fecha_registro` date NOT NULL,
   `institucion_solicita` varchar(150) NOT NULL,
   `ubicacion` varchar(150) NOT NULL,
   `nombre_solicita` varchar(150) NOT NULL,
   `falla_reportada` text NOT NULL,
   `id_personal` bigint(20) NOT NULL,
-  `comisionada` tinyint(1) NOT NULL
+  `comisionada` tinyint(1) NOT NULL,
+  `num_contacto` varchar(12) NOT NULL,
+  `fecha_comision` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

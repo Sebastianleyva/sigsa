@@ -88,6 +88,8 @@ export default function ComisionesEnCurso() {
                 <h2>{comision.institucion_solicita}</h2>
                 <dl>
                   <div><dt>Lugar</dt><dd>{comision.lugar}</dd></div>
+                  <div><dt>Contacto</dt><dd>{comision.num_contacto}</dd></div>
+                  <div><dt>Fecha de comisión</dt><dd>{comision.fecha_comision ?? 'Por definir'}</dd></div>
                   <div><dt>Área</dt><dd>{comision.area_nombre}</dd></div>
                   <div><dt>Falla reportada</dt><dd>{comision.falla_reportada}</dd></div>
                   <div><dt>Tipo de comisión</dt><dd>{comision.tipo_comision}</dd></div>

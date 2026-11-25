@@ -64,11 +64,13 @@ export default function SolicitudesSinComision() {
               <article className="solicitudes-comision-card" key={solicitud.id_solicitud}>
                 <div className="solicitudes-comision-card-heading">
                   <span className="solicitudes-comision-card-id">SOLICITUD #{solicitud.id_solicitud}</span>
-                  <time dateTime={solicitud.fecha}>{solicitud.fecha}</time>
+                  <time dateTime={solicitud.fecha_registro}>{solicitud.fecha_registro}</time>
                 </div>
                 <h2>{solicitud.institucion_solicita}</h2>
                 <dl>
                   <div><dt>Solicita</dt><dd>{solicitud.nombre_solicita}</dd></div>
+                  <div><dt>Contacto</dt><dd>{solicitud.num_contacto}</dd></div>
+                  <div><dt>Fecha de comisión</dt><dd>{solicitud.fecha_comision ?? 'Por definir'}</dd></div>
                   <div><dt>Ubicación</dt><dd>{solicitud.ubicacion}</dd></div>
                   <div><dt>Falla reportada</dt><dd>{solicitud.falla_reportada}</dd></div>
                 </dl>

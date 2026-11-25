@@ -104,6 +104,8 @@ export default function AsignarComision() {
               <span>COMISIÓN #{opciones.comision.id_comision}</span>
               <h2>{opciones.comision.institucion_solicita}</h2>
               <p>{opciones.comision.lugar} · {opciones.comision.area_nombre}</p>
+              <p>Contacto: {opciones.comision.num_contacto}</p>
+              <p>Fecha de comisión: {opciones.comision.fecha_comision ?? 'Por definir'}</p>
               <p>{opciones.comision.tipo_comision} · {opciones.comision.tipo_destino}</p>
               <p><strong>Falla reportada:</strong> {opciones.comision.falla_reportada}</p>
             </section>

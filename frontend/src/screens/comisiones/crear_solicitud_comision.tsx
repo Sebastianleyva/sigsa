@@ -10,6 +10,8 @@ const initialForm: SolicitudComisionData = {
   ubicacion: '',
   nombre_solicita: '',
   falla_reportada: '',
+  num_contacto: '',
+  fecha_comision: null,
 }
 
 export default function CrearSolicitudComision() {
@@ -33,6 +35,8 @@ export default function CrearSolicitudComision() {
         ubicacion: form.ubicacion.trim(),
         nombre_solicita: form.nombre_solicita.trim(),
         falla_reportada: form.falla_reportada.trim(),
+        num_contacto: form.num_contacto.trim(),
+        fecha_comision: form.fecha_comision || null,
       })
       setSolicitudCreada(solicitud.id_solicitud)
     } catch (submitError) {
@@ -97,6 +101,25 @@ export default function CrearSolicitudComision() {
                 value={form.nombre_solicita}
                 onChange={(event) => updateField('nombre_solicita', event.target.value)}
                 placeholder="Nombre completo"
+              />
+            </label>
+            <label>
+              Número de contacto <b>*</b>
+              <input
+                type="tel"
+                maxLength={12}
+                required
+                value={form.num_contacto}
+                onChange={(event) => updateField('num_contacto', event.target.value)}
+                placeholder="Teléfono de contacto"
+              />
+            </label>
+            <label>
+              Fecha de comisión
+              <input
+                type="date"
+                value={form.fecha_comision ?? ''}
+                onChange={(event) => updateField('fecha_comision', event.target.value)}
               />
             </label>
             <label className="crear-solicitud-comision-full-width">
