@@ -35,6 +35,14 @@ const opciones = [
     action: 'Ver comisiones',
     path: '/comisiones/en-curso',
   },
+  {
+    index: '05',
+    category: 'VIÁTICOS',
+    title: 'Solicitudes de viáticos',
+    description: 'Consulta y gestiona las solicitudes de viáticos de las comisiones.',
+    action: 'Ver solicitudes',
+    path: '/comisiones/solicitudes-viaticos',
+  },
 ]
 
 export default function ComisionesHome() {
@@ -45,10 +53,13 @@ export default function ComisionesHome() {
   const puedeCrearComision = [1, 2].includes(Number(usuario?.puesto))
     || Number(usuario?.area) === 6
   const puedeGestionarComisiones = [2, 3].includes(Number(usuario?.puesto))
+  const puedeConsultarViaticos = [1, 2].includes(Number(usuario?.puesto))
+    || Number(usuario?.area) === 6
   const opcionesVisibles = opciones.filter((opcion) => (
     (opcion.path !== '/comisiones/solicitudes/crear' || puedeCrearSolicitud)
     && (opcion.path !== '/comisiones/crear' || puedeCrearComision)
     && (opcion.path !== '/comisiones/pendientes' || puedeGestionarComisiones)
+    && (opcion.path !== '/comisiones/solicitudes-viaticos' || puedeConsultarViaticos)
   ))
 
   return (

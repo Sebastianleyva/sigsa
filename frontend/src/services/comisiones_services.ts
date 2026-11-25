@@ -89,6 +89,21 @@ export type ComisionEnCurso = ComisionPendiente & {
   puede_terminar: boolean
 }
 
+export type PersonaPendienteSolicitudViaticos = {
+  id_comision: number
+  tipo_comision: string
+  tipo_destino: string
+  estado: string
+  institucion_solicita: string
+  lugar: string
+  fecha_comision: string | null
+  id_personal: number
+  nombre: string
+  apellido_p: string
+  apellido_m: string
+  puesto_nombre: string
+}
+
 function obtenerError(error: unknown, mensaje: string): Error {
   if (axios.isAxiosError<{ ERROR?: string; error?: string }>(error)) {
     return new Error(error.response?.data?.ERROR || error.response?.data?.error || mensaje)
@@ -245,6 +260,24 @@ export async function consultarComisionesEnCurso(): Promise<ComisionEnCurso[]> {
     }))
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar las comisiones en curso.')
+  }
+}
+
+export async function consultarPersonalPendienteSolicitudViaticos(): Promise<PersonaPendienteSolicitudViaticos[]> {
+  try {
+    const response = await api.get<{ personal: PersonaPendienteSolicitudViaticos[] }>(
+      'comisiones/routes/ver_personal_solicitudes_viaticos.php',
+    )
+    if (!Array.isArray(response.data?.personal)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar el personal pendiente de viáticos.')
+    }
+    return response.data.personal.map((persona) => ({
+      ...persona,
+      id_comision: Number(persona.id_comision),
+      id_personal: Number(persona.id_personal),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar el personal pendiente de solicitudes de viáticos.')
   }
 }
 
