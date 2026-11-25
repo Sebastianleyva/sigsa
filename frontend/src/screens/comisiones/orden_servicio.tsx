@@ -259,12 +259,10 @@ export default function OrdenServicio() {
                 <input
                   required
                   type="tel"
-                  inputMode="numeric"
-                  pattern="[0-9]{10}"
                   maxLength={10}
                   value={form.tel_institucion}
                   onChange={(event) => updateField('tel_institucion', event.target.value)}
-                  placeholder="10 dígitos"
+                  placeholder="Teléfono o extensión"
                 />
               </label>
               <label>

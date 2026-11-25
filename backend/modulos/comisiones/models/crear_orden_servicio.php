@@ -46,8 +46,8 @@ function crear_orden_servicio($pdo, $input, int $id_personal): array {
     if (strlen($input['clave_institucion']) > 10) {
         throw new InvalidArgumentException('La clave de la institución no puede exceder 10 caracteres');
     }
-    if (!preg_match('/^[0-9]{10}$/', $input['tel_institucion'])) {
-        throw new InvalidArgumentException('El teléfono debe contener exactamente 10 dígitos');
+    if (strlen($input['tel_institucion']) > 10) {
+        throw new InvalidArgumentException('El teléfono o extensión no puede exceder 10 caracteres');
     }
 
     $pdo->beginTransaction();
@@ -137,6 +137,17 @@ function crear_orden_servicio($pdo, $input, int $id_personal): array {
         if ($actualizar_comision->rowCount() !== 1) {
             throw new RuntimeException('No fue posible finalizar la comisión');
         }
+
+        $liberar_personal = $pdo->prepare(
+            'UPDATE personal
+             SET comisionado = 0
+             WHERE id_personal IN (
+                 SELECT id_personal
+                 FROM personal_comisionado
+                 WHERE id_comision = :id_comision
+             )'
+        );
+        $liberar_personal->execute(['id_comision' => $id_comision]);
 
         $resultado = $pdo->prepare('SELECT * FROM orden_servicio WHERE id_comision = :id_comision');
         $resultado->execute(['id_comision' => $id_comision]);
