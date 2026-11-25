@@ -53,7 +53,9 @@ try {
     $comision = asignar_comision($pdo, $input, $puesto, $area);
     http_response_code(200);
     echo json_encode([
-        'mensaje' => 'Comisión iniciada correctamente',
+        'mensaje' => $comision['estado'] === 'EN CURSO'
+            ? 'Comisión iniciada correctamente'
+            : 'Personal asignado correctamente. La comisión está pendiente de solicitudes de servicio.',
         'comision' => $comision
     ]);
 } catch (InvalidArgumentException $e) {

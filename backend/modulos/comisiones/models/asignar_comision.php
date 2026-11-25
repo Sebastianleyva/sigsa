@@ -29,7 +29,7 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
     $pdo->beginTransaction();
     try {
         $consulta_comision = $pdo->prepare(
-            'SELECT c.id_area, c.estado, a.id_subdireccion
+            'SELECT c.id_area, c.estado, c.tipo_comision, a.id_subdireccion
              FROM comisiones c
              INNER JOIN areas a ON a.id_area = c.id_area
              WHERE c.id_comision = :id_comision
@@ -43,6 +43,9 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
         );
         if (!$pertenece_al_area || $comision['estado'] !== 'PENDIENTE') {
             throw new InvalidArgumentException('La comisión no está pendiente o no pertenece a tu área');
+        }
+        if (!in_array($comision['tipo_comision'], ['URBANA', 'FORANEA'], true)) {
+            throw new InvalidArgumentException('El tipo de comisión no es válido');
         }
 
         $placeholders = [];
@@ -103,21 +106,33 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
             throw new InvalidArgumentException('Selecciona al menos una persona para la comisión');
         }
 
-        $actualizar_comision = $pdo->prepare(
-            "UPDATE comisiones
-             SET estado = 'EN CURSO', fecha_inicio = CURDATE()
-             WHERE id_comision = :id_comision AND estado = 'PENDIENTE'"
-        );
+        $estado = $comision['tipo_comision'] === 'FORANEA'
+            ? 'PENDIENTE DE SOLICITUDES_V'
+            : 'EN CURSO';
+        $actualizar_comision = $estado === 'EN CURSO'
+            ? $pdo->prepare(
+                "UPDATE comisiones
+                 SET estado = 'EN CURSO', fecha_inicio = CURDATE()
+                 WHERE id_comision = :id_comision AND estado = 'PENDIENTE'"
+            )
+            : $pdo->prepare(
+                "UPDATE comisiones
+                 SET estado = 'PENDIENTE DE SOLICITUDES_V', fecha_inicio = NULL
+                 WHERE id_comision = :id_comision AND estado = 'PENDIENTE'"
+            );
         $actualizar_comision->execute(['id_comision' => $id_comision]);
         if ($actualizar_comision->rowCount() !== 1) {
-            throw new InvalidArgumentException('La comisión ya fue iniciada');
+            throw new InvalidArgumentException('La comisión ya fue asignada');
         }
 
-        $consulta_fecha = $pdo->prepare(
-            'SELECT fecha_inicio FROM comisiones WHERE id_comision = :id_comision'
-        );
-        $consulta_fecha->execute(['id_comision' => $id_comision]);
-        $fecha_inicio = $consulta_fecha->fetchColumn();
+        $fecha_inicio = null;
+        if ($estado === 'EN CURSO') {
+            $consulta_fecha = $pdo->prepare(
+                'SELECT fecha_inicio FROM comisiones WHERE id_comision = :id_comision'
+            );
+            $consulta_fecha->execute(['id_comision' => $id_comision]);
+            $fecha_inicio = $consulta_fecha->fetchColumn();
+        }
         $pdo->commit();
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) {
@@ -128,7 +143,7 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
 
     return [
         'id_comision' => $id_comision,
-        'estado' => 'EN CURSO',
+        'estado' => $estado,
         'fecha_inicio' => $fecha_inicio,
         'ids_personal' => array_values(array_unique(array_merge($ids_existentes, $ids_personal))),
     ];
