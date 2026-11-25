@@ -104,6 +104,22 @@ export type PersonaPendienteSolicitudViaticos = {
   puesto_nombre: string
 }
 
+export type ComisionadoSolicitudViaticos = {
+  id_comision: number
+  id_personal: number
+  nombre_completo: string
+  curp: string
+  rfc: string
+  correo: string
+  telefono: string
+  cisco: string
+  registrante: {
+    nombre: string
+    correo: string
+    cisco: string
+  }
+}
+
 function obtenerError(error: unknown, mensaje: string): Error {
   if (axios.isAxiosError<{ ERROR?: string; error?: string }>(error)) {
     return new Error(error.response?.data?.ERROR || error.response?.data?.error || mensaje)
@@ -278,6 +294,32 @@ export async function consultarPersonalPendienteSolicitudViaticos(): Promise<Per
     }))
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar el personal pendiente de solicitudes de viáticos.')
+  }
+}
+
+export async function consultarComisionadoSolicitudViaticos(
+  id_comision: number,
+  id_personal: number,
+): Promise<ComisionadoSolicitudViaticos> {
+  try {
+    const response = await api.get<{
+      comisionado: Omit<ComisionadoSolicitudViaticos, 'registrante'>
+      registrante: ComisionadoSolicitudViaticos['registrante']
+    }>(
+      'comisiones/routes/ver_comisionado_solicitud_viaticos.php',
+      { params: { id_comision, id_personal } },
+    )
+    if (!response.data?.comisionado || !response.data?.registrante) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar los datos del comisionado.')
+    }
+    return {
+      ...response.data.comisionado,
+      id_comision: Number(response.data.comisionado.id_comision),
+      id_personal: Number(response.data.comisionado.id_personal),
+      registrante: response.data.registrante,
+    }
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar los datos del comisionado.')
   }
 }
 

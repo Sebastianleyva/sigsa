@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { authService } from '../../services/auth_services.js'
 import {
   consultarPersonalPendienteSolicitudViaticos,
@@ -91,13 +91,12 @@ export default function SolicitudesViaticos() {
                   <div><dt>Fecha de comisión</dt><dd>{persona.fecha_comision ?? 'Por definir'}</dd></div>
                   <div><dt>Tipo de destino</dt><dd>{persona.tipo_destino}</dd></div>
                 </dl>
-                <button
-                  type="button"
-                  disabled
-                  title="La captura de solicitudes de viáticos estará disponible próximamente."
+                <Link
+                  className="comisiones-operacion-card-action"
+                  to={`/comisiones/solicitudes-viaticos/${persona.id_comision}/${persona.id_personal}/crear`}
                 >
                   Crear solicitud de viáticos
-                </button>
+                </Link>
               </article>
             ))}
           </section>

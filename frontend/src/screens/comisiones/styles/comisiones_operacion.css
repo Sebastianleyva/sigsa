@@ -205,6 +205,7 @@
 }
 
 .comisiones-operacion-card > button,
+.comisiones-operacion-card > .comisiones-operacion-card-action,
 .comisiones-operacion-actions button {
   align-self: end;
   display: inline-flex;
@@ -221,16 +222,13 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .comisiones-operacion-card > button:hover,
+.comisiones-operacion-card > .comisiones-operacion-card-action:hover,
 .comisiones-operacion-actions button:hover:not(:disabled) {
   background: #125643;
-}
-
-.comisiones-operacion-card > button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .comisiones-operacion-summary {
@@ -452,7 +450,8 @@
     grid-template-columns: 1fr;
   }
 
-  .comisiones-operacion-card > button {
+  .comisiones-operacion-card > button,
+  .comisiones-operacion-card > .comisiones-operacion-card-action {
     justify-self: start;
   }
 
