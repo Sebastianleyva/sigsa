@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import ConfirmationDialog from '../../components/ConfirmationDialog'
 import {
   asignarComisionados,
   consultarOpcionesAsignacionComision,
@@ -17,7 +18,8 @@ export default function AsignarComision() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [fechaInicio, setFechaInicio] = useState<string | null>(null)
+  const [resultadoAsignacion, setResultadoAsignacion] = useState<Awaited<ReturnType<typeof asignarComisionados>> | null>(null)
+  const [mostrarAvisoSolicitudes, setMostrarAvisoSolicitudes] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -55,7 +57,10 @@ export default function AsignarComision() {
     setSubmitting(true)
     try {
       const resultado = await asignarComisionados(idComision, seleccionados)
-      setFechaInicio(resultado.fecha_inicio)
+      setResultadoAsignacion(resultado)
+      if (resultado.estado === 'PENDIENTE DE SOLICITUDES_V') {
+        setMostrarAvisoSolicitudes(true)
+      }
     } catch (submitError) {
       setError(submitError instanceof Error
         ? submitError.message
@@ -82,23 +87,35 @@ export default function AsignarComision() {
         <div className="comisiones-operacion-heading">
           <span className="comisiones-operacion-eyebrow">COMISIONES · SIGSA</span>
           <h1>Asignar comisionados</h1>
-          <p>Selecciona una o más personas del área para iniciar esta comisión.</p>
+          <p>
+            {opciones?.comision.tipo_comision === 'FORANEA'
+              ? 'Selecciona una o más personas del área para asignarlas a esta comisión.'
+              : 'Selecciona una o más personas del área para iniciar esta comisión.'}
+          </p>
         </div>
 
         {loading && <p className="comisiones-operacion-state" role="status">Cargando comisión y personal...</p>}
         {!loading && !opciones && error && (
           <p className="comisiones-operacion-state error" role="alert">{error}</p>
         )}
-        {fechaInicio && (
+        {resultadoAsignacion?.estado === 'EN CURSO' && (
           <div className="comisiones-operacion-state success" role="status">
-            Comisión iniciada el {fechaInicio}. Su estado cambió a EN CURSO.
+            Comisión iniciada el {resultadoAsignacion.fecha_inicio}. Su estado cambió a EN CURSO.
             <button type="button" onClick={() => navigate('/comisiones/en-curso')}>
               Ver comisiones en curso <span aria-hidden="true">→</span>
             </button>
           </div>
         )}
+        {resultadoAsignacion?.estado === 'PENDIENTE DE SOLICITUDES_V' && (
+          <div className="comisiones-operacion-state success" role="status">
+            Personal asignado correctamente. Estado: PENDIENTE DE SOLICITUDES_V.
+            <button type="button" onClick={() => navigate('/comisiones/pendientes')}>
+              Volver a comisiones pendientes <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        )}
 
-        {!loading && opciones && !fechaInicio && (
+        {!loading && opciones && !resultadoAsignacion && (
           <form className="comisiones-operacion-form" onSubmit={handleSubmit}>
             <section className="comisiones-operacion-summary" aria-label="Datos de la comisión">
               <span>COMISIÓN #{opciones.comision.id_comision}</span>
@@ -150,17 +167,32 @@ export default function AsignarComision() {
 
             {error && <p className="comisiones-operacion-state error" role="alert">{error}</p>}
             <div className="comisiones-operacion-actions">
-              <span>Al aceptar, se registrará la fecha de inicio y la comisión quedará EN CURSO.</span>
+              <span>
+                {opciones.comision.tipo_comision === 'FORANEA'
+                  ? 'Al asignar, la comisión quedará pendiente de solicitudes de servicio.'
+                  : 'Al aceptar, se registrará la fecha de inicio y la comisión quedará EN CURSO.'}
+              </span>
               <button
                 type="submit"
                 disabled={submitting || opciones.personal.length === 0}
               >
-                {submitting ? 'Iniciando...' : 'Aceptar e iniciar comisión'} <span aria-hidden="true">→</span>
+                {submitting
+                  ? opciones.comision.tipo_comision === 'FORANEA' ? 'Asignando...' : 'Iniciando...'
+                  : opciones.comision.tipo_comision === 'FORANEA' ? 'Asignar' : 'Aceptar e iniciar comisión'}
+                {opciones.comision.tipo_comision === 'URBANA' && <span aria-hidden="true">→</span>}
               </button>
             </div>
           </form>
         )}
       </section>
+      <ConfirmationDialog
+        open={mostrarAvisoSolicitudes}
+        title="Solicitudes de servicio"
+        message="Para continuar se tienen que llenar las solicitudes de servicio."
+        actions={[]}
+        cancelLabel="Entendido"
+        onCancel={() => setMostrarAvisoSolicitudes(false)}
+      />
     </main>
   )
 }

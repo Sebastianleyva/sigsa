@@ -51,7 +51,7 @@ export type ComisionPendiente = {
   id_comision: number
   id_solicitud: number
   fecha: string
-  tipo_comision: string
+  tipo_comision: 'URBANA' | 'FORANEA'
   tipo_destino: string
   id_area: number
   estado: string
@@ -67,6 +67,20 @@ export type OpcionesAsignacionComision = {
   comision: ComisionPendiente & { area_nombre: string }
   personal: PersonalComision[]
 }
+
+export type ResultadoAsignacionComision =
+  | {
+    id_comision: number
+    estado: 'EN CURSO'
+    fecha_inicio: string
+    ids_personal: number[]
+  }
+  | {
+    id_comision: number
+    estado: 'PENDIENTE DE SOLICITUDES_V'
+    fecha_inicio: null
+    ids_personal: number[]
+  }
 
 export type ComisionEnCurso = ComisionPendiente & {
   fecha_inicio: string | null
@@ -183,20 +197,30 @@ export async function consultarOpcionesAsignacionComision(
   }
 }
 
-export async function asignarComisionados(id_comision: number, ids_personal: number[]) {
+export async function asignarComisionados(
+  id_comision: number,
+  ids_personal: number[],
+): Promise<ResultadoAsignacionComision> {
   try {
     const response = await api.post<{
-      comision: { id_comision: number; estado: string; fecha_inicio: string; ids_personal: number[] }
+      comision: ResultadoAsignacionComision
     }>(
       'comisiones/routes/asignar_comision.php',
       { id_comision, ids_personal },
     )
-    if (!response.data?.comision) {
-      throw new Error('El servidor devolvió una respuesta inválida al iniciar la comisión.')
+    const resultado = response.data?.comision
+    if (
+      !resultado
+      || !Array.isArray(resultado.ids_personal)
+      || (resultado.estado === 'EN CURSO' && typeof resultado.fecha_inicio !== 'string')
+      || (resultado.estado === 'PENDIENTE DE SOLICITUDES_V' && resultado.fecha_inicio !== null)
+      || !['EN CURSO', 'PENDIENTE DE SOLICITUDES_V'].includes(resultado.estado)
+    ) {
+      throw new Error('El servidor devolvió una respuesta inválida al asignar la comisión.')
     }
-    return response.data.comision
+    return resultado
   } catch (error) {
-    throw obtenerError(error, 'No fue posible asignar al personal e iniciar la comisión.')
+    throw obtenerError(error, 'No fue posible asignar al personal.')
   }
 }
 
