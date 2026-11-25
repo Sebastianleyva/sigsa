@@ -272,16 +272,29 @@ export type OrdenServicioData = {
 
 export async function crearOrdenServicio(datos: OrdenServicioData) {
   try {
-    const response = await api.post<{ orden: Record<string, unknown> }>(
+    const response = await api.post<{ orden: { id_orden: number | string } }>(
       'comisiones/routes/crear_orden_servicio.php',
       datos,
     )
-    if (!response.data?.orden) {
+    const idOrden = Number(response.data?.orden?.id_orden)
+    if (!Number.isInteger(idOrden) || idOrden < 1) {
       throw new Error('El servidor devolvió una respuesta inválida al registrar la orden de servicio.')
     }
-    return response.data.orden
+    return { ...response.data.orden, id_orden: idOrden }
   } catch (error) {
     throw obtenerError(error, 'No fue posible registrar la orden de servicio.')
+  }
+}
+
+export async function obtenerPdfOrdenServicio(id_orden: number) {
+  try {
+    const response = await api.get<Blob>(
+      `comisiones/routes/generar_pdf_orden_servicio.php?id=${id_orden}`,
+      { responseType: 'blob' },
+    )
+    return URL.createObjectURL(response.data)
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible generar el documento de la orden de servicio.')
   }
 }
 

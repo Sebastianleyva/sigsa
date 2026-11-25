@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
   consultarComisionesEnCurso,
   crearOrdenServicio,
+  obtenerPdfOrdenServicio,
 } from '../../services/comisiones_services'
 import type { ComisionEnCurso } from '../../services/comisiones_services'
 import './styles/comisiones_operacion.css'
@@ -28,6 +29,7 @@ export default function OrdenServicio() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [completado, setCompletado] = useState(false)
+  const [idOrden, setIdOrden] = useState<number | null>(null)
   const [form, setForm] = useState({
     fecha: fechaLocal(new Date()),
     n_reporte: '',
@@ -96,7 +98,7 @@ export default function OrdenServicio() {
     setError('')
     setSaving(true)
     try {
-      await crearOrdenServicio({
+      const orden = await crearOrdenServicio({
         id_comision: idComision,
         fecha: form.fecha,
         n_reporte: Number(form.n_reporte),
@@ -116,6 +118,7 @@ export default function OrdenServicio() {
         alumnos_benefi: numeroOpcional(form.alumnos_benefi),
         donacion: numeroOpcional(form.donacion),
       })
+      setIdOrden(orden.id_orden)
       setCompletado(true)
     } catch (submitError) {
       setError(submitError instanceof Error
@@ -123,6 +126,26 @@ export default function OrdenServicio() {
         : 'No fue posible registrar la orden de servicio.')
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function abrirPdf() {
+    if (idOrden === null) return
+    const ventana = window.open('', '_blank')
+    if (!ventana) {
+      setError('Permite las ventanas emergentes para abrir el documento.')
+      return
+    }
+
+    ventana.opener = null
+    setError('')
+    try {
+      ventana.location.href = await obtenerPdfOrdenServicio(idOrden)
+    } catch (pdfError) {
+      ventana.close()
+      setError(pdfError instanceof Error
+        ? pdfError.message
+        : 'No fue posible generar el documento de la orden de servicio.')
     }
   }
 
@@ -148,6 +171,9 @@ export default function OrdenServicio() {
         {completado && (
           <p className="comisiones-operacion-state success" role="status">
             Orden de servicio registrada y comisión finalizada correctamente.
+            <button type="button" onClick={() => void abrirPdf()}>
+              Imprimir / Guardar como PDF
+            </button>
           </p>
         )}
 
