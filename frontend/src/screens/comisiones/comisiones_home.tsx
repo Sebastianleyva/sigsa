@@ -5,6 +5,7 @@ import { authService } from '../../services/auth_services.js'
 const opciones = [
   {
     index: '01',
+    division: 'foraneas',
     category: 'NUEVA SOLICITUD',
     title: 'Crear solicitud',
     description: 'Registra los datos de la solicitud que dará origen a una comisión.',
@@ -13,6 +14,7 @@ const opciones = [
   },
   {
     index: '02',
+    division: 'foraneas',
     category: 'NUEVA COMISIÓN',
     title: 'Crear comisión',
     description: 'Genera una comisión a partir de una solicitud registrada.',
@@ -21,6 +23,7 @@ const opciones = [
   },
   {
     index: '03',
+    division: 'foraneas',
     category: 'ASIGNACIÓN',
     title: 'Comisiones pendientes',
     description: 'Asigna al personal de tu departamento para iniciar sus comisiones.',
@@ -29,6 +32,7 @@ const opciones = [
   },
   {
     index: '04',
+    division: 'foraneas',
     category: 'SEGUIMIENTO',
     title: 'Comisiones en curso',
     description: 'Consulta el lugar, la fecha de inicio y el personal comisionado.',
@@ -37,11 +41,21 @@ const opciones = [
   },
   {
     index: '05',
+    division: 'viaticos',
     category: 'VIÁTICOS',
     title: 'Solicitudes de viáticos',
     description: 'Consulta y gestiona las solicitudes de viáticos de las comisiones.',
     action: 'Ver solicitudes',
     path: '/comisiones/solicitudes-viaticos',
+  },
+  {
+    index: '06',
+    division: 'viaticos',
+    category: 'CONSULTA · VIÁTICOS',
+    title: 'Ver solicitudes de viáticos',
+    description: 'Consulta las solicitudes registradas por mes y descarga sus documentos PDF.',
+    action: 'Consultar solicitudes',
+    path: '/comisiones/ver-solicitudes-viaticos',
   },
 ]
 
@@ -60,7 +74,10 @@ export default function ComisionesHome() {
     && (opcion.path !== '/comisiones/crear' || puedeCrearComision)
     && (opcion.path !== '/comisiones/pendientes' || puedeGestionarComisiones)
     && (opcion.path !== '/comisiones/solicitudes-viaticos' || puedeConsultarViaticos)
+    && (opcion.path !== '/comisiones/ver-solicitudes-viaticos' || puedeConsultarViaticos)
   ))
+  const opcionesComisionesForaneas = opcionesVisibles.filter((opcion) => opcion.division === 'foraneas')
+  const opcionesViaticos = opcionesVisibles.filter((opcion) => opcion.division === 'viaticos')
 
   return (
     <main className="comisiones-home-page">
@@ -82,17 +99,17 @@ export default function ComisionesHome() {
           <p>Registra solicitudes y crea comisiones para organizar las actividades fuera de la oficina.</p>
         </div>
 
-        <section className="comisiones-home-options" aria-labelledby="comisiones-home-options-title">
+        <section className="comisiones-home-options" aria-labelledby="comisiones-home-foraneas-title">
           <div className="comisiones-home-section-heading">
             <div>
-              <span className="comisiones-home-section-index">01 / ACCIONES</span>
-              <h2 id="comisiones-home-options-title">¿Qué deseas hacer?</h2>
+              <span className="comisiones-home-section-index">01 / COMISIONES</span>
+              <h2 id="comisiones-home-foraneas-title">¿Qué deseas hacer?</h2>
             </div>
-            <span className="comisiones-home-section-note">MÓDULO DE COMISIONES</span>
+            <span className="comisiones-home-section-note">REGISTRO Y SEGUIMIENTO</span>
           </div>
 
           <div className="comisiones-home-grid">
-            {opcionesVisibles.map((opcion) => (
+            {opcionesComisionesForaneas.map((opcion) => (
               <button
                 className="comisiones-home-card"
                 key={opcion.index}
@@ -111,6 +128,38 @@ export default function ComisionesHome() {
             ))}
           </div>
         </section>
+
+        {opcionesViaticos.length > 0 && (
+          <section className="comisiones-home-options" aria-labelledby="comisiones-home-viaticos-title">
+            <div className="comisiones-home-section-heading">
+              <div>
+                <span className="comisiones-home-section-index">02 / ADMINISTRACIÓN</span>
+                <h2 id="comisiones-home-viaticos-title">Funciones administrativas</h2>
+              </div>
+              <span className="comisiones-home-section-note">CONSULTA Y VIÁTICOS</span>
+            </div>
+
+            <div className="comisiones-home-grid">
+              {opcionesViaticos.map((opcion) => (
+                <button
+                  className="comisiones-home-card"
+                  key={opcion.index}
+                  type="button"
+                  onClick={() => navigate(opcion.path)}
+                >
+                  <span className="comisiones-home-card-category">{opcion.category}</span>
+                  <span className="comisiones-home-card-index">{opcion.index}</span>
+                  <h3>{opcion.title}</h3>
+                  <p>{opcion.description}</p>
+                  <span className="comisiones-home-card-action">
+                    {opcion.action}<span aria-hidden="true">→</span>
+                  </span>
+                  <span className="comisiones-home-card-rule" aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         <footer className="comisiones-home-footer">
           <button type="button" onClick={() => navigate('/home')}>← Volver a módulos</button>
