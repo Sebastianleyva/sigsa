@@ -46,7 +46,8 @@ try {
         "SELECT sv.id_solicitud_viaticos, sv.fecha, sv.clave_cobro, sv.puesto,
                 sv.contacto_emergencia_nombre, sv.contacto_emergencia_numero,
                 sv.programa, sv.financiamiento, sv.observaciones, sv.id_comision,
-                c.id_comision AS folio_comision, s.fecha_comision,
+        c.id_comision AS folio_comision, c.tipo_comision,
+        c.fecha_inicio, c.fecha_final, s.fecha_comision,
                 s.ubicacion AS lugar, s.falla_reportada AS motivo,
                 CONCAT_WS(' ', pc.nombre, pc.apellido_p, pc.apellido_m) AS comisionado,
                 pc.curp, pc.rfc, pc.correo AS correo_comisionado, pc.telefono,
@@ -99,6 +100,11 @@ try {
         $fecha = DateTime::createFromFormat('!Y-m-d', (string) $valor);
         return $fecha ? $fecha->format('d/m/Y') : (string) $valor;
     };
+    $periodo_comision = $solicitud['tipo_comision'] === 'FORANEA'
+        && !empty($solicitud['fecha_inicio'])
+        && !empty($solicitud['fecha_final'])
+        ? 'Del ' . $fecha($solicitud['fecha_inicio']) . ' al ' . $fecha($solicitud['fecha_final'])
+        : $fecha($solicitud['fecha_comision']);
     $dinero = static fn ($valor): string => '$' . number_format((float) ($valor ?? 0), 2, '.', ',');
     $total = array_sum(array_map(static fn (array $renglon): float => (float) $renglon['importe'], $renglones));
 
@@ -602,7 +608,7 @@ try {
         <div class="col-comision-izq">
           <div class="fila-form" style="margin-top: 0;">
             <span class="lbl" style="min-width: 48px;">Periodo:</span>
-            <span class="val grow" style="font-weight: bold; text-align: center;"><?= $escape($fecha($solicitud['fecha_comision'])) ?></span>
+            <span class="val grow" style="font-weight: bold; text-align: center;"><?= $escape($periodo_comision) ?></span>
           </div>
           <div class="fila-form" style="margin-top: 0;">
             <span class="lbl" style="min-width: 48px;">Lugar:</span>

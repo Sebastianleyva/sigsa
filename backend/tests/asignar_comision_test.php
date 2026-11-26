@@ -13,6 +13,8 @@ final class AsignacionPdoFalso {
             'estado' => $estado,
             'tipo_comision' => $tipoComision,
             'id_subdireccion' => 20,
+            'fecha_inicio' => $tipoComision === 'FORANEA' ? '2026-12-01' : null,
+            'fecha_final' => $tipoComision === 'FORANEA' ? '2026-12-03' : null,
         ];
     }
 
@@ -69,9 +71,9 @@ final class AsignacionPdoFalso {
             $this->comision['estado'] = str_contains($sql, "'EN CURSO'")
                 ? 'EN CURSO'
                 : 'PENDIENTE DE SOLICITUDES_V';
-            $this->comision['fecha_inicio'] = $this->comision['estado'] === 'EN CURSO'
-                ? date('Y-m-d')
-                : null;
+            if ($this->comision['estado'] === 'EN CURSO') {
+                $this->comision['fecha_inicio'] = date('Y-m-d');
+            }
             return ['filas' => [], 'afectadas' => 1];
         }
         if (str_contains($sql, 'SELECT fecha_inicio')) {
@@ -146,8 +148,16 @@ comprobar(
     $resultadoForanea['estado'] === 'PENDIENTE DE SOLICITUDES_V',
     'La comisión foránea debe quedar pendiente de solicitudes.',
 );
-comprobar($resultadoForanea['fecha_inicio'] === null, 'La comisión foránea no debe registrar fecha de inicio.');
+comprobar(
+    $resultadoForanea['fecha_inicio'] === '2026-12-01',
+    'La respuesta debe conservar la fecha programada de la comisión foránea.',
+);
 comprobar($foranea->personalComisionado === [31], 'Debe asignarse el personal de la comisión foránea.');
+comprobar(
+    $foranea->comision['fecha_inicio'] === '2026-12-01'
+        && $foranea->comision['fecha_final'] === '2026-12-03',
+    'La asignación no debe borrar el periodo programado de la comisión foránea.',
+);
 
 $noPendiente = new AsignacionPdoFalso('FORANEA', 'EN CURSO');
 try {

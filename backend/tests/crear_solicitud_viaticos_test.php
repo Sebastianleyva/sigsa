@@ -5,7 +5,8 @@ require_once __DIR__ . '/../modulos/comisiones/models/crear_solicitud_viaticos.p
 final class SolicitudViaticosPdoFalso {
     public string $estado = 'PENDIENTE DE SOLICITUDES_V';
     public string $tipo_comision = 'FORANEA';
-    public ?string $fecha_inicio = null;
+    public ?string $fecha_inicio = '2026-12-01';
+    public ?string $fecha_final = '2026-12-03';
     public array $solicitudes = [];
     public array $renglones = [];
     public bool $transaccion_activa = false;
@@ -13,7 +14,13 @@ final class SolicitudViaticosPdoFalso {
     private ?array $respaldo = null;
 
     public function beginTransaction(): bool {
-        $this->respaldo = [$this->estado, $this->fecha_inicio, $this->solicitudes, $this->renglones];
+        $this->respaldo = [
+            $this->estado,
+            $this->fecha_inicio,
+            $this->fecha_final,
+            $this->solicitudes,
+            $this->renglones,
+        ];
         $this->transaccion_activa = true;
         return true;
     }
@@ -26,7 +33,13 @@ final class SolicitudViaticosPdoFalso {
 
     public function rollBack(): bool {
         if ($this->respaldo !== null) {
-            [$this->estado, $this->fecha_inicio, $this->solicitudes, $this->renglones] = $this->respaldo;
+            [
+                $this->estado,
+                $this->fecha_inicio,
+                $this->fecha_final,
+                $this->solicitudes,
+                $this->renglones,
+            ] = $this->respaldo;
         }
         $this->transaccion_activa = false;
         $this->respaldo = null;
@@ -91,7 +104,6 @@ final class SolicitudViaticosPdoFalso {
         }
         if (str_contains($sql, 'UPDATE comisiones')) {
             $this->estado = 'EN CURSO';
-            $this->fecha_inicio = date('Y-m-d');
             return ['filas' => [], 'afectadas' => 1];
         }
         throw new RuntimeException("Consulta inesperada en prueba: {$sql}");
@@ -188,7 +200,10 @@ comprobar_solicitud_viaticos(
     $primera['estado_comision'] === 'PENDIENTE DE SOLICITUDES_V' && $primera['personal_pendiente'] === 1,
     'La comisión debe seguir pendiente mientras falte otra solicitud.',
 );
-comprobar_solicitud_viaticos($pdo->fecha_inicio === null, 'La comisión no debe iniciar mientras queden solicitudes pendientes.');
+comprobar_solicitud_viaticos(
+    $pdo->fecha_inicio === '2026-12-01' && $pdo->fecha_final === '2026-12-03',
+    'El periodo programado debe conservarse mientras queden solicitudes pendientes.',
+);
 comprobar_solicitud_viaticos(
     $pdo->renglones[0]['num_dias'] === null && $pdo->renglones[0]['cuota_diaria'] === null,
     'Los días vacíos deben guardarse junto con una cuota nula.',
@@ -211,7 +226,10 @@ comprobar_solicitud_viaticos(
     $ultima['estado_comision'] === 'EN CURSO' && $ultima['personal_pendiente'] === 0,
     'La comisión debe iniciar cuando todas las personas tengan solicitud.',
 );
-comprobar_solicitud_viaticos($pdo->fecha_inicio === date('Y-m-d'), 'Al iniciar debe guardarse la fecha de inicio.');
+comprobar_solicitud_viaticos(
+    $pdo->fecha_inicio === '2026-12-01' && $pdo->fecha_final === '2026-12-03',
+    'Al completar las solicitudes debe conservarse el periodo programado.',
+);
 comprobar_solicitud_viaticos(
     $pdo->renglones[1]['cuota_diaria'] === '425.00',
     'La cuota sin pernocta debe guardarse para medio día.',

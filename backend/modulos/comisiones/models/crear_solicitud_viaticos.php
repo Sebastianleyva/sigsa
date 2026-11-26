@@ -285,7 +285,7 @@ function crear_solicitud_viaticos($pdo, array $input, int $id_personal_registra)
         if ($personal_pendiente === 0) {
             $actualizar_comision = $pdo->prepare(
                 "UPDATE comisiones
-                 SET estado = 'EN CURSO', fecha_inicio = CURDATE()
+                 SET estado = 'EN CURSO'
                  WHERE id_comision = :id_comision
                    AND estado = 'PENDIENTE DE SOLICITUDES_V'"
             );

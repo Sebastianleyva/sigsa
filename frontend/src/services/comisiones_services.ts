@@ -19,8 +19,10 @@ export type SolicitudComision = SolicitudComisionData & {
 export type ComisionData = {
   id_solicitud: number
   id_area: number
-  tipo_comision: string
+  tipo_comision: 'URBANA' | 'FORANEA'
   tipo_destino: string
+  fecha_inicio: string | null
+  fecha_final: string | null
 }
 
 export type Comision = ComisionData & {
@@ -78,7 +80,7 @@ export type ResultadoAsignacionComision =
   | {
     id_comision: number
     estado: 'PENDIENTE DE SOLICITUDES_V'
-    fecha_inicio: null
+    fecha_inicio: string | null
     ids_personal: number[]
   }
 
@@ -308,7 +310,9 @@ export async function asignarComisionados(
       !resultado
       || !Array.isArray(resultado.ids_personal)
       || (resultado.estado === 'EN CURSO' && typeof resultado.fecha_inicio !== 'string')
-      || (resultado.estado === 'PENDIENTE DE SOLICITUDES_V' && resultado.fecha_inicio !== null)
+      || (resultado.estado === 'PENDIENTE DE SOLICITUDES_V'
+        && resultado.fecha_inicio !== null
+        && typeof resultado.fecha_inicio !== 'string')
       || !['EN CURSO', 'PENDIENTE DE SOLICITUDES_V'].includes(resultado.estado)
     ) {
       throw new Error('El servidor devolvió una respuesta inválida al asignar la comisión.')

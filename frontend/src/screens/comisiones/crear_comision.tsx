@@ -12,10 +12,20 @@ import type {
 } from '../../services/comisiones_services'
 import './styles/crear_comision.css'
 
-const initialForm = {
+type FormularioComision = {
+  id_area: string
+  tipo_comision: '' | 'URBANA' | 'FORANEA'
+  tipo_destino: string
+  fecha_inicio: string
+  fecha_final: string
+}
+
+const initialForm: FormularioComision = {
   id_area: '',
   tipo_comision: '',
   tipo_destino: '',
+  fecha_inicio: '',
+  fecha_final: '',
 }
 
 export default function CrearComision() {
@@ -56,13 +66,33 @@ export default function CrearComision() {
     }
   }, [idSolicitudParam])
 
-  function updateField(field: keyof typeof initialForm, value: string) {
-    setForm((current) => ({ ...current, [field]: value }))
+  function updateField<Field extends keyof FormularioComision>(
+    field: Field,
+    value: FormularioComision[Field],
+  ) {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+      ...(field === 'tipo_comision' && value === 'URBANA'
+        ? { fecha_inicio: '', fecha_final: '' }
+        : {}),
+    }))
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!solicitud) return
+    if (form.tipo_comision !== 'URBANA' && form.tipo_comision !== 'FORANEA') {
+      setError('Selecciona el tipo de comisión.')
+      return
+    }
+    if (
+      form.tipo_comision === 'FORANEA'
+      && (!form.fecha_inicio || !form.fecha_final || form.fecha_final < form.fecha_inicio)
+    ) {
+      setError('Selecciona un periodo válido para la comisión foránea.')
+      return
+    }
 
     setError(null)
     setSubmitting(true)
@@ -70,8 +100,10 @@ export default function CrearComision() {
       const datos: ComisionData = {
         id_solicitud: Number(solicitud.id_solicitud),
         id_area: Number(form.id_area),
-        tipo_comision: form.tipo_comision.trim(),
+        tipo_comision: form.tipo_comision,
         tipo_destino: form.tipo_destino.trim(),
+        fecha_inicio: form.tipo_comision === 'FORANEA' ? form.fecha_inicio : null,
+        fecha_final: form.tipo_comision === 'FORANEA' ? form.fecha_final : null,
       }
       const resultado = await crearComision(datos)
       setComisionCreada(resultado.id_comision)
@@ -155,7 +187,13 @@ export default function CrearComision() {
                 <select
                   required
                   value={form.tipo_comision}
-                  onChange={(event) => updateField('tipo_comision', event.target.value)}
+                  onChange={(event) => {
+                    const tipo = event.target.value
+                    updateField(
+                      'tipo_comision',
+                      tipo === 'URBANA' || tipo === 'FORANEA' ? tipo : '',
+                    )
+                  }}
                 >
                   <option value="" disabled>Selecciona el tipo de comisión</option>
                   <option value="URBANA">Urbana</option>
@@ -174,6 +212,35 @@ export default function CrearComision() {
                   <option value="CENTRO ADMINISTRATIVO">Centro administrativo</option>
                 </select>
               </label>
+              {form.tipo_comision === 'FORANEA' && (
+                <>
+                  <label>
+                    Fecha de inicio <b>*</b>
+                    <input
+                      type="date"
+                      required
+                      value={form.fecha_inicio}
+                      onChange={(event) => {
+                        const fecha = event.target.value
+                        updateField('fecha_inicio', fecha)
+                        if (form.fecha_final && form.fecha_final < fecha) {
+                          updateField('fecha_final', '')
+                        }
+                      }}
+                    />
+                  </label>
+                  <label>
+                    Fecha final <b>*</b>
+                    <input
+                      type="date"
+                      required
+                      min={form.fecha_inicio || undefined}
+                      value={form.fecha_final}
+                      onChange={(event) => updateField('fecha_final', event.target.value)}
+                    />
+                  </label>
+                </>
+              )}
             </div>
 
             {error && <p className="crear-comision-state error" role="alert">{error}</p>}

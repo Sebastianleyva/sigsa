@@ -43,6 +43,28 @@ function crear_comision($pdo,$input){
     $tipo_comision = $textos['tipo_comision'];
     $tipo_destino = $textos['tipo_destino'];
     $estado = 'PENDIENTE';
+    $fecha_inicio = null;
+    $fecha_final = null;
+    if ($tipo_comision === 'FORANEA') {
+        foreach (['fecha_inicio', 'fecha_final'] as $campo) {
+            $valor = $input[$campo] ?? null;
+            if (
+                !is_string($valor)
+                || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $valor)
+                || !checkdate((int) substr($valor, 5, 2), (int) substr($valor, 8, 2), (int) substr($valor, 0, 4))
+            ) {
+                throw new InvalidArgumentException("El campo {$campo} debe ser una fecha válida");
+            }
+            if ($campo === 'fecha_inicio') {
+                $fecha_inicio = $valor;
+            } else {
+                $fecha_final = $valor;
+            }
+        }
+        if ($fecha_final < $fecha_inicio) {
+            throw new InvalidArgumentException('La fecha final no puede ser anterior a la fecha de inicio');
+        }
+    }
 
     $pdo->beginTransaction();
     try {
@@ -58,9 +80,9 @@ function crear_comision($pdo,$input){
 
         $query = $pdo->prepare(
             'INSERT INTO comisiones
-             (id_solicitud, fecha, tipo_comision, tipo_destino, id_area, estado)
+             (id_solicitud, fecha, tipo_comision, tipo_destino, id_area, estado, fecha_inicio, fecha_final)
              VALUES
-             (:id_solicitud, :fecha, :tipo_comision, :tipo_destino, :id_area, :estado)'
+             (:id_solicitud, :fecha, :tipo_comision, :tipo_destino, :id_area, :estado, :fecha_inicio, :fecha_final)'
         );
         $query->execute([
             'id_solicitud' => $id_solicitud,
@@ -68,7 +90,9 @@ function crear_comision($pdo,$input){
             'tipo_comision' => $tipo_comision,
             'tipo_destino' => $tipo_destino,
             'id_area' => $id_area,
-            'estado' => $estado
+            'estado' => $estado,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_final' => $fecha_final,
         ]);
         $id_comision = $pdo->lastInsertId();
         $pdo->commit();
@@ -86,6 +110,8 @@ function crear_comision($pdo,$input){
         'tipo_comision' => $tipo_comision,
         'tipo_destino' => $tipo_destino,
         'id_area' => $id_area,
-        'estado' => $estado
+        'estado' => $estado,
+        'fecha_inicio' => $fecha_inicio,
+        'fecha_final' => $fecha_final,
     ];
 }
