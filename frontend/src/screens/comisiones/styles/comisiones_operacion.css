@@ -130,6 +130,17 @@
   cursor: pointer;
 }
 
+.viaticos-solicitud-success-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.viaticos-solicitud-success-actions button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .comisiones-operacion-list {
   display: grid;
   gap: 14px;
@@ -629,5 +640,9 @@
   .comisiones-operacion-state.success {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .viaticos-solicitud-success-actions {
+    flex-wrap: wrap;
   }
 }

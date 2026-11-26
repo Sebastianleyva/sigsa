@@ -5,6 +5,7 @@ import { authService } from '../../services/auth_services.js'
 import {
   crearSolicitudViaticos,
   consultarComisionadoSolicitudViaticos,
+  obtenerPdfSolicitudViaticos,
 } from '../../services/comisiones_services'
 import type {
   ComisionadoSolicitudViaticos,
@@ -84,6 +85,8 @@ export default function CrearSolicitudViaticos() {
   const [guardarError, setGuardarError] = useState<string | null>(null)
   const [guardando, setGuardando] = useState(false)
   const [resultado, setResultado] = useState<ResultadoSolicitudViaticos | null>(null)
+  const [generandoPdf, setGenerandoPdf] = useState(false)
+  const [errorPdf, setErrorPdf] = useState<string | null>(null)
 
   useEffect(() => {
     if (!puedeConsultar || !idsValidos) return
@@ -272,6 +275,30 @@ export default function CrearSolicitudViaticos() {
     }
   }
 
+  async function guardarPdf() {
+    if (!resultado || generandoPdf) return
+
+    const ventana = window.open('', '_blank')
+    if (!ventana) {
+      setErrorPdf('Permite las ventanas emergentes para abrir el documento imprimible.')
+      return
+    }
+
+    setErrorPdf(null)
+    setGenerandoPdf(true)
+    try {
+      const url = await obtenerPdfSolicitudViaticos(resultado.id_solicitud_viaticos)
+      ventana.location.href = url
+    } catch (pdfError) {
+      ventana.close()
+      setErrorPdf(pdfError instanceof Error
+        ? pdfError.message
+        : 'No fue posible generar el PDF de la solicitud de viáticos.')
+    } finally {
+      setGenerandoPdf(false)
+    }
+  }
+
   if (!puedeConsultar) {
     return <Navigate to="/comisiones" replace />
   }
@@ -307,16 +334,24 @@ export default function CrearSolicitudViaticos() {
         {loading && <p className="comisiones-operacion-state" role="status">Cargando datos del comisionado...</p>}
         {!loading && error && <p className="comisiones-operacion-state error" role="alert">{error}</p>}
         {resultado && (
-          <div className="comisiones-operacion-state success" role="status">
-            <span>
-              {resultado.mensaje}
-              {resultado.personal_pendiente > 0
-                && ` Faltan solicitudes de ${resultado.personal_pendiente} persona(s).`}
-            </span>
-            <button type="button" onClick={() => navigate('/comisiones/solicitudes-viaticos')}>
-              Volver al listado
-            </button>
-          </div>
+          <>
+            <div className="comisiones-operacion-state success" role="status">
+              <span>
+                {resultado.mensaje}
+                {resultado.personal_pendiente > 0
+                  && ` Faltan solicitudes de ${resultado.personal_pendiente} persona(s).`}
+              </span>
+              <div className="viaticos-solicitud-success-actions">
+                <button type="button" onClick={() => void guardarPdf()} disabled={generandoPdf}>
+                  {generandoPdf ? 'Generando...' : 'Guardar PDF'}
+                </button>
+                <button type="button" onClick={() => navigate('/comisiones/solicitudes-viaticos')}>
+                  Volver al listado
+                </button>
+              </div>
+            </div>
+            {errorPdf && <p className="comisiones-operacion-state error" role="alert">{errorPdf}</p>}
+          </>
         )}
 
         {!loading && !error && !resultado && comisionado && (

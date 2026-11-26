@@ -449,6 +449,21 @@ export async function crearSolicitudViaticos(
   }
 }
 
+export async function obtenerPdfSolicitudViaticos(id_solicitud_viaticos: number): Promise<string> {
+  try {
+    const response = await api.get<Blob>(
+      `comisiones/routes/generar_pdf_solicitud_viaticos.php?id=${id_solicitud_viaticos}`,
+      { responseType: 'blob' },
+    )
+    if (!response.data || response.data.size === 0) {
+      throw new Error('El servidor devolvió un documento vacío.')
+    }
+    return URL.createObjectURL(response.data)
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible generar el PDF de la solicitud de viáticos.')
+  }
+}
+
 export type SolicitudSoporteData = {
   id_comision: number
   direccion: string
