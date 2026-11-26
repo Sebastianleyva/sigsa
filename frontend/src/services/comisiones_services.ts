@@ -125,6 +125,35 @@ export type ComisionadoSolicitudViaticos = {
   opciones: OpcionesSolicitudViaticos
 }
 
+export type RenglonSolicitudViaticosData = {
+  id_codigo_contable_comision: number
+  num_dias: number | null
+  importe: number
+}
+
+export type SolicitudViaticosData = {
+  id_comision: number
+  id_personal_comisionado: number
+  id_zona: number
+  tipo_comprobacion: 'FACTURA' | 'CONSTANCIA'
+  puesto: string
+  contacto_emergencia_nombre: string
+  contacto_emergencia_numero: string
+  programa: string
+  clave_cobro: string
+  observaciones: string
+  renglones: RenglonSolicitudViaticosData[]
+}
+
+export type ResultadoSolicitudViaticos = {
+  id_solicitud_viaticos: number
+  id_comision: number
+  id_personal_comisionado: number
+  estado_comision: 'PENDIENTE DE SOLICITUDES_V' | 'EN CURSO'
+  personal_pendiente: number
+  mensaje: string
+}
+
 export type OpcionesSolicitudViaticos = {
   codigos_contables: {
     id_codigo_contable_comision: number
@@ -373,6 +402,50 @@ export async function consultarComisionadoSolicitudViaticos(
     }
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar los datos del comisionado.')
+  }
+}
+
+export async function crearSolicitudViaticos(
+  datos: SolicitudViaticosData,
+): Promise<ResultadoSolicitudViaticos> {
+  try {
+    const response = await api.post<{
+      mensaje: string
+      solicitud: Omit<ResultadoSolicitudViaticos, 'mensaje'>
+    }>(
+      'comisiones/routes/crear_solicitud_viaticos.php',
+      datos,
+    )
+    const solicitud = response.data?.solicitud
+    const idSolicitud = Number(solicitud?.id_solicitud_viaticos)
+    const idComision = Number(solicitud?.id_comision)
+    const idPersonal = Number(solicitud?.id_personal_comisionado)
+    const personalPendiente = Number(solicitud?.personal_pendiente)
+    if (
+      !solicitud
+      || !Number.isInteger(idSolicitud)
+      || idSolicitud < 1
+      || !Number.isInteger(idComision)
+      || idComision < 1
+      || !Number.isInteger(idPersonal)
+      || idPersonal < 1
+      || !['PENDIENTE DE SOLICITUDES_V', 'EN CURSO'].includes(solicitud.estado_comision)
+      || !Number.isInteger(personalPendiente)
+      || personalPendiente < 0
+      || typeof response.data.mensaje !== 'string'
+    ) {
+      throw new Error('El servidor devolvió una respuesta inválida al guardar la solicitud de viáticos.')
+    }
+    return {
+      ...solicitud,
+      id_solicitud_viaticos: idSolicitud,
+      id_comision: idComision,
+      id_personal_comisionado: idPersonal,
+      personal_pendiente: personalPendiente,
+      mensaje: response.data.mensaje,
+    }
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible guardar la solicitud de viáticos.')
   }
 }
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 26, 2026 at 01:11 AM
+-- Generation Time: Nov 26, 2026 at 02:17 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -331,7 +331,6 @@ CREATE TABLE `solicitudes_de_viaticos` (
   `id_personal_comisionado` bigint(20) NOT NULL,
   `id_personal_registra` bigint(20) NOT NULL,
   `financiamiento` varchar(10) NOT NULL,
-  `id_codigo_contable` bigint(20) NOT NULL,
   `id_comision` bigint(20) NOT NULL,
   `observaciones` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -383,9 +382,9 @@ CREATE TABLE `viaticos_comisiones` (
   `id_viaticos` bigint(20) NOT NULL,
   `id_solicitud_viaticos` bigint(20) NOT NULL,
   `id_codigo_c_comision` bigint(20) NOT NULL,
-  `num_dias` decimal(10,2) NOT NULL,
-  `cuota_diaria` decimal(10,2) NOT NULL,
-  `importe` int(11) NOT NULL,
+  `num_dias` decimal(10,2) DEFAULT NULL,
+  `cuota_diaria` decimal(10,2) DEFAULT NULL,
+  `importe` decimal(10,0) NOT NULL,
   `tipo_comprobacion` enum('FACTURA','CONSTANCIA') NOT NULL COMMENT 'tipo de facturacion'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -546,7 +545,6 @@ ALTER TABLE `solicitudes_de_viaticos`
   ADD PRIMARY KEY (`id_solicitud_viaticos`),
   ADD KEY `fk_id_personal_comisionado` (`id_personal_comisionado`),
   ADD KEY `fk_id_personal_registra` (`id_personal_registra`),
-  ADD KEY `fk_id_codigo_contable` (`id_codigo_contable`),
   ADD KEY `fk_id_comision` (`id_comision`);
 
 --
@@ -808,8 +806,7 @@ ALTER TABLE `salidas`
 ALTER TABLE `solicitudes_de_viaticos`
   ADD CONSTRAINT `solicitudes_de_viaticos_ibfk_1` FOREIGN KEY (`id_personal_comisionado`) REFERENCES `personal` (`id_personal`),
   ADD CONSTRAINT `solicitudes_de_viaticos_ibfk_2` FOREIGN KEY (`id_personal_registra`) REFERENCES `personal` (`id_personal`),
-  ADD CONSTRAINT `solicitudes_de_viaticos_ibfk_3` FOREIGN KEY (`id_comision`) REFERENCES `comisiones` (`id_comision`),
-  ADD CONSTRAINT `solicitudes_de_viaticos_ibfk_4` FOREIGN KEY (`id_codigo_contable`) REFERENCES `codigos_contables` (`id_codigo`);
+  ADD CONSTRAINT `solicitudes_de_viaticos_ibfk_3` FOREIGN KEY (`id_comision`) REFERENCES `comisiones` (`id_comision`);
 
 --
 -- Constraints for table `solicitud_soporte`

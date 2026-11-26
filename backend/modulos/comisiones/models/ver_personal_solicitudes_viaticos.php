@@ -12,6 +12,12 @@ function ver_personal_solicitudes_viaticos($pdo): array {
          INNER JOIN personal p ON p.id_personal = pc.id_personal
          INNER JOIN puestos pu ON pu.id_puesto = p.puesto
          WHERE c.estado = :estado
+           AND NOT EXISTS (
+               SELECT 1
+               FROM solicitudes_de_viaticos sv
+               WHERE sv.id_comision = c.id_comision
+                 AND sv.id_personal_comisionado = p.id_personal
+           )
          ORDER BY c.id_comision DESC, p.apellido_p, p.apellido_m, p.nombre"
     );
     $consulta->execute(['estado' => 'PENDIENTE DE SOLICITUDES_V']);
@@ -33,7 +39,13 @@ function ver_comisionado_solicitud_viaticos($pdo, int $id_comision, int $id_pers
          INNER JOIN solicitudes s ON s.id_solicitud = c.id_solicitud
          WHERE c.id_comision = :id_comision
            AND p.id_personal = :id_personal
-           AND c.estado = :estado"
+           AND c.estado = :estado
+           AND NOT EXISTS (
+               SELECT 1
+               FROM solicitudes_de_viaticos sv
+               WHERE sv.id_comision = c.id_comision
+                 AND sv.id_personal_comisionado = p.id_personal
+           )"
     );
     $consulta->execute([
         'id_comision' => $id_comision,

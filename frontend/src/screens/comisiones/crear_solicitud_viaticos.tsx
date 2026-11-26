@@ -3,9 +3,13 @@ import type { FormEvent } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { authService } from '../../services/auth_services.js'
 import {
+  crearSolicitudViaticos,
   consultarComisionadoSolicitudViaticos,
 } from '../../services/comisiones_services'
-import type { ComisionadoSolicitudViaticos } from '../../services/comisiones_services'
+import type {
+  ComisionadoSolicitudViaticos,
+  ResultadoSolicitudViaticos,
+} from '../../services/comisiones_services'
 import './styles/comisiones_operacion.css'
 
 type DatosEmergencia = {
@@ -27,6 +31,7 @@ type RenglonViaticos = {
   id_codigo_contable_comision: string
   num_dias: string
   importe: string
+  importeManual: boolean
 }
 
 const datosEmergenciaIniciales: DatosEmergencia = {
@@ -67,14 +72,18 @@ export default function CrearSolicitudViaticos() {
   const [comisionado, setComisionado] = useState<ComisionadoSolicitudViaticos | null>(null)
   const [datosEmergencia, setDatosEmergencia] = useState(datosEmergenciaIniciales)
   const [datosUnidad, setDatosUnidad] = useState(datosUnidadIniciales)
+  const [observaciones, setObservaciones] = useState('')
   const [zona, setZona] = useState('')
   const [tipoComprobacion, setTipoComprobacion] = useState<'FACTURA' | 'CONSTANCIA' | ''>('')
   const [renglonesViaticos, setRenglonesViaticos] = useState<RenglonViaticos[]>([
-    { id: 1, id_codigo_contable_comision: '', num_dias: '0.5', importe: '' },
+    { id: 1, id_codigo_contable_comision: '', num_dias: '', importe: '', importeManual: false },
   ])
   const [siguienteRenglonId, setSiguienteRenglonId] = useState(2)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [guardarError, setGuardarError] = useState<string | null>(null)
+  const [guardando, setGuardando] = useState(false)
+  const [resultado, setResultado] = useState<ResultadoSolicitudViaticos | null>(null)
 
   useEffect(() => {
     if (!puedeConsultar || !idsValidos) return
@@ -119,7 +128,17 @@ export default function CrearSolicitudViaticos() {
 
   function actualizarRenglon(id: number, campo: keyof Omit<RenglonViaticos, 'id'>, valor: string) {
     setRenglonesViaticos((actuales) => actuales.map((renglon) => (
-      renglon.id === id ? { ...renglon, [campo]: valor } : renglon
+      renglon.id === id
+        ? {
+          ...renglon,
+          [campo]: valor,
+          ...(campo === 'importe'
+            ? { importeManual: true }
+            : campo === 'num_dias'
+              ? { importeManual: false }
+              : {}),
+        }
+        : renglon
     )))
   }
 
@@ -129,24 +148,33 @@ export default function CrearSolicitudViaticos() {
       {
         id: siguienteRenglonId,
         id_codigo_contable_comision: '',
-        num_dias: '0.5',
+        num_dias: '',
         importe: '',
+        importeManual: false,
       },
     ])
     setSiguienteRenglonId((id) => id + 1)
   }
 
+  function eliminarRenglon(id: number) {
+    setRenglonesViaticos((actuales) => (
+      actuales.length > 1 ? actuales.filter((renglon) => renglon.id !== id) : actuales
+    ))
+  }
+
   function obtenerCuotaDiaria(numDias: string): number | null {
     const dias = Number(numDias)
+    if (!Number.isFinite(dias) || dias < 0.5 || !Number.isInteger(dias * 2)) return null
+    const pernocta = dias >= 1 ? 1 : 0
+    return obtenerTarifaDiaria(pernocta)
+  }
+
+  function obtenerTarifaDiaria(pernocta: 0 | 1): number | null {
     if (
       !comisionado
       || !zona
       || !tipoComprobacion
-      || !Number.isFinite(dias)
-      || dias < 0.5
-      || !Number.isInteger(dias * 2)
     ) return null
-    const pernocta = dias >= 1 ? 1 : 0
     const tarifa = comisionado.opciones.tabulador.find((opcion) => (
       opcion.id_zona === Number(zona)
       && opcion.tipo_comprobacion === tipoComprobacion
@@ -155,8 +183,93 @@ export default function CrearSolicitudViaticos() {
     return tarifa ? Number(tarifa.monto_diario) : null
   }
 
-  function evitarEnvio(event: FormEvent<HTMLFormElement>) {
+  function calcularImporte(numDias: string): string {
+    const dias = Number(numDias)
+    if (!Number.isFinite(dias) || dias < 0.5 || !Number.isInteger(dias * 2)) return ''
+
+    const diasConPernocta = Math.floor(dias)
+    const diasSinPernocta = dias % 1 === 0.5 ? 1 : 0
+    const cuotaConPernocta = diasConPernocta > 0
+      ? obtenerTarifaDiaria(1)
+      : 0
+    const cuotaSinPernocta = diasSinPernocta > 0
+      ? obtenerTarifaDiaria(0)
+      : 0
+
+    if (
+      cuotaConPernocta === null
+      || cuotaSinPernocta === null
+    ) return ''
+
+    const importe = diasConPernocta * cuotaConPernocta
+      + diasSinPernocta * cuotaSinPernocta
+    return String(Math.round(importe))
+  }
+
+  function obtenerTotalImportes(): string {
+    const totalEnCentavos = renglonesViaticos.reduce((total, renglon) => {
+      const importe = renglon.importeManual
+        ? renglon.importe
+        : calcularImporte(renglon.num_dias)
+      const valor = importe === '' ? 0 : Number(importe)
+      return total + (Number.isFinite(valor) ? Math.round(valor * 100) : 0)
+    }, 0)
+    return (totalEnCentavos / 100).toLocaleString('es-MX', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  }
+
+  function hayTarifaConstancia(idZona: number): boolean {
+    return Boolean(
+      comisionado?.opciones.zonas.find((opcion) => opcion.id_zona === idZona)?.permite_constancia
+      && comisionado.opciones.tabulador.some((tarifa) => (
+        tarifa.id_zona === idZona && tarifa.tipo_comprobacion === 'CONSTANCIA'
+      )),
+    )
+  }
+
+  function reiniciarImportesManuales() {
+    setRenglonesViaticos((actuales) => actuales.map((renglon) => ({
+      ...renglon,
+      importeManual: false,
+    })))
+  }
+
+  async function guardarSolicitud(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (!comisionado || !zona || !tipoComprobacion) return
+
+    setGuardarError(null)
+    setGuardando(true)
+    try {
+      const resultadoGuardado = await crearSolicitudViaticos({
+        id_comision: idComision,
+        id_personal_comisionado: idPersonal,
+        id_zona: Number(zona),
+        tipo_comprobacion: tipoComprobacion,
+        puesto: datosEmergencia.puesto.trim(),
+        contacto_emergencia_nombre: datosEmergencia.contacto_emergencia_nombre.trim(),
+        contacto_emergencia_numero: datosEmergencia.contacto_emergencia_numero.trim(),
+        programa: datosUnidad.programa.trim(),
+        clave_cobro: datosUnidad.codigo_contable.trim(),
+        observaciones: observaciones.trim(),
+        renglones: renglonesViaticos.map((renglon) => ({
+          id_codigo_contable_comision: Number(renglon.id_codigo_contable_comision),
+          num_dias: renglon.num_dias === '' ? null : Number(renglon.num_dias),
+          importe: Number(renglon.importeManual
+            ? renglon.importe
+            : calcularImporte(renglon.num_dias)),
+        })),
+      })
+      setResultado(resultadoGuardado)
+    } catch (saveError) {
+      setGuardarError(saveError instanceof Error
+        ? saveError.message
+        : 'No fue posible guardar la solicitud de viáticos.')
+    } finally {
+      setGuardando(false)
+    }
   }
 
   if (!puedeConsultar) {
@@ -193,9 +306,21 @@ export default function CrearSolicitudViaticos() {
 
         {loading && <p className="comisiones-operacion-state" role="status">Cargando datos del comisionado...</p>}
         {!loading && error && <p className="comisiones-operacion-state error" role="alert">{error}</p>}
+        {resultado && (
+          <div className="comisiones-operacion-state success" role="status">
+            <span>
+              {resultado.mensaje}
+              {resultado.personal_pendiente > 0
+                && ` Faltan solicitudes de ${resultado.personal_pendiente} persona(s).`}
+            </span>
+            <button type="button" onClick={() => navigate('/comisiones/solicitudes-viaticos')}>
+              Volver al listado
+            </button>
+          </div>
+        )}
 
-        {!loading && !error && comisionado && (
-          <form className="comisiones-operacion-form" onSubmit={evitarEnvio}>
+        {!loading && !error && !resultado && comisionado && (
+          <form className="comisiones-operacion-form" onSubmit={guardarSolicitud}>
             <section aria-labelledby="viaticos-comisionado-heading">
               <h2 id="viaticos-comisionado-heading">Comisionado:</h2>
               <div className="comisiones-orden-grid">
@@ -293,6 +418,8 @@ export default function CrearSolicitudViaticos() {
                   Programa
                   <input
                     value={datosUnidad.programa}
+                    maxLength={10}
+                    required
                     onChange={(event) => actualizarDatoUnidad('programa', event.target.value)}
                   />
                 </label>
@@ -307,10 +434,15 @@ export default function CrearSolicitudViaticos() {
                   Código contable
                   <input
                     value={datosUnidad.codigo_contable}
+                    maxLength={15}
+                    required
                     onChange={(event) => actualizarDatoUnidad('codigo_contable', event.target.value)}
                   />
                 </label>
               </div>
+              <p className="comisiones-operacion-state">
+                El perfil del registrante no se modifica al guardar. El correo, Cisco y rubro escritos aquí no se guardan en la solicitud porque el esquema no tiene esos campos; el COG guardado es el que se selecciona en cada renglón.
+              </p>
             </section>
 
             <section aria-labelledby="viaticos-comision-heading">
@@ -352,12 +484,10 @@ export default function CrearSolicitudViaticos() {
                     onChange={(event) => {
                       const nuevaZona = event.target.value
                       setZona(nuevaZona)
-                      const zonaSeleccionada = comisionado.opciones.zonas.find(
-                        (opcion) => opcion.id_zona === Number(nuevaZona),
-                      )
-                      if (tipoComprobacion === 'CONSTANCIA' && !Number(zonaSeleccionada?.permite_constancia)) {
+                      if (tipoComprobacion === 'CONSTANCIA' && !hayTarifaConstancia(Number(nuevaZona))) {
                         setTipoComprobacion('')
                       }
+                      reiniciarImportesManuales()
                     }}
                     required
                   >
@@ -375,14 +505,14 @@ export default function CrearSolicitudViaticos() {
                       const valor = event.target.value
                       if (valor === '' || valor === 'FACTURA' || valor === 'CONSTANCIA') {
                         setTipoComprobacion(valor)
+                        reiniciarImportesManuales()
                       }
                     }}
                     required
                   >
                     <option value="" disabled>Selecciona comprobación</option>
                     <option value="FACTURA">Factura</option>
-                    <option value="CONSTANCIA" disabled={!comisionado.opciones.zonas
-                      .find((opcion) => opcion.id_zona === Number(zona))?.permite_constancia}>
+                    <option value="CONSTANCIA" disabled={!zona || !hayTarifaConstancia(Number(zona))}>
                       Constancia
                     </option>
                   </select>
@@ -392,6 +522,7 @@ export default function CrearSolicitudViaticos() {
                 <table className="viaticos-partidas-table">
                   <thead>
                     <tr>
+                      <th scope="col" aria-label="Acciones" />
                       <th scope="col">Partida / COG / concepto</th>
                       <th scope="col">Núm. días</th>
                       <th scope="col">Cuota diaria</th>
@@ -401,8 +532,21 @@ export default function CrearSolicitudViaticos() {
                   <tbody>
                     {renglonesViaticos.map((renglon, indice) => {
                       const cuotaDiaria = obtenerCuotaDiaria(renglon.num_dias)
+                      const importeCalculado = calcularImporte(renglon.num_dias)
                       return (
                         <tr key={renglon.id}>
+                          <td>
+                            <button
+                              className="viaticos-row-remove"
+                              type="button"
+                              onClick={() => eliminarRenglon(renglon.id)}
+                              disabled={renglonesViaticos.length === 1}
+                              aria-label={`Eliminar renglón ${indice + 1}`}
+                              title="Eliminar renglón"
+                            >
+                              ×
+                            </button>
+                          </td>
                           <td>
                             <select
                               aria-label={`Partida, COG o concepto del renglón ${indice + 1}`}
@@ -438,17 +582,21 @@ export default function CrearSolicitudViaticos() {
                                   'num_dias',
                                   event.target.value,
                                 )}
-                                required
                               />
                               <output aria-live="polite">
-                                {formatearDias(renglon.num_dias)
+                                {renglon.num_dias === ''
+                                  ? ''
+                                  : formatearDias(renglon.num_dias)
                                   ? `${formatearDias(renglon.num_dias)} ${Number(renglon.num_dias) === 0.5 ? 'día' : 'días'}`
-                                  : 'Indica días en incrementos de 1/2'}
+                                  : 'Usa incrementos de 1/2'}
                               </output>
                             </label>
                           </td>
                           <td>
-                            <output aria-label={`Cuota diaria del renglón ${indice + 1}`}>
+                            <output
+                              className="viaticos-quota-value"
+                              aria-label={`Cuota diaria aplicada del renglón ${indice + 1}`}
+                            >
                               {cuotaDiaria === null ? '—' : `$${cuotaDiaria.toFixed(2)}`}
                             </output>
                           </td>
@@ -457,8 +605,10 @@ export default function CrearSolicitudViaticos() {
                               aria-label={`Importe del renglón ${indice + 1}`}
                               type="number"
                               min="0"
+                              max="9999999999"
                               step="1"
-                              value={renglon.importe}
+                              value={renglon.importeManual ? renglon.importe : importeCalculado}
+                              required
                               onChange={(event) => actualizarRenglon(
                                 renglon.id,
                                 'importe',
@@ -470,6 +620,14 @@ export default function CrearSolicitudViaticos() {
                       )
                     })}
                   </tbody>
+                  <tfoot>
+                    <tr>
+                      <th scope="row" colSpan={4}>Total</th>
+                      <td>
+                        <output aria-label="Importe total">${obtenerTotalImportes()}</output>
+                      </td>
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
               {tipoComprobacion === 'CONSTANCIA'
@@ -480,13 +638,38 @@ export default function CrearSolicitudViaticos() {
                 </p>
               )}
               {zona && tipoComprobacion && renglonesViaticos.some(
-                (renglon) => obtenerCuotaDiaria(renglon.num_dias) === null,
+                (renglon) => renglon.num_dias !== ''
+                  && formatearDias(renglon.num_dias) !== ''
+                  && calcularImporte(renglon.num_dias) === '',
               ) && (
                 <p className="comisiones-operacion-state error" role="alert">
                   No se encontró una cuota en el tabulador para la zona, comprobación y número de días seleccionados.
                 </p>
               )}
             </section>
+
+            <section aria-labelledby="viaticos-observaciones-heading">
+              <h2 id="viaticos-observaciones-heading">Observaciones</h2>
+              <label className="viaticos-observaciones-field">
+                Observación
+                <textarea
+                  value={observaciones}
+                  rows={5}
+                  onChange={(event) => setObservaciones(event.target.value)}
+                />
+              </label>
+            </section>
+            {guardarError && (
+              <p className="comisiones-operacion-state error" role="alert">{guardarError}</p>
+            )}
+            <div className="comisiones-operacion-actions">
+              <span>
+                El importe se guarda en pesos enteros conforme al esquema de la base de datos.
+              </span>
+              <button type="submit" disabled={guardando}>
+                {guardando ? 'Guardando...' : 'Guardar solicitud de viáticos'}
+              </button>
+            </div>
           </form>
         )}
       </section>
