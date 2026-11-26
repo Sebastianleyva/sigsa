@@ -104,6 +104,15 @@
   font-size: 13px;
 }
 
+.viaticos-historial-heading {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.viaticos-historial-controls {
+  justify-content: flex-start;
+}
+
 .comisiones-operacion-state.error {
   border-color: #e8c2b9;
   background: #fff8f6;
@@ -128,6 +137,109 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+.viaticos-historial-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 32px 0 28px;
+}
+
+.viaticos-historial-heading .comisiones-operacion-heading {
+  margin: 0;
+}
+
+.viaticos-historial-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.viaticos-historial-month,
+.viaticos-historial-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0 7px;
+  border: 1px solid var(--comisiones-op-line);
+  background: #fff;
+  color: var(--comisiones-op-ink);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.viaticos-historial-month button {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  background: transparent;
+  color: var(--comisiones-op-green);
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.viaticos-historial-month button:disabled {
+  color: #aab8af;
+  cursor: not-allowed;
+}
+
+.viaticos-historial-count {
+  gap: 7px;
+  color: var(--comisiones-op-muted);
+  font-weight: 400;
+}
+
+.viaticos-historial-count strong {
+  color: var(--comisiones-op-ink);
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+}
+
+.viaticos-historial-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.viaticos-historial-error button {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid #e8c2b9;
+  border-radius: 2px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.viaticos-historial-empty {
+  text-align: center;
+}
+
+.viaticos-historial-empty h2 {
+  margin: 0 0 7px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+}
+
+.viaticos-historial-empty p {
+  margin: 0;
+  color: var(--comisiones-op-muted);
+  font-size: 12px;
+}
+
+.comisiones-operacion-card-action:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .viaticos-solicitud-success-actions {

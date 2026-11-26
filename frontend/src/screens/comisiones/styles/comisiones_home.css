@@ -108,6 +108,10 @@
   border-top: 1px solid var(--comisiones-line);
 }
 
+.comisiones-home-options + .comisiones-home-options {
+  margin-top: 38px;
+}
+
 .comisiones-home-section-heading {
   display: flex;
   align-items: flex-end;

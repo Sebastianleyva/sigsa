@@ -104,6 +104,17 @@ export type PersonaPendienteSolicitudViaticos = {
   puesto_nombre: string
 }
 
+export type SolicitudViaticosResumen = {
+  id_solicitud_viaticos: number
+  id_comision: number
+  fecha: string
+  fecha_comision: string | null
+  comisionado: string
+  lugar: string
+  estado_comision: string
+  total_importe: number
+}
+
 export type ComisionadoSolicitudViaticos = {
   id_comision: number
   id_personal: number
@@ -347,6 +358,29 @@ export async function consultarPersonalPendienteSolicitudViaticos(): Promise<Per
     }))
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar el personal pendiente de solicitudes de viáticos.')
+  }
+}
+
+export async function consultarSolicitudesViaticosMes(
+  mes: number,
+  anio: number,
+): Promise<SolicitudViaticosResumen[]> {
+  try {
+    const response = await api.get<{ solicitudes: SolicitudViaticosResumen[] }>(
+      'comisiones/routes/ver_solicitudes_viaticos_mes.php',
+      { params: { mes, anio } },
+    )
+    if (!Array.isArray(response.data?.solicitudes)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar las solicitudes de viáticos.')
+    }
+    return response.data.solicitudes.map((solicitud) => ({
+      ...solicitud,
+      id_solicitud_viaticos: Number(solicitud.id_solicitud_viaticos),
+      id_comision: Number(solicitud.id_comision),
+      total_importe: Number(solicitud.total_importe),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar las solicitudes de viáticos.')
   }
 }
 
