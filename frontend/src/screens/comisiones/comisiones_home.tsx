@@ -41,6 +41,15 @@ const opciones = [
   },
   {
     index: '05',
+    division: 'foraneas',
+    category: 'INFORMES',
+    title: 'Informe de comisión',
+    description: 'Consulta las comisiones en las que participas y registra su informe.',
+    action: 'Informe de comisión',
+    path: '/comisiones/informes',
+  },
+  {
+    index: '06',
     division: 'viaticos',
     category: 'VIÁTICOS',
     title: 'Solicitudes de viáticos',
@@ -49,7 +58,7 @@ const opciones = [
     path: '/comisiones/solicitudes-viaticos',
   },
   {
-    index: '06',
+    index: '07',
     division: 'viaticos',
     category: 'CONSULTA · VIÁTICOS',
     title: 'Ver solicitudes de viáticos',

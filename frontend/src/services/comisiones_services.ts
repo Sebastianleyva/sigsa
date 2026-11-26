@@ -347,6 +347,37 @@ export async function consultarComisionesEnCurso(): Promise<ComisionEnCurso[]> {
   }
 }
 
+export type ComisionParticipante = ComisionPendiente & {
+  fecha_inicio: string | null
+  fecha_final: string | null
+  area_nombre: string
+  comisionados: PersonalComision[]
+}
+
+export async function consultarComisionesParticipante(): Promise<ComisionParticipante[]> {
+  try {
+    const response = await api.get<{ comisiones: ComisionParticipante[] }>(
+      'comisiones/routes/ver_comisiones_participante.php',
+    )
+    if (!Array.isArray(response.data?.comisiones)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar tus comisiones.')
+    }
+    return response.data.comisiones.map((comision) => ({
+      ...comision,
+      id_comision: Number(comision.id_comision),
+      id_solicitud: Number(comision.id_solicitud),
+      id_area: Number(comision.id_area),
+      comisionados: (comision.comisionados ?? []).map((persona) => ({
+        ...persona,
+        id_personal: Number(persona.id_personal),
+        puesto: Number(persona.puesto),
+      })),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar tus comisiones.')
+  }
+}
+
 export async function consultarPersonalPendienteSolicitudViaticos(): Promise<PersonaPendienteSolicitudViaticos[]> {
   try {
     const response = await api.get<{ personal: PersonaPendienteSolicitudViaticos[] }>(
