@@ -594,7 +594,7 @@ try {
             <?php else: ?>
               <?php foreach ($renglones as $idx => $r): ?>
                 <div class="val" style="<?= $idx > 0 ? 'margin-top: 2px;' : '' ?>">
-                  <?= $escape($r['codigo_contable']) ?>
+                  1-99999-<?= $escape($r['codigo_contable']) ?>-25021-1-2110008020010-2501-151012009-5050001-6I015-015
                 </div>
               <?php endforeach; ?>
             <?php endif; ?>

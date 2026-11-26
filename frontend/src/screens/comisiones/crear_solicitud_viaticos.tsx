@@ -14,7 +14,6 @@ import type {
 import './styles/comisiones_operacion.css'
 
 type DatosEmergencia = {
-  puesto: string
   contacto_emergencia_nombre: string
   contacto_emergencia_numero: string
 }
@@ -36,7 +35,6 @@ type RenglonViaticos = {
 }
 
 const datosEmergenciaIniciales: DatosEmergencia = {
-  puesto: '',
   contacto_emergencia_nombre: '',
   contacto_emergencia_numero: '',
 }
@@ -71,6 +69,7 @@ export default function CrearSolicitudViaticos() {
   const idsValidos = Number.isInteger(idComision) && idComision > 0
     && Number.isInteger(idPersonal) && idPersonal > 0
   const [comisionado, setComisionado] = useState<ComisionadoSolicitudViaticos | null>(null)
+  const [puesto, setPuesto] = useState('')
   const [datosEmergencia, setDatosEmergencia] = useState(datosEmergenciaIniciales)
   const [datosUnidad, setDatosUnidad] = useState(datosUnidadIniciales)
   const [observaciones, setObservaciones] = useState('')
@@ -251,7 +250,7 @@ export default function CrearSolicitudViaticos() {
         id_personal_comisionado: idPersonal,
         id_zona: Number(zona),
         tipo_comprobacion: tipoComprobacion,
-        puesto: datosEmergencia.puesto.trim(),
+        puesto: puesto.trim(),
         contacto_emergencia_nombre: datosEmergencia.contacto_emergencia_nombre.trim(),
         contacto_emergencia_numero: datosEmergencia.contacto_emergencia_numero.trim(),
         programa: datosUnidad.programa.trim(),
@@ -364,6 +363,15 @@ export default function CrearSolicitudViaticos() {
                   <input value={comisionado.nombre_completo} readOnly />
                 </label>
                 <label>
+                  Puesto
+                  <input
+                    value={puesto}
+                    maxLength={50}
+                    required
+                    onChange={(event) => setPuesto(event.target.value)}
+                  />
+                </label>
+                <label>
                   CURP
                   <input value={comisionado.curp} readOnly />
                 </label>
@@ -389,15 +397,6 @@ export default function CrearSolicitudViaticos() {
             <section aria-labelledby="viaticos-emergencia-heading">
               <h2 id="viaticos-emergencia-heading">Contacto de emergencia</h2>
               <div className="comisiones-orden-grid">
-                <label>
-                  Puesto
-                  <input
-                    value={datosEmergencia.puesto}
-                    maxLength={50}
-                    required
-                    onChange={(event) => actualizarDato('puesto', event.target.value)}
-                  />
-                </label>
                 <label>
                   Nombre del contacto de emergencia
                   <input
