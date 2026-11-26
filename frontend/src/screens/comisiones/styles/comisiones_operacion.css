@@ -238,6 +238,102 @@
   background: #f6f9f6;
 }
 
+.viaticos-partidas-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.viaticos-partidas-heading h2 {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 17px;
+}
+
+.viaticos-partidas-add {
+  display: inline-grid;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  border-radius: 2px;
+  background: var(--comisiones-op-green);
+  color: #fff;
+  font: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.viaticos-partidas-add:hover {
+  background: #125643;
+}
+
+.viaticos-partidas-options {
+  margin-bottom: 18px;
+}
+
+.viaticos-partidas-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--comisiones-op-line);
+}
+
+.viaticos-partidas-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.viaticos-partidas-table th,
+.viaticos-partidas-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--comisiones-op-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.viaticos-partidas-table th {
+  background: #f6f9f6;
+  color: var(--comisiones-op-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.viaticos-partidas-table td {
+  font-size: 12px;
+}
+
+.viaticos-partidas-table input,
+.viaticos-partidas-table select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #cbd8cf;
+  border-radius: 2px;
+  background: #fff;
+  color: var(--comisiones-op-ink);
+  font: inherit;
+}
+
+.viaticos-dias-field {
+  display: grid;
+  gap: 5px;
+  min-width: 105px;
+}
+
+.viaticos-dias-field output,
+.viaticos-partidas-table td > output {
+  color: var(--comisiones-op-muted);
+  font-size: 11px;
+}
+
 .comisiones-operacion-summary h2 {
   margin: 9px 0 6px;
   font-family: 'Manrope', sans-serif;

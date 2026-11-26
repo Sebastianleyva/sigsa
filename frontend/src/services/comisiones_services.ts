@@ -107,17 +107,41 @@ export type PersonaPendienteSolicitudViaticos = {
 export type ComisionadoSolicitudViaticos = {
   id_comision: number
   id_personal: number
+  id_puesto: number
   nombre_completo: string
   curp: string
   rfc: string
   correo: string
   telefono: string
   cisco: string
+  periodo: string | null
+  lugar: string
+  motivo: string
   registrante: {
     nombre: string
     correo: string
     cisco: string
   }
+  opciones: OpcionesSolicitudViaticos
+}
+
+export type OpcionesSolicitudViaticos = {
+  codigos_contables: {
+    id_codigo_contable_comision: number
+    codigo_contable: string
+    descripcion: string
+  }[]
+  zonas: {
+    id_zona: number
+    nombre: string
+    permite_constancia: number | string
+  }[]
+  tabulador: {
+    id_zona: number
+    tipo_comprobacion: 'FACTURA' | 'CONSTANCIA'
+    pernocta: number | string
+    monto_diario: number | string
+  }[]
 }
 
 function obtenerError(error: unknown, mensaje: string): Error {
@@ -303,20 +327,49 @@ export async function consultarComisionadoSolicitudViaticos(
 ): Promise<ComisionadoSolicitudViaticos> {
   try {
     const response = await api.get<{
-      comisionado: Omit<ComisionadoSolicitudViaticos, 'registrante'>
+      comisionado: Omit<ComisionadoSolicitudViaticos, 'registrante' | 'periodo'> & {
+        fecha_comision: string | null
+      }
       registrante: ComisionadoSolicitudViaticos['registrante']
+      opciones: OpcionesSolicitudViaticos
     }>(
       'comisiones/routes/ver_comisionado_solicitud_viaticos.php',
       { params: { id_comision, id_personal } },
     )
-    if (!response.data?.comisionado || !response.data?.registrante) {
+    if (
+      !response.data?.comisionado
+      || !response.data?.registrante
+      || !Array.isArray(response.data?.opciones?.codigos_contables)
+      || !Array.isArray(response.data?.opciones?.zonas)
+      || !Array.isArray(response.data?.opciones?.tabulador)
+    ) {
       throw new Error('El servidor devolvió una respuesta inválida al consultar los datos del comisionado.')
     }
+    const { fecha_comision: periodo, ...datosComisionado } = response.data.comisionado
     return {
-      ...response.data.comisionado,
+      ...datosComisionado,
       id_comision: Number(response.data.comisionado.id_comision),
       id_personal: Number(response.data.comisionado.id_personal),
+      id_puesto: Number(response.data.comisionado.id_puesto),
+      periodo,
       registrante: response.data.registrante,
+      opciones: {
+        codigos_contables: response.data.opciones.codigos_contables.map((codigo) => ({
+          ...codigo,
+          id_codigo_contable_comision: Number(codigo.id_codigo_contable_comision),
+        })),
+        zonas: response.data.opciones.zonas.map((zona) => ({
+          ...zona,
+          id_zona: Number(zona.id_zona),
+          permite_constancia: Number(zona.permite_constancia),
+        })),
+        tabulador: response.data.opciones.tabulador.map((tarifa) => ({
+          ...tarifa,
+          id_zona: Number(tarifa.id_zona),
+          pernocta: Number(tarifa.pernocta),
+          monto_diario: Number(tarifa.monto_diario),
+        })),
+      },
     }
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar los datos del comisionado.')

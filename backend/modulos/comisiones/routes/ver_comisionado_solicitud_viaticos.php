@@ -61,10 +61,12 @@ try {
         echo json_encode(['ERROR' => 'El personal no pertenece a una comisión pendiente de solicitudes de viáticos']);
         exit;
     }
+    $opciones = obtener_opciones_solicitud_viaticos($pdo, (int) $comisionado['id_puesto']);
 
     http_response_code(200);
     echo json_encode([
         'comisionado' => $comisionado,
+        'opciones' => $opciones,
         'registrante' => [
             'nombre' => $usuario_actual['nombre'],
             'correo' => $usuario_actual['correo'],
