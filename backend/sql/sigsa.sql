@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 25, 2026 at 07:38 PM
+-- Generation Time: Nov 26, 2026 at 01:11 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -58,6 +58,19 @@ CREATE TABLE `codigos_contables` (
   `codigo_contable` varchar(14) NOT NULL COMMENT 'codigo del numero de cuenta',
   `descripcion` text DEFAULT NULL COMMENT 'descripción del uso del código de cuenta',
   `activo` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `codigos_contables_comisiones`
+--
+
+CREATE TABLE `codigos_contables_comisiones` (
+  `id_codigo_contable_comision` bigint(20) NOT NULL,
+  `codigo_contable` varchar(14) NOT NULL,
+  `descripcion` text NOT NULL,
+  `activo` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -173,13 +186,7 @@ CREATE TABLE `personal` (
 CREATE TABLE `personal_comisionado` (
   `id_personalcomisionado` bigint(20) NOT NULL COMMENT 'identificador de la tabla',
   `id_comision` bigint(20) NOT NULL COMMENT 'identificador de la comisión en tramite',
-  `id_personal` bigint(20) NOT NULL COMMENT 'identificador del personal comisionado',
-  `tipo_comprobación` enum('FACTURA','CONSTANCIA') DEFAULT NULL COMMENT 'tipo de comprobación de viaticos',
-  `dias_pernocta` int(3) NOT NULL DEFAULT 0 COMMENT 'dias que pernocta el personal durante la comision',
-  `dias_sin_pernocta` int(3) NOT NULL DEFAULT 0 COMMENT 'dia sin pernoctar durante la comision',
-  `tarifa_pernocta` decimal(10,2) DEFAULT NULL COMMENT 'tarifa del tabulador',
-  `tarifa_sin_pernocta` decimal(10,2) DEFAULT NULL COMMENT 'tarifa del tabulador',
-  `monto_designado` decimal(10,2) DEFAULT NULL COMMENT 'dias_pernocta*tarifa_pernocta + dias_sin_pernocta*tarifa_sin_pernocta'
+  `id_personal` bigint(20) NOT NULL COMMENT 'identificador del personal comisionado'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -369,6 +376,22 @@ CREATE TABLE `tabulador_viaticos` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `viaticos_comisiones`
+--
+
+CREATE TABLE `viaticos_comisiones` (
+  `id_viaticos` bigint(20) NOT NULL,
+  `id_solicitud_viaticos` bigint(20) NOT NULL,
+  `id_codigo_c_comision` bigint(20) NOT NULL,
+  `num_dias` decimal(10,2) NOT NULL,
+  `cuota_diaria` decimal(10,2) NOT NULL,
+  `importe` int(11) NOT NULL,
+  `tipo_comprobacion` enum('FACTURA','CONSTANCIA') NOT NULL COMMENT 'tipo de facturacion'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `zonas_viaticos`
 --
 
@@ -402,6 +425,12 @@ ALTER TABLE `calendario`
 ALTER TABLE `codigos_contables`
   ADD PRIMARY KEY (`id_codigo`),
   ADD UNIQUE KEY `cuenta_cargo` (`codigo_contable`);
+
+--
+-- Indexes for table `codigos_contables_comisiones`
+--
+ALTER TABLE `codigos_contables_comisiones`
+  ADD PRIMARY KEY (`id_codigo_contable_comision`);
 
 --
 -- Indexes for table `comisiones`
@@ -537,6 +566,14 @@ ALTER TABLE `tabulador_viaticos`
   ADD KEY `fk_tabulador_zona` (`id_zona`);
 
 --
+-- Indexes for table `viaticos_comisiones`
+--
+ALTER TABLE `viaticos_comisiones`
+  ADD PRIMARY KEY (`id_viaticos`),
+  ADD KEY `fk_id_solicitud_viaticos` (`id_solicitud_viaticos`),
+  ADD KEY `fk_id_codigo_c_comision` (`id_codigo_c_comision`);
+
+--
 -- Indexes for table `zonas_viaticos`
 --
 ALTER TABLE `zonas_viaticos`
@@ -563,6 +600,12 @@ ALTER TABLE `calendario`
 --
 ALTER TABLE `codigos_contables`
   MODIFY `id_codigo` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'identificador del numero de cuenta';
+
+--
+-- AUTO_INCREMENT for table `codigos_contables_comisiones`
+--
+ALTER TABLE `codigos_contables_comisiones`
+  MODIFY `id_codigo_contable_comision` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `comisiones`
@@ -659,6 +702,12 @@ ALTER TABLE `solicitud_soporte`
 --
 ALTER TABLE `tabulador_viaticos`
   MODIFY `id_tabulador` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `viaticos_comisiones`
+--
+ALTER TABLE `viaticos_comisiones`
+  MODIFY `id_viaticos` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `zonas_viaticos`
@@ -774,6 +823,13 @@ ALTER TABLE `solicitud_soporte`
 ALTER TABLE `tabulador_viaticos`
   ADD CONSTRAINT `fk_tabulador_puesto` FOREIGN KEY (`id_puesto`) REFERENCES `puestos` (`id_puesto`),
   ADD CONSTRAINT `fk_tabulador_zona` FOREIGN KEY (`id_zona`) REFERENCES `zonas_viaticos` (`id_zona`);
+
+--
+-- Constraints for table `viaticos_comisiones`
+--
+ALTER TABLE `viaticos_comisiones`
+  ADD CONSTRAINT `fk_id_codigo_c_comision` FOREIGN KEY (`id_codigo_c_comision`) REFERENCES `codigos_contables_comisiones` (`id_codigo_contable_comision`),
+  ADD CONSTRAINT `fk_id_solicitud_viaticos` FOREIGN KEY (`id_solicitud_viaticos`) REFERENCES `solicitudes_de_viaticos` (`id_solicitud_viaticos`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
