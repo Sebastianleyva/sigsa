@@ -1,0 +1,211 @@
+@page {
+  size: letter portrait;
+  margin: 11mm 13mm;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+html, body, table, tr, th, td, .gris, .gris-izq {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8.5pt;
+  color: #000;
+  background: #e9ecef;
+}
+.toolbar-print {
+  text-align: center;
+  padding: 12px;
+  background: #172b27;
+}
+.btn-print {
+  padding: 9px 18px;
+  background: #176c58;
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn-print:hover {
+  background: #125646;
+}
+.hoja-carta {
+  width: 215.9mm;
+  min-height: 279.4mm;
+  margin: 16px auto;
+  padding: 11mm 13mm;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+}
+.marco-documento {
+  border: 1.5px solid #000;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+@media print {
+  body {
+    background: #fff;
+  }
+  .toolbar-print {
+    display: none !important;
+  }
+  .hoja-carta {
+    width: 100%;
+    min-height: 256mm;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+td, th {
+  border: 1px solid #000;
+  padding: 2.5px 5px;
+  vertical-align: middle;
+}
+
+/* Quitar borde exterior duplicado contra .marco-documento y evitar líneas dobles entre tablas apiladas */
+.marco-documento > table:first-child tr:first-child td,
+.marco-documento > table:first-child tr:first-child th { border-top: none; }
+.marco-documento > table tr td:first-child,
+.marco-documento > table tr th:first-child { border-left: none; }
+.marco-documento > table tr td:last-child,
+.marco-documento > table tr th:last-child { border-right: none; }
+.sin-borde-inferior td { border-bottom: none !important; }
+
+/* Color gris neutro exacto del Excel (garantizado al imprimir PDF) */
+.gris, .gris-izq, .tabla-partidas th {
+  background: #bfbfbf !important;
+  background-color: #bfbfbf !important;
+  box-shadow: inset 0 0 0 1000px #bfbfbf !important;
+  color: #000000 !important;
+  font-weight: bold;
+}
+.gris { text-align: center; }
+.gris-izq { text-align: left; }
+.centro { text-align: center; }
+.negrita { font-weight: bold; }
+.sin-borde td { border: none !important; padding: 1px 2px; }
+
+/* Encabezado institucional con división logos / título */
+.celda-logo {
+  padding: 4px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+.logo-oficial {
+  max-height: 44px;
+  max-width: 100%;
+  object-fit: contain;
+  display: inline-block;
+}
+.titulo-requisicion {
+  font-size: 14.5pt;
+  font-weight: bold;
+  letter-spacing: 0.4px;
+  text-align: center;
+}
+
+/* Tabla de partidas: las líneas verticales siempre bajan hasta JUSTIFICACIÓN */
+.contenedor-partidas {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.tabla-partidas {
+  width: 100%;
+  flex: 1 1 auto;
+  height: 100%;
+  border-collapse: collapse;
+}
+.tabla-partidas th {
+  font-size: 7.5pt;
+  text-align: center;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 3px 4px;
+}
+.tabla-partidas th:first-child { border-left: none; }
+.tabla-partidas th:last-child { border-right: none; }
+.tabla-partidas td {
+  border-top: none;
+  border-bottom: none;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+  vertical-align: top;
+  padding: 3px 6px;
+  font-size: 8pt;
+}
+.tabla-partidas td:first-child { border-left: none; }
+.tabla-partidas td:last-child { border-right: none; }
+.tabla-partidas tbody tr:not(.fila-relleno) td {
+  height: 1%;
+}
+.tabla-partidas tr.fila-relleno td {
+  height: 99%;
+  min-height: 20px;
+}
+
+/* Justificación */
+.caja-justificacion {
+  min-height: 68px;
+  padding: 8px 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8.5pt;
+}
+
+/* Sellos */
+.caja-sello {
+  height: 70px;
+  text-align: center;
+  font-size: 7.5pt;
+  color: #444;
+}
+.caja-responsabilidad {
+  height: 70px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 7.8pt;
+  line-height: 1.3;
+}
+
+/* Firmas: espacio para firma + celda de nombre + celda de cargo */
+.espacio-firma {
+  height: 52px;
+  border-bottom: 1px solid #000 !important;
+}
+.celda-nombre-firma {
+  height: 18px;
+  border-top: 1px solid #000 !important;
+  border-bottom: 1px solid #000 !important;
+  text-align: center;
+  font-weight: bold;
+  font-size: 7.5pt;
+  padding: 2.5px 4px;
+}
+.celda-cargo-firma {
+  height: 17px;
+  border-top: 1px solid #000 !important;
+  border-bottom: 1px solid #000 !important;
+  text-align: center;
+  font-size: 7pt;
+  padding: 2px 4px;
+}

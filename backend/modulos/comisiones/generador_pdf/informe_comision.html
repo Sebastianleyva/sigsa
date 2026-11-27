@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Informe de comisión #{{id_informe_comision}}</title>
+  <style>{{estilos}}</style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <button type="button" onclick="window.print()">Imprimir / Guardar como PDF</button>
+  </div>
+
+  <main class="sheet">
+    <header class="encabezado">
+      {{logo}}
+      <h1>Formato de Informe de Comisión</h1>
+    </header>
+
+    <div class="franja centro">Datos del Personal Comisionado</div>
+
+    <section class="datos">
+      <div class="franja">Lugar y Periodo de la Comisión</div>
+      <div class="linea">{{lugar_periodo}}</div>
+
+      <div class="franja">Nombre del Comisionado</div>
+      <div class="fila-rfc">
+        <div class="linea">{{comisionado}}</div>
+        <div class="franja">R.F.C.</div>
+        <div class="linea" style="justify-content: center;">{{rfc}}</div>
+      </div>
+
+      <div class="franja">Departamento o Dirección de Adscripción</div>
+      <div class="linea">{{area_nombre}}</div>
+
+      <div class="franja">Programa o Recurso</div>
+      <div class="linea">{{programa}}</div>
+    </section>
+
+    <section class="datos objetivo">
+      <div class="franja">Objetivo de la Comisión</div>
+      <div class="caja-objetivo">{{objetivo_comision}}</div>
+    </section>
+
+    <section class="apartado">
+      <div class="franja centro">Reporte de las Actividades Desarrolladas durante la Comisión</div>
+      <div class="caja centro alta">{{actividad_desarrollada}}</div>
+    </section>
+
+    <section class="apartado">
+      <div class="franja centro linea-inferior">Resultados Obtenidos a través de la Comisión</div>
+      <div class="caja media" style="border-top: 0;">{{resultados}}</div>
+    </section>
+
+    <section class="apartado">
+      <div class="franja centro linea-inferior">Contribución de haber realizado la Comisón</div>
+      <div class="caja centro media" style="border-top: 0;">{{contribucion}}</div>
+    </section>
+
+    <section class="apartado">
+      <div class="franja centro linea-inferior">Conclusiones Después de haber realizado la Comisión</div>
+      <div class="caja media" style="border-top: 0;">{{conclusion}}</div>
+    </section>
+
+    <section class="firmas">
+      <div class="firma-comisionado">
+        <div class="franja">Firma del Comisionado</div>
+        <div class="recuadro-firma"></div>
+        <div class="franja">Nombre:</div>
+        <div class="linea">{{comisionado}}</div>
+      </div>
+
+      <div class="finanzas">
+        <div class="franja">Exclusivo de Subdirección de Finanzas</div>
+        <div class="espacio"></div>
+        <div class="franja">Sello y Firma de Recibido</div>
+      </div>
+    </section>
+  </main>
+
+</body>
+</html>

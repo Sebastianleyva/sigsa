@@ -126,8 +126,8 @@ try {
     if (!empty($renglones)) {
         $codigos_contables = '';
         foreach ($renglones as $indice => $renglon) {
-            $estilo = $indice > 0 ? ' style="margin-top: 2px;"' : '';
-            $codigos_contables .= '<div class="val"' . $estilo . '>1-99999-'
+            $estilo = $indice > 0 ? 'margin-top: 2px;' : '';
+            $codigos_contables .= '<div class="val" style="' . $estilo . '">1-99999-'
                 . $escape($renglon['codigo_contable'])
                 . '-25021-1-2110008020010-2501-151012009-5050001-6I015-015</div>';
         }
