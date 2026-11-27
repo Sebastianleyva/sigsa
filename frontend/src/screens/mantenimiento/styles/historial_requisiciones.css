@@ -1,0 +1,13 @@
+.historial-requisiciones-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+.historial-requisiciones-card-actions .historial-reportes-export:disabled {
+  cursor: wait;
+}
+
+.historial-requisiciones-pdf-error {
+  margin-bottom: 14px;
+}

@@ -21,6 +21,7 @@ import ConcluirMantenimiento from './screens/mantenimiento/concluir_mantenimient
 import HistorialReportesMantenimiento from './screens/mantenimiento/historial_reportes.tsx'
 import RequisicionesMantenimiento from './screens/mantenimiento/requisiciones_mantenimiento.tsx'
 import CrearRequisicionMantenimiento from './screens/mantenimiento/crear_requisicion_mantenimiento.tsx'
+import HistorialRequisicionesMantenimiento from './screens/mantenimiento/historial_requisiciones.tsx'
 import ReportarIncidencia from './screens/mantenimiento/reportar_incidencia.tsx'
 import VerIncidenciasMantenimiento from './screens/mantenimiento/ver_incidencias.tsx'
 import ComisionesHome from './screens/comisiones/comisiones_home.tsx'
@@ -73,6 +74,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/mantenimiento/reportes/historial" element={<HistorialReportesMantenimiento />} />
         <Route path="/mantenimiento/reportes/:id_reporte/concluir" element={<ConcluirMantenimiento />} />
         <Route path="/mantenimiento/requisiciones" element={<RequisicionesMantenimiento />} />
+        <Route path="/mantenimiento/requisiciones/historial" element={<HistorialRequisicionesMantenimiento />} />
         <Route path="/mantenimiento/requisiciones/:id_reporte" element={<CrearRequisicionMantenimiento />} />
         <Route path="/mantenimiento/incidencias/crear" element={<ReportarIncidencia />} />
         <Route path="/mantenimiento/incidencias" element={<VerIncidenciasMantenimiento />} />

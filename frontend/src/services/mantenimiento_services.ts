@@ -406,6 +406,64 @@ export async function consultarOpcionesRequisicion(): Promise<OpcionesRequisicio
   }
 }
 
+export type DetalleHistorialRequisicion = {
+  num_lote: string | null
+  cantidad: number | null
+  descripcion: string
+}
+
+export type RequisicionHistorial = {
+  id_requisicion: number
+  tipo_requisicion: string | null
+  id_reporte: number
+  fecha: string
+  fecha_entrega: string | null
+  estado: string
+  tipo_financiamiento: string
+  justificacion: string | null
+  descripcion_servicio: string
+  tipo_codigo: 'CC_DIRECCION' | 'CC_CENTRAL'
+  codigo_contable: string | null
+  tipo_reporte: string
+  estado_reporte: string
+  lugar: string | null
+  servicio: string | null
+  solicitante: string | null
+  autorizador: string | null
+  elaborador: string | null
+  detalles: DetalleHistorialRequisicion[]
+}
+
+export function puedeVerHistorialRequisiciones(usuario: {
+  puesto?: number | string
+  area?: number | string | null
+} | null) {
+  return [1, 2].includes(Number(usuario?.puesto)) || Number(usuario?.area) === 6
+}
+
+export async function consultarHistorialRequisiciones(mes: number, anio: number): Promise<RequisicionHistorial[]> {
+  try {
+    const response = await api.get<{ data: RequisicionHistorial[] }>(
+      'mantenimiento/routes/ver_historial_requisiciones.php',
+      { params: { mes, anio } },
+    )
+    if (!Array.isArray(response.data?.data)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar el historial de requisiciones.')
+    }
+    return response.data.data.map((requisicion) => ({
+      ...requisicion,
+      id_requisicion: Number(requisicion.id_requisicion),
+      id_reporte: Number(requisicion.id_reporte),
+      detalles: (requisicion.detalles ?? []).map((detalle) => ({
+        ...detalle,
+        cantidad: detalle.cantidad === null ? null : Number(detalle.cantidad),
+      })),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar el historial de requisiciones.')
+  }
+}
+
 export async function obtenerPdfRequisicion(id_requisicion: number) {
   const response = await api.get<Blob>(
     `mantenimiento/routes/generar_pdf_requisicion.php?id=${id_requisicion}`,

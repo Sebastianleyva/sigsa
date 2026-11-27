@@ -1,6 +1,9 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { authService } from '../../services/auth_services.js'
-import { puedeGestionarMantenimiento } from '../../services/mantenimiento_services'
+import {
+  puedeGestionarMantenimiento,
+  puedeVerHistorialRequisiciones,
+} from '../../services/mantenimiento_services'
 import './styles/mantenimiento_home.css'
 
 type OpcionMantenimiento = {
@@ -74,6 +77,14 @@ const opcionesAdministrativas: OpcionMantenimiento[] = [
     },
     {
         index: '08',
+        category: 'CONSULTA',
+        title: 'Historial de requisiciones',
+        description: 'Consulta las requisiciones por mes y descarga sus documentos PDF.',
+        action: 'Ver historial',
+        path: '/mantenimiento/requisiciones/historial',
+    },
+    {
+        index: '09',
         category: 'CATÁLOGO',
         title: 'Códigos contables',
         description: 'Agrega, modifica o desactiva códigos contables para las requisiciones.',
@@ -90,6 +101,7 @@ const destinos: Record<string, string> = {
     '/mantenimiento/reportes/en-curso': 'Mantenimientos en curso',
     '/mantenimiento/servicios': 'Servicios',
     '/mantenimiento/requisiciones': 'Requisiciones',
+    '/mantenimiento/requisiciones/historial': 'Historial de requisiciones',
     '/mantenimiento/codigos-contables': 'Códigos contables',
 }
 
@@ -103,6 +115,9 @@ export default function MantenimientoHome() {
     const opcionesVisibles = opcionesAdministrativas.filter((opcion) => {
       if (['/mantenimiento/servicios', '/mantenimiento/requisiciones', '/mantenimiento/codigos-contables'].includes(opcion.path)) {
         return puedeGestionar
+      }
+      if (opcion.path === '/mantenimiento/requisiciones/historial') {
+        return puedeVerHistorialRequisiciones(usuario)
       }
       if (opcion.path === '/mantenimiento/reportes/historial') {
         return esPersonalAdministrativo || esArea6
