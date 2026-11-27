@@ -66,6 +66,15 @@ const opciones = [
     action: 'Consultar solicitudes',
     path: '/comisiones/ver-solicitudes-viaticos',
   },
+  {
+    index: '08',
+    division: 'viaticos',
+    category: 'CONSULTA · INFORMES',
+    title: 'Ver informes de comisión',
+    description: 'Consulta los informes de comisión por mes y descarga sus documentos PDF.',
+    action: 'Consultar informes',
+    path: '/comisiones/ver-informes-comision',
+  },
 ]
 
 export default function ComisionesHome() {
@@ -84,6 +93,7 @@ export default function ComisionesHome() {
     && (opcion.path !== '/comisiones/pendientes' || puedeGestionarComisiones)
     && (opcion.path !== '/comisiones/solicitudes-viaticos' || puedeConsultarViaticos)
     && (opcion.path !== '/comisiones/ver-solicitudes-viaticos' || puedeConsultarViaticos)
+    && (opcion.path !== '/comisiones/ver-informes-comision' || puedeConsultarViaticos)
   ))
   const opcionesComisionesForaneas = opcionesVisibles.filter((opcion) => opcion.division === 'foraneas')
   const opcionesViaticos = opcionesVisibles.filter((opcion) => opcion.division === 'viaticos')
