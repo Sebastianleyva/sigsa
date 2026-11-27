@@ -623,3 +623,127 @@ export async function obtenerPdfOrdenServicio(id_orden: number) {
   }
 }
 
+
+export type DatosInformeComision = {
+  id_comision: number
+  estado: string
+  lugar: string
+  fecha_inicio: string | null
+  fecha_final: string | null
+  fecha_comision: string | null
+  nombre_completo: string
+  rfc: string
+  area_nombre: string
+  informe_registrado: boolean
+  puede_registrar: boolean
+}
+
+export type InformeComisionData = {
+  id_comision: number
+  objetivo_comision: string
+  actividad_desarrollada: string
+  resultados: string
+  contribucion: string
+  conclusion: string
+}
+
+export type ResultadoInformeComision = {
+  id_informe_comision: number
+  id_comision: number
+  id_personal: number
+  estado_comision: 'FINALIZADA'
+}
+
+export async function consultarDatosInformeComision(id_comision: number): Promise<DatosInformeComision> {
+  try {
+    const response = await api.get<{ datos: DatosInformeComision }>(
+      'comisiones/routes/ver_datos_informe_comision.php',
+      { params: { id_comision } },
+    )
+    if (!response.data?.datos) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar los datos del informe.')
+    }
+    return {
+      ...response.data.datos,
+      id_comision: Number(response.data.datos.id_comision),
+      informe_registrado: Boolean(response.data.datos.informe_registrado),
+      puede_registrar: Boolean(response.data.datos.puede_registrar),
+    }
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar los datos del informe de comisión.')
+  }
+}
+
+export async function crearInformeComision(
+  datos: InformeComisionData,
+): Promise<ResultadoInformeComision> {
+  try {
+    const response = await api.post<{ mensaje: string; informe: ResultadoInformeComision }>(
+      'comisiones/routes/crear_informe_comision.php',
+      datos,
+    )
+    const idInforme = Number(response.data?.informe?.id_informe_comision)
+    if (!Number.isInteger(idInforme) || idInforme < 1) {
+      throw new Error('El servidor devolvió una respuesta inválida al guardar el informe.')
+    }
+    return {
+      ...response.data.informe,
+      id_informe_comision: idInforme,
+      id_comision: Number(response.data.informe.id_comision),
+      id_personal: Number(response.data.informe.id_personal),
+    }
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible guardar el informe de comisión.')
+  }
+}
+
+export async function obtenerPdfInformeComision(id_informe_comision: number): Promise<string> {
+  try {
+    const response = await api.get<Blob>(
+      `comisiones/routes/generar_pdf_informe_comision.php?id=${id_informe_comision}`,
+      { responseType: 'blob' },
+    )
+    if (!response.data || response.data.size === 0) {
+      throw new Error('El servidor devolvió un documento vacío.')
+    }
+    return URL.createObjectURL(response.data)
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible generar el PDF del informe de comisión.')
+  }
+}
+
+export type InformeComisionResumen = {
+  id_informe_comision: number
+  id_comision: number
+  comisionado: string
+  area_nombre: string | null
+  fecha_inicio: string | null
+  fecha_final: string | null
+  fecha_comision: string | null
+  fecha_referencia: string | null
+  estado_comision: string
+  lugar: string
+  institucion_solicita: string
+}
+
+export async function consultarInformesComisionMes(
+  mes: number,
+  anio: number,
+): Promise<InformeComisionResumen[]> {
+  try {
+    const response = await api.get<{ informes: InformeComisionResumen[] }>(
+      'comisiones/routes/ver_informes_comision_mes.php',
+      { params: { mes, anio } },
+    )
+    if (!Array.isArray(response.data?.informes)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar los informes de comisión.')
+    }
+    return response.data.informes.map((informe) => ({
+      ...informe,
+      id_informe_comision: Number(informe.id_informe_comision),
+      id_comision: Number(informe.id_comision),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar los informes de comisión.')
+  }
+}
