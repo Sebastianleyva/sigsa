@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitud de soporte #{{id_solicitud_soporte}}</title>
+  <style>{{estilos}}</style>
+</head>
+<body>
+  <div class="toolbar">
+    <button type="button" onclick="window.print()">Imprimir / Guardar como PDF</button>
+  </div>
+  <main class="sheet">
+    <header class="heading">
+      <img class="logo-izq" src="data:image/png;base64,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" alt="Durango · Gobierno del Estado">
+      <div class="heading-center">
+        <div class="agency">SECRETARÍA DE EDUCACIÓN DEL ESTADO DE DURANGO</div>
+        <div class="directorate">DIRECCIÓN DE SISTEMAS Y TECNOLOGÍAS DE LA INFORMACIÓN</div>
+        <div class="title">SOLICITUD DE SOPORTE Y MANTENIMIENTO CORRECTIVO</div>
+      </div>
+      <img class="logo-der" src="data:image/png;base64,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" alt="SEED">
+    </header>
+
+    <div class="meta">
+      <div class="meta-item"><strong>Fecha:</strong><span class="box">{{fecha}}</span></div>
+      <div class="meta-item"><strong>Hora:</strong><span class="box">{{hora}}</span></div>
+    </div>
+
+    <section class="frame">
+      <div class="bar first">DATOS DE LA SOLICITUD</div>
+      <div class="fields">
+        <div class="field"><span class="label">Departamento:</span><span class="value">{{departamento}}</span></div>
+        <div class="field"><span class="label">CISCO:</span><span class="value">{{cisco}}</span></div>
+        <div class="field full"><span class="label">Dirección / domicilio:</span><span class="value">{{direccion}}</span></div>
+        <div class="field"><span class="label">Reporta:</span><span class="value">{{nombre_reporta}}</span></div>
+        <div class="field"><span class="label">Técnico asignado:</span><span class="value">{{tecnico}}</span></div>
+      </div>
+
+      <div class="bar">DESCRIPCIÓN DE LA FALLA</div>
+      <div class="free-text">{{solicitud_falla}}</div>
+
+      <div class="bar">RESULTADO DE LA ATENCIÓN</div>
+      <div class="counts">
+        <div class="field"><span class="label">Equipos atendidos:</span><span class="value">{{equipos_atendidos}}</span></div>
+        <div class="field"><span class="label">Usuarios beneficiados:</span><span class="value">{{usuarios_beneficiados}}</span></div>
+      </div>
+
+      <div class="signatures">
+        <div class="signature">Nombre y firma de quien reporta</div>
+        <div class="signature">Nombre y firma del técnico</div>
+      </div>
+    </section>
+
+    <footer class="footer-address">
+      <span>D.S. y T.I. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Xicotencatl 204, Los Fuentes. Durango, Dgo.</span>
+      <span>Tel: 618 812 9898</span>
+    </footer>
+  </main>
+</body>
+</html>
