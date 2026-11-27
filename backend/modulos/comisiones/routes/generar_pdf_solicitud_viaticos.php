@@ -47,6 +47,12 @@ try {
                 sv.contacto_emergencia_nombre, sv.contacto_emergencia_numero,
                 sv.programa, sv.financiamiento, sv.observaciones, sv.id_comision,
         c.id_comision AS folio_comision, c.tipo_comision,
+                YEAR(c.fecha) AS anio_comision,
+                (SELECT COUNT(*)
+                 FROM comisiones cf
+                 WHERE cf.tipo_comision = 'FORANEA'
+                   AND YEAR(cf.fecha) = YEAR(c.fecha)
+                   AND cf.id_comision <= c.id_comision) AS numero_comision_foranea,
         c.fecha_inicio, c.fecha_final, s.fecha_comision,
                 s.ubicacion AS lugar, s.falla_reportada AS motivo,
                 CONCAT_WS(' ', pc.nombre, pc.apellido_p, pc.apellido_m) AS comisionado,
@@ -166,7 +172,8 @@ try {
     $html = strtr($plantilla, [
         '{{estilos}}' => $estilos,
         '{{id_solicitud_viaticos}}' => $escape($solicitud['id_solicitud_viaticos']),
-        '{{anio}}' => date('y'),
+        '{{numero_comision_foranea}}' => $escape($solicitud['numero_comision_foranea']),
+        '{{anio}}' => $escape(substr((string) $solicitud['anio_comision'], -2)),
         '{{fecha}}' => $escape($fecha($solicitud['fecha'])),
         '{{comisionado}}' => $escape($solicitud['comisionado']),
         '{{comisionado_mayusculas}}' => $escape(mb_strtoupper((string) $solicitud['comisionado'], 'UTF-8')),
