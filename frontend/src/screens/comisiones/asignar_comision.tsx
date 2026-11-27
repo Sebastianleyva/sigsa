@@ -20,6 +20,7 @@ export default function AsignarComision() {
   const [error, setError] = useState<string | null>(null)
   const [resultadoAsignacion, setResultadoAsignacion] = useState<Awaited<ReturnType<typeof asignarComisionados>> | null>(null)
   const [mostrarAvisoSolicitudes, setMostrarAvisoSolicitudes] = useState(false)
+  const hayPersonalDisponible = opciones?.personal.some((persona) => persona.disponible) ?? false
 
   useEffect(() => {
     let active = true
@@ -141,10 +142,16 @@ export default function AsignarComision() {
                 </legend>
                 <div className="comisiones-operacion-personal-list">
                   {opciones.personal.map((persona) => (
-                    <label key={persona.id_personal} htmlFor={`personal-${persona.id_personal}`}>
+                    <label
+                      key={persona.id_personal}
+                      htmlFor={`personal-${persona.id_personal}`}
+                      className={persona.disponible ? undefined : 'no-disponible'}
+                    >
                       <input
                         id={`personal-${persona.id_personal}`}
                         type="checkbox"
+                        disabled={!persona.disponible}
+                        aria-describedby={persona.motivo ? `personal-${persona.id_personal}-motivo` : undefined}
                         checked={seleccionados.includes(persona.id_personal)}
                         onChange={(event) => {
                           setSeleccionados((actuales) => event.target.checked
@@ -155,12 +162,22 @@ export default function AsignarComision() {
                       <span>
                         {persona.nombre} {persona.apellido_p} {persona.apellido_m}
                         {persona.puesto === 3 ? ' · Jefe de departamento' : ''}
+                        {persona.motivo && (
+                          <small
+                            className="comisiones-operacion-personal-motivo"
+                            id={`personal-${persona.id_personal}-motivo`}
+                          >
+                            {persona.motivo}
+                          </small>
+                        )}
                       </span>
                     </label>
                   ))}
                 </div>
                 <p className="comisiones-operacion-hint" id="personal-comisionado-hint">
-                  Marca una o más personas para asignarlas a la comisión.
+                  {hayPersonalDisponible
+                    ? 'Marca una o más personas para asignarlas a la comisión.'
+                    : 'Nadie del área está disponible en las fechas de esta comisión.'}
                 </p>
               </fieldset>
             )}
@@ -174,7 +191,7 @@ export default function AsignarComision() {
               </span>
               <button
                 type="submit"
-                disabled={submitting || opciones.personal.length === 0}
+                disabled={submitting || !hayPersonalDisponible}
               >
                 {submitting
                   ? opciones.comision.tipo_comision === 'FORANEA' ? 'Asignando...' : 'Iniciando...'

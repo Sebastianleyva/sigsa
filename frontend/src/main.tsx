@@ -31,6 +31,7 @@ import CrearComision from './screens/comisiones/crear_comision.tsx'
 import ComisionesPendientes from './screens/comisiones/comisiones_pendientes.tsx'
 import AsignarComision from './screens/comisiones/asignar_comision.tsx'
 import ComisionesEnCurso from './screens/comisiones/comisiones_en_curso.tsx'
+import ComisionesProgramadas from './screens/comisiones/comisiones_programadas.tsx'
 import SolicitudesViaticos from './screens/comisiones/solicitudes_viaticos.tsx'
 import CrearSolicitudViaticos from './screens/comisiones/crear_solicitud_viaticos.tsx'
 import VerSolicitudesViaticos from './screens/comisiones/ver_solicitudes_viaticos.tsx'
@@ -54,6 +55,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/comisiones/crear/:id_solicitud" element={<CrearComision />} />
         <Route path="/comisiones/pendientes" element={<ComisionesPendientes />} />
         <Route path="/comisiones/pendientes/:id_comision/asignar" element={<AsignarComision />} />
+        <Route path="/comisiones/programadas" element={<ComisionesProgramadas />} />
         <Route path="/comisiones/en-curso" element={<ComisionesEnCurso />} />
         <Route path="/comisiones/solicitudes-viaticos" element={<SolicitudesViaticos />} />
         <Route path="/comisiones/ver-solicitudes-viaticos" element={<VerSolicitudesViaticos />} />

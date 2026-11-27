@@ -65,9 +65,18 @@ export type ComisionPendiente = {
   fecha_comision: string | null
 }
 
+export type PersonalAsignable = PersonalComision & {
+  disponible: boolean
+  motivo: string | null
+}
+
 export type OpcionesAsignacionComision = {
-  comision: ComisionPendiente & { area_nombre: string }
-  personal: PersonalComision[]
+  comision: ComisionPendiente & {
+    area_nombre: string
+    fecha_inicio: string | null
+    fecha_final: string | null
+  }
+  personal: PersonalAsignable[]
 }
 
 export type ResultadoAsignacionComision =
@@ -89,6 +98,21 @@ export type ComisionEnCurso = ComisionPendiente & {
   area_nombre: string
   comisionados: PersonalComision[]
   puede_terminar: boolean
+}
+
+export type ComisionProgramada = ComisionPendiente & {
+  fecha_inicio: string
+  fecha_final: string
+  area_nombre: string
+  comisionados: PersonalComision[]
+  puede_iniciar: boolean
+}
+
+export type ResultadoInicioComision = {
+  id_comision: number
+  estado: 'EN CURSO'
+  fecha_inicio: string
+  ids_personal: number[]
 }
 
 export type PersonaPendienteSolicitudViaticos = {
@@ -162,7 +186,7 @@ export type ResultadoSolicitudViaticos = {
   id_solicitud_viaticos: number
   id_comision: number
   id_personal_comisionado: number
-  estado_comision: 'PENDIENTE DE SOLICITUDES_V' | 'EN CURSO'
+  estado_comision: 'PENDIENTE DE SOLICITUDES_V' | 'PROGRAMADA'
   personal_pendiente: number
   mensaje: string
 }
@@ -287,6 +311,8 @@ export async function consultarOpcionesAsignacionComision(
         ...persona,
         id_personal: Number(persona.id_personal),
         puesto: Number(persona.puesto),
+        disponible: persona.disponible === true,
+        motivo: persona.motivo ?? null,
       })),
     }
   } catch (error) {
@@ -344,6 +370,47 @@ export async function consultarComisionesEnCurso(): Promise<ComisionEnCurso[]> {
     }))
   } catch (error) {
     throw obtenerError(error, 'No fue posible consultar las comisiones en curso.')
+  }
+}
+
+export async function consultarComisionesProgramadas(): Promise<ComisionProgramada[]> {
+  try {
+    const response = await api.get<{ comisiones: ComisionProgramada[] }>(
+      'comisiones/routes/ver_comisiones_programadas.php',
+    )
+    if (!Array.isArray(response.data?.comisiones)) {
+      throw new Error('El servidor devolvió una respuesta inválida al consultar las comisiones programadas.')
+    }
+    return response.data.comisiones.map((comision) => ({
+      ...comision,
+      id_comision: Number(comision.id_comision),
+      id_solicitud: Number(comision.id_solicitud),
+      id_area: Number(comision.id_area),
+      puede_iniciar: comision.puede_iniciar === true,
+      comisionados: (comision.comisionados ?? []).map((persona) => ({
+        ...persona,
+        id_personal: Number(persona.id_personal),
+        puesto: Number(persona.puesto),
+      })),
+    }))
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible consultar las comisiones programadas.')
+  }
+}
+
+export async function iniciarComision(id_comision: number): Promise<ResultadoInicioComision> {
+  try {
+    const response = await api.post<{ comision: ResultadoInicioComision }>(
+      'comisiones/routes/iniciar_comision.php',
+      { id_comision },
+    )
+    const resultado = response.data?.comision
+    if (!resultado || resultado.estado !== 'EN CURSO' || typeof resultado.fecha_inicio !== 'string') {
+      throw new Error('El servidor devolvió una respuesta inválida al iniciar la comisión.')
+    }
+    return { ...resultado, id_comision: Number(resultado.id_comision) }
+  } catch (error) {
+    throw obtenerError(error, 'No fue posible iniciar la comisión.')
   }
 }
 
@@ -498,7 +565,7 @@ export async function crearSolicitudViaticos(
       || idComision < 1
       || !Number.isInteger(idPersonal)
       || idPersonal < 1
-      || !['PENDIENTE DE SOLICITUDES_V', 'EN CURSO'].includes(solicitud.estado_comision)
+      || !['PENDIENTE DE SOLICITUDES_V', 'PROGRAMADA'].includes(solicitud.estado_comision)
       || !Number.isInteger(personalPendiente)
       || personalPendiente < 0
       || typeof response.data.mensaje !== 'string'

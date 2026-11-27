@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/disponibilidad_comision.php';
+
 function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
     $id_comision = filter_var($input['id_comision'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
     if ($id_comision === false) {
@@ -29,7 +31,8 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
     $pdo->beginTransaction();
     try {
         $consulta_comision = $pdo->prepare(
-            'SELECT c.id_area, c.estado, c.tipo_comision, a.id_subdireccion
+            'SELECT c.id_comision, c.id_area, c.estado, c.tipo_comision, c.fecha_inicio, c.fecha_final,
+                    a.id_subdireccion
              FROM comisiones c
              INNER JOIN areas a ON a.id_area = c.id_area
              WHERE c.id_comision = :id_comision
@@ -56,7 +59,7 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
             $parametros_personal[$placeholder] = $id_personal;
         }
         $consulta_personal = $pdo->prepare(
-            "SELECT id_personal, comisionado
+            "SELECT id_personal
              FROM personal
              WHERE area = :area AND activo = '1' AND puesto IN (3, 4)
                AND id_personal IN (" . implode(', ', $placeholders) . ')
@@ -75,20 +78,14 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
         );
         $consulta_asignados->execute(['id_comision' => $id_comision]);
         $ids_existentes = array_map('intval', $consulta_asignados->fetchAll(PDO::FETCH_COLUMN));
-        $ids_existentes_lookup = array_fill_keys($ids_existentes, true);
-        foreach ($personal_valido as $persona) {
-            $id_personal = (int) $persona['id_personal'];
-            if ((int) $persona['comisionado'] === 1 && !isset($ids_existentes_lookup[$id_personal])) {
-                throw new InvalidArgumentException('Una o más personas seleccionadas ya participan en otra comisión');
-            }
-        }
-
         $ids_nuevos = array_values(array_diff($ids_personal, $ids_existentes));
-        $marcar_comisionado = $pdo->prepare(
-            'UPDATE personal SET comisionado = 1 WHERE id_personal = :id_personal'
-        );
-        foreach ($ids_personal as $id_personal) {
-            $marcar_comisionado->execute(['id_personal' => $id_personal]);
+
+        // Nadie puede estar en una comisión en curso ni en otra foránea con fechas traslapadas
+        $conflictos = consultar_conflictos_comision($pdo, $ids_nuevos, $comision);
+        if (count($conflictos) > 0) {
+            throw new InvalidArgumentException(
+                'Una o más personas seleccionadas no están disponibles en las fechas de esta comisión'
+            );
         }
 
         $insertar_personal = $pdo->prepare(
@@ -124,6 +121,7 @@ function asignar_comision($pdo, $input, int $puesto, ?int $area): array {
         if ($actualizar_comision->rowCount() !== 1) {
             throw new InvalidArgumentException('La comisión ya fue asignada');
         }
+        sincronizar_bandera_comisionado($pdo, $id_comision);
 
         $consulta_fecha = $pdo->prepare(
             'SELECT fecha_inicio FROM comisiones WHERE id_comision = :id_comision'

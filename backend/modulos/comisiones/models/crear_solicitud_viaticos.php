@@ -285,17 +285,17 @@ function crear_solicitud_viaticos($pdo, array $input, int $id_personal_registra)
         if ($personal_pendiente === 0) {
             $actualizar_comision = $pdo->prepare(
                 "UPDATE comisiones
-                 SET estado = 'EN CURSO'
+                 SET estado = 'PROGRAMADA'
                  WHERE id_comision = :id_comision
                    AND estado = 'PENDIENTE DE SOLICITUDES_V'"
             );
             $actualizar_comision->execute(['id_comision' => $id_comision]);
             if ($actualizar_comision->rowCount() !== 1) {
                 throw new SolicitudViaticosConflictException(
-                    'No fue posible iniciar la comisión después de completar las solicitudes',
+                    'No fue posible programar la comisión después de completar las solicitudes',
                 );
             }
-            $estado_resultante = 'EN CURSO';
+            $estado_resultante = 'PROGRAMADA';
         }
 
         $pdo->commit();

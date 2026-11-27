@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/disponibilidad_comision.php';
+
 const INFORME_COMISION_CAMPOS = [
     'objetivo_comision',
     'actividad_desarrollada',
@@ -130,16 +132,8 @@ function crear_informe_comision($pdo, array $input, int $id_personal): array {
                 throw new RuntimeException('No fue posible finalizar la comisión');
             }
 
-            $liberar_personal = $pdo->prepare(
-                'UPDATE personal
-                 SET comisionado = 0
-                 WHERE id_personal IN (
-                     SELECT id_personal
-                     FROM personal_comisionado
-                     WHERE id_comision = :id_comision
-                 )'
-            );
-            $liberar_personal->execute(['id_comision' => $id_comision]);
+            // Solo se libera a quien ya no participe en otra comisión en curso
+            sincronizar_bandera_comisionado($pdo, (int) $id_comision);
         }
 
         $pdo->commit();

@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/disponibilidad_comision.php';
+
 function ver_personal_comision($pdo, int $id_comision, int $puesto, ?int $area): array {
     if (!in_array($puesto, [2, 3], true) || $area === null) {
         throw new InvalidArgumentException('No tienes permisos para consultar esta comisión');
@@ -16,7 +18,8 @@ function ver_personal_comision($pdo, int $id_comision, int $puesto, ?int $area):
 
     $consulta_comision = $pdo->prepare(
         "SELECT c.id_comision, c.id_solicitud, c.fecha, c.tipo_comision,
-                c.tipo_destino, c.id_area, c.estado, s.ubicacion AS lugar,
+                c.tipo_destino, c.id_area, c.estado, c.fecha_inicio, c.fecha_final,
+                s.ubicacion AS lugar,
                 s.institucion_solicita, s.nombre_solicita, s.falla_reportada,
                 s.num_contacto, s.fecha_comision, a.nombre AS area_nombre
          FROM comisiones c
@@ -36,13 +39,26 @@ function ver_personal_comision($pdo, int $id_comision, int $puesto, ?int $area):
         "SELECT id_personal, nombre, apellido_p, apellido_m, puesto
          FROM personal
          WHERE area = :area AND activo = '1' AND puesto IN (3, 4)
-           AND COALESCE(comisionado, 0) = 0
          ORDER BY puesto, apellido_p, apellido_m, nombre"
     );
     $consulta_personal->execute(['area' => (int) $comision['id_area']]);
+    $personal = $consulta_personal->fetchAll(PDO::FETCH_ASSOC);
+
+    // Se devuelve todo el personal; quien tenga traslape aparece como no disponible con su motivo
+    $conflictos = consultar_conflictos_comision(
+        $pdo,
+        array_map('intval', array_column($personal, 'id_personal')),
+        $comision,
+    );
+    foreach ($personal as &$persona) {
+        $motivo = $conflictos[(int) $persona['id_personal']] ?? null;
+        $persona['disponible'] = $motivo === null;
+        $persona['motivo'] = $motivo;
+    }
+    unset($persona);
 
     return [
         'comision' => $comision,
-        'personal' => $consulta_personal->fetchAll(PDO::FETCH_ASSOC),
+        'personal' => $personal,
     ];
 }

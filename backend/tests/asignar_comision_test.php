@@ -5,10 +5,13 @@ require_once __DIR__ . '/../modulos/comisiones/models/asignar_comision.php';
 final class AsignacionPdoFalso {
     public array $comision;
     public array $personalComisionado = [];
+    public array $conflictos = [];
+    public bool $banderaSincronizada = false;
     public bool $transaccionActiva = false;
 
     public function __construct(string $tipoComision, string $estado = 'PENDIENTE') {
         $this->comision = [
+            'id_comision' => 1,
             'id_area' => 10,
             'estado' => $estado,
             'tipo_comision' => $tipoComision,
@@ -42,14 +45,18 @@ final class AsignacionPdoFalso {
     }
 
     public function ejecutar(string $sql, array $parametros): array {
-        if (str_contains($sql, 'SELECT c.id_area')) {
+        if (str_contains($sql, 'a.id_subdireccion')) {
             return ['filas' => [$this->comision], 'afectadas' => 0];
         }
-        if (str_contains($sql, 'SELECT id_personal, comisionado')) {
-            return [
-                'filas' => [['id_personal' => 31, 'comisionado' => 0]],
-                'afectadas' => 0,
-            ];
+        if (str_contains($sql, 'INNER JOIN comisiones o')) {
+            return ['filas' => $this->conflictos, 'afectadas' => 0];
+        }
+        if (str_contains($sql, 'WHERE area = :area')) {
+            return ['filas' => [['id_personal' => 31]], 'afectadas' => 0];
+        }
+        if (str_contains($sql, 'UPDATE personal p')) {
+            $this->banderaSincronizada = true;
+            return ['filas' => [], 'afectadas' => 1];
         }
         if (str_contains($sql, 'SELECT id_personal FROM personal_comisionado')) {
             return [
@@ -138,6 +145,7 @@ $resultadoUrbana = asignar_comision($urbana, [
 comprobar($resultadoUrbana['estado'] === 'EN CURSO', 'La comisión urbana debe iniciar.');
 comprobar($resultadoUrbana['fecha_inicio'] === date('Y-m-d'), 'La comisión urbana debe registrar fecha de inicio.');
 comprobar($urbana->personalComisionado === [31], 'Debe asignarse el personal de la comisión urbana.');
+comprobar($urbana->banderaSincronizada, 'Debe recalcularse la bandera comisionado tras asignar.');
 
 $foranea = new AsignacionPdoFalso('FORANEA');
 $resultadoForanea = asignar_comision($foranea, [
@@ -169,6 +177,22 @@ try {
 } catch (InvalidArgumentException $error) {
     comprobar(!$noPendiente->transaccionActiva, 'El rechazo debe revertir la transacción.');
     comprobar($noPendiente->personalComisionado === [], 'El rechazo no debe asignar personal.');
+}
+
+$traslape = new AsignacionPdoFalso('FORANEA');
+$traslape->conflictos = [[
+    'id_personal' => 31, 'id_comision' => 2, 'estado' => 'PROGRAMADA',
+    'fecha_inicio' => '2026-12-02', 'fecha_final' => '2026-12-04',
+]];
+try {
+    asignar_comision($traslape, [
+        'id_comision' => 1,
+        'ids_personal' => [31],
+    ], 3, 10);
+    throw new RuntimeException('No debe asignarse personal con fechas traslapadas.');
+} catch (InvalidArgumentException $error) {
+    comprobar(!$traslape->transaccionActiva, 'El traslape debe revertir la transacción.');
+    comprobar($traslape->personalComisionado === [], 'El traslape no debe asignar personal.');
 }
 
 echo "Pruebas de asignación de comisiones correctas.\n";

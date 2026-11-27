@@ -599,6 +599,36 @@
   outline-offset: 2px;
 }
 
+.comisiones-operacion-personal-list label.no-disponible {
+  background: #f3f5f4;
+  color: var(--comisiones-op-muted);
+  cursor: not-allowed;
+}
+
+.comisiones-operacion-personal-list label.no-disponible:hover {
+  background: #f3f5f4;
+}
+
+.comisiones-operacion-personal-motivo {
+  display: block;
+  margin-top: 2px;
+  color: var(--comisiones-op-muted);
+  font-size: 11px;
+}
+
+.comisiones-operacion-card > button:disabled {
+  background: #c9d3ce;
+  color: #5d6b66;
+  cursor: not-allowed;
+}
+
+.comisiones-operacion-card-hint {
+  align-self: end;
+  margin: 0;
+  color: var(--comisiones-op-muted);
+  font-size: 11px;
+}
+
 .comisiones-operacion-hint {
   margin: 7px 0 0;
   color: var(--comisiones-op-muted);

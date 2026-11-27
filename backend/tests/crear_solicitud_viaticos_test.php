@@ -103,7 +103,7 @@ final class SolicitudViaticosPdoFalso {
             return ['filas' => [['1' => 1]], 'afectadas' => 0];
         }
         if (str_contains($sql, 'UPDATE comisiones')) {
-            $this->estado = 'EN CURSO';
+            $this->estado = 'PROGRAMADA';
             return ['filas' => [], 'afectadas' => 1];
         }
         throw new RuntimeException("Consulta inesperada en prueba: {$sql}");
@@ -223,8 +223,8 @@ $entrada['renglones'][0]['num_dias'] = 0.5;
 $entrada['renglones'][0]['importe'] = 425;
 $ultima = crear_solicitud_viaticos($pdo, $entrada, 10);
 comprobar_solicitud_viaticos(
-    $ultima['estado_comision'] === 'EN CURSO' && $ultima['personal_pendiente'] === 0,
-    'La comisión debe iniciar cuando todas las personas tengan solicitud.',
+    $ultima['estado_comision'] === 'PROGRAMADA' && $ultima['personal_pendiente'] === 0,
+    'La comisión debe quedar programada cuando todas las personas tengan solicitud.',
 );
 comprobar_solicitud_viaticos(
     $pdo->fecha_inicio === '2026-12-01' && $pdo->fecha_final === '2026-12-03',

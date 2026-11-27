@@ -33,8 +33,8 @@ try {
     $solicitud = crear_solicitud_viaticos($pdo, $input, $id_personal);
     http_response_code(201);
     echo json_encode([
-        'mensaje' => $solicitud['estado_comision'] === 'EN CURSO'
-            ? 'Solicitud registrada. Todas las solicitudes de viáticos están completas y la comisión inició.'
+        'mensaje' => $solicitud['estado_comision'] === 'PROGRAMADA'
+            ? 'Solicitud registrada. Todas las solicitudes de viáticos están completas y la comisión quedó programada.'
             : 'Solicitud de viáticos registrada correctamente.',
         'solicitud' => $solicitud,
     ]);

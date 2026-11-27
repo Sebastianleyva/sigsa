@@ -33,6 +33,15 @@ const opciones = [
   {
     index: '04',
     division: 'foraneas',
+    category: 'PROGRAMACIÓN',
+    title: 'Comisiones programadas',
+    description: 'Inicia las comisiones foráneas con viáticos completos al llegar su fecha de inicio.',
+    action: 'Ver programadas',
+    path: '/comisiones/programadas',
+  },
+  {
+    index: '05',
+    division: 'foraneas',
     category: 'SEGUIMIENTO',
     title: 'Comisiones en curso',
     description: 'Consulta el lugar, la fecha de inicio y el personal comisionado.',
@@ -40,7 +49,7 @@ const opciones = [
     path: '/comisiones/en-curso',
   },
   {
-    index: '05',
+    index: '06',
     division: 'foraneas',
     category: 'INFORMES',
     title: 'Informe de comisión',
@@ -49,7 +58,7 @@ const opciones = [
     path: '/comisiones/informes',
   },
   {
-    index: '06',
+    index: '07',
     division: 'viaticos',
     category: 'VIÁTICOS',
     title: 'Solicitudes de viáticos',
@@ -58,7 +67,7 @@ const opciones = [
     path: '/comisiones/solicitudes-viaticos',
   },
   {
-    index: '07',
+    index: '08',
     division: 'viaticos',
     category: 'CONSULTA · VIÁTICOS',
     title: 'Ver solicitudes de viáticos',
@@ -67,7 +76,7 @@ const opciones = [
     path: '/comisiones/ver-solicitudes-viaticos',
   },
   {
-    index: '08',
+    index: '09',
     division: 'viaticos',
     category: 'CONSULTA · INFORMES',
     title: 'Ver informes de comisión',
