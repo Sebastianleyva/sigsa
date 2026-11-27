@@ -10,7 +10,8 @@ function ver_comisiones_participante($pdo, int $id_personal): array {
          FROM comisiones c
          INNER JOIN areas a ON a.id_area = c.id_area
          INNER JOIN solicitudes s ON s.id_solicitud = c.id_solicitud
-         WHERE EXISTS (
+         WHERE c.estado <> 'FINALIZADA'
+           AND EXISTS (
              SELECT 1 FROM personal_comisionado pc
              WHERE pc.id_comision = c.id_comision AND pc.id_personal = :id_personal
          )
