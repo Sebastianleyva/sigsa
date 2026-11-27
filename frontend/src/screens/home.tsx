@@ -37,6 +37,10 @@ export default function HomeScreen() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
   const esJefe = [1, 2, 3].includes(usuario?.puesto ?? 0)
+  const primerNombre = usuario?.nombre?.trim().split(/\s+/)[0] ?? ''
+  const nombreCorto = [primerNombre, usuario?.apellido_p?.trim() ?? '']
+    .filter(Boolean)
+    .join(' ')
   return (
     <main className="home-page">
       <header className="home-topbar">
@@ -53,7 +57,11 @@ export default function HomeScreen() {
       <section className="home-content" id="inicio">
         <div className="home-heading">
           <span className="home-eyebrow">PANEL PRINCIPAL · SIGSA</span>
-          <h1>Bienvenido a SIGSA</h1>
+          <h1>
+            {nombreCorto
+              ? `${nombreCorto}, te damos la bienvenida a SIGSA`
+              : 'Te damos la bienvenida a SIGSA'}
+          </h1>
           <p>Un espacio para organizar y dar seguimiento a la gestión del equipo.</p>
         </div>
 

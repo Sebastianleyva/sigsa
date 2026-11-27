@@ -86,6 +86,8 @@ function login($pdo, $input) {
             "id_personal" => $_SESSION['id_personal'],
             "id_jefe"     => $_SESSION['id_jefe'],
             "nombre"      => $_SESSION['nombre'],
+            "apellido_p"  => $usuario['apellido_p'],
+            "apellido_m"  => $usuario['apellido_m'],
             "correo"      => $_SESSION['correo'],
             "area"        => $_SESSION['area'],
             "area_nombre" => $_SESSION['area_nombre'],
