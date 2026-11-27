@@ -62,7 +62,13 @@ export default function SalidasHome() {
   const navigate = useNavigate();
   const usuario = authService.getUsuarioActual()
 
-  const puedeVerFuncionesAdministrativas = [1, 2, 3].includes(usuario?.puesto ?? 0);
+  const esMando = [1, 2, 3].includes(Number(usuario?.puesto ?? 0));
+  const esArea6 = Number(usuario?.area ?? 0) === 6;
+  // El área 6 solo tiene acceso al historial general, no a autorizar ni dar seguimiento.
+  const opcionesAdministrativasVisibles = opcionesAdministrativas.filter((opcion) => (
+    esMando || (esArea6 && opcion.path === '/salidas/historial-general')
+  ));
+  const puedeVerFuncionesAdministrativas = opcionesAdministrativasVisibles.length > 0;
 
   const renderOpciones = (opciones: OpcionSalida[]) => opciones.map((opcion) => (
     <button
@@ -126,7 +132,7 @@ export default function SalidasHome() {
               </div>
             </div>
             <div className="salidas-home-grid salidas-home-admin-grid">
-              {renderOpciones(opcionesAdministrativas)}
+              {renderOpciones(opcionesAdministrativasVisibles)}
             </div>
           </section>
         )}

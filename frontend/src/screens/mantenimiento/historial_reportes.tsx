@@ -103,6 +103,7 @@ export default function HistorialReportesMantenimiento() {
   const navigate = useNavigate()
   const usuario = authService.getUsuarioActual()
   const autorizado = [1, 2, 3].includes(Number(usuario?.puesto))
+    || Number(usuario?.area) === 6
   const hoy = new Date()
   const inicioDelAno = new Date(hoy.getFullYear(), 0, 1)
   const [reportes, setReportes] = useState<ReporteHistorial[]>([])

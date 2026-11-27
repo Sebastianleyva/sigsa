@@ -99,11 +99,16 @@ export default function MantenimientoHome() {
     const puedeGestionar = puedeGestionarMantenimiento(usuario)
     const esPersonalAdministrativo = [1, 2, 3].includes(Number(usuario?.puesto))
     const puedeVerFuncionesAdministrativas = esPersonalAdministrativo || puedeGestionar
-    const opcionesVisibles = opcionesAdministrativas.filter((opcion) => (
-      ['/mantenimiento/servicios', '/mantenimiento/requisiciones', '/mantenimiento/codigos-contables'].includes(opcion.path)
-        ? puedeGestionar
-        : esPersonalAdministrativo
-    ))
+    const esArea6 = Number(usuario?.area) === 6
+    const opcionesVisibles = opcionesAdministrativas.filter((opcion) => {
+      if (['/mantenimiento/servicios', '/mantenimiento/requisiciones', '/mantenimiento/codigos-contables'].includes(opcion.path)) {
+        return puedeGestionar
+      }
+      if (opcion.path === '/mantenimiento/reportes/historial') {
+        return esPersonalAdministrativo || esArea6
+      }
+      return esPersonalAdministrativo
+    })
 
     const renderOpciones = (opciones: OpcionMantenimiento[]) => opciones.map((opcion) => (
       <button

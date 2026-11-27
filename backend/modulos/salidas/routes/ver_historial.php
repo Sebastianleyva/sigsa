@@ -9,13 +9,24 @@ switch($_SERVER['REQUEST_METHOD']){
     case 'GET':
         validar_jwt_requerido();
         validar_csrf_requerido();
-        requerir_rol([1, 2, 3]);
+        requerir_acceso_historial_general();
         ver_historial($pdo);
         break;
     case 'DEFAULT':
         http_response_code(405);
         echo json_encode(["ERROR"=>"Metodo no permitido"]);
         break;
+}
+
+// Director, subdirectores y jefes de departamento, además de todo el personal del área 6.
+function requerir_acceso_historial_general(): void {
+    $puesto = (int) ($_SESSION['puesto'] ?? 0);
+    $area = (int) ($_SESSION['area'] ?? 0);
+    if (!in_array($puesto, [1, 2, 3], true) && $area !== 6) {
+        http_response_code(403);
+        echo json_encode(['error' => 'No tienes permisos para realizar esta acción']);
+        exit;
+    }
 }
 
 function ver_historial($pdo){
